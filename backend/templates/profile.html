@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Garment Detect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="h3 mb-4"><i class="fas fa-id-card"></i> Operator Profile</h1>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Operator ID:</strong> {{ user.operator_id }}</p>
+                    <p><strong>Operator Name:</strong> {{ user.operator_name }}</p>
+                    <p><strong>NIC:</strong> {{ user.nic }}</p>
+                    <p><strong>Email:</strong> {{ user.email if user.email else 'Not provided' }}</p>
+                    <p><strong>Member Since:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

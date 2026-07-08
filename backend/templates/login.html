@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Garment Detect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="fas fa-tshirt"></i> Garment Defect Detection</h4>
+                    <small>Operator Login</small>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label class="form-label">Operator ID</label>
+                            {{ form.operator_id(class="form-control", placeholder="Enter Operator ID") }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">PIN</label>
+                            {{ form.pin(class="form-control", placeholder="Enter PIN") }}
+                        </div>
+                        <div class="mb-3 form-check">
+                            {{ form.remember(class="form-check-input") }}
+                            <label class="form-check-label">Remember Me</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('forgot_password') }}">Forgot PIN?</a>
+                    </div>
+                    <hr>
+                    <div class="text-center">
+                        <p>New Operator? <a href="{{ url_for('register') }}">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

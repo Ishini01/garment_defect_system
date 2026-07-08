@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}New Inspection - Garment Detect{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4"><i class="fas fa-camera"></i> New Inspection</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-video"></i> Camera Feed
+                </div>
+                <div class="card-body text-center">
+                    <video id="videoFeed" autoplay playsinline style="width:100%; max-height:400px; background:#000; border-radius:8px;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <img id="capturedImage" style="display:none; width:100%; max-height:400px; border-radius:8px;">
+                    <div class="mt-3">
+                        <button class="btn btn-success" onclick="startCamera()"><i class="fas fa-play"></i> Start Camera</button>
+                        <button class="btn btn-danger" onclick="stopCamera()"><i class="fas fa-stop"></i> Stop Camera</button>
+                        <button class="btn btn-primary" onclick="captureImage()"><i class="fas fa-camera"></i> Capture</button>
+                        <button class="btn btn-warning" onclick="resetInspection()"><i class="fas fa-redo"></i> Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-upload"></i> Upload Image
+                </div>
+                <div class="card-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="file" class="form-control" id="imageFile" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-info w-100">
+                            <i class="fas fa-upload"></i> Upload & Detect
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow mt-3" id="resultsCard" style="display:none;">
+                <div class="card-header" id="resultsHeader">Results</div>
+                <div class="card-body" id="resultsBody"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let stream = null;
+const video = document.getElementById('videoFeed');
+const canvas = document.getElementById('canvas');
+const capturedImg = document.getElementById('capturedImage');
+
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(s => {
+            stream = s;
+            video.srcObject = stream;
+            video.style.display = 'block';
+            capturedImg.style.display = 'none';
+        })
+        .catch(err => alert('Camera error: ' + err.message));
+}
+
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+        video.srcObject = null;
+    }
+}
+
+function captureImage() {
+    if (!stream) {
+        alert('Start camera first!');
+        return;
+    }
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    capturedImg.src = canvas.toDataURL('image/jpeg');
+    capturedImg.style.display = 'block';
+    video.style.display = 'none';
+}
+
+function resetInspection() {
+    capturedImg.style.display = 'none';
+    video.style.display = 'block';
+    document.getElementById('resultsCard').style.display = 'none';
+    document.getElementById('imageFile').value = '';
+}
+
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const fileInput = document.getElementById('imageFile');
+    if (!fileInput.files[0]) {
+        alert('Please select an image');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', fileInput.files[0]);
+
+    document.getElementById('resultsCard').style.display = 'block';
+    document.getElementById('resultsBody').innerHTML = 
+        '<div class="text-center"><div class="spinner-border text-primary"></div><p>Analyzing...</p></div>';
+
+    fetch('/api/detect', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const isPass = data.overall_status === 'PASS';
+        document.getElementById('resultsHeader').className = 
+            `card-header ${isPass ? 'bg-success' : 'bg-danger'}`;
+        document.getElementById('resultsBody').innerHTML = `
+            <h3 class="${isPass ? 'text-success' : 'text-danger'}">${data.overall_status}</h3>
+            <p><strong>Buttons Found:</strong> ${data.button_count} / ${data.expected}</p>
+            <p><strong>Alignment:</strong> ${(data.alignment_score || 0).toFixed(1)}%</p>
+            ${data.has_defect ? 
+                '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Defect Found!</div>' : 
+                '<div class="alert alert-success"><i class="fas fa-check-circle"></i> No defects detected</div>'}
+            ${data.defects ? data.defects.map(d => 
+                `<div class="alert alert-warning"><i class="fas fa-bug"></i> ${d}</div>`
+            ).join('') : ''}
+        `;
+    })
+    .catch(error => {
+        document.getElementById('resultsBody').innerHTML = 
+            `<div class="alert alert-danger">Error: ${error.message}</div>`;
+    });
+});
+
+window.onload = startCamera;
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Garment Detect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="h3 mb-4"><i class="fas fa-file-alt"></i> Reports</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-calendar-alt"></i> Generate Report
+                </div>
+                <div class="card-body">
+                    <form id="reportForm">
+                        <div class="mb-3">
+                            <label class="form-label">Report Period</label>
+                            <select class="form-select" id="period" name="period">
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="annual">Annual</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-file-export"></i> Generate Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-chart-bar"></i> Defect Statistics
+                </div>
+                <div class="card-body" id="defectStats">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary"></div>
+                        <p>Loading stats...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('reportForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('/api/generate-report', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Report generated successfully!');
+            window.location.href = data.download_url;
+        } else {
+            alert('❌ ' + data.error);
+        }
+    })
+    .catch(error => alert('Error: ' + error.message));
+});
+
+function loadDefectStats() {
+    fetch('/api/defect-stats')
+        .then(response => response.json())
+        .then(data => {
+            let html = `<h5>Total Defects: <span class="text-danger">${data.total_defects}</span></h5>`;
+            if (data.defect_breakdown && data.defect_breakdown.length > 0) {
+                html += '<div class="row">';
+                data.defect_breakdown.forEach(item => {
+                    html += `
+                        <div class="col-6 mb-2">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">${item.type.replace('_', ' ').title()}</small>
+                                <h5>${item.count}</h5>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else {
+                html += '<p class="text-muted">No defects recorded yet.</p>';
+            }
+            document.getElementById('defectStats').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('defectStats').innerHTML = 
+                `<div class="alert alert-danger">Error loading stats: ${error.message}</div>`;
+        });
+}
+
+window.onload = loadDefectStats;
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Garment Detect{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">
+                <i class="fas fa-chart-line"></i> Dashboard
+                <small class="text-muted">Welcome, {{ current_user.operator_name }}!</small>
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-primary h-100">
+                <div class="card-body">
+                    <div class="text-primary text-uppercase mb-1">Total Inspections</div>
+                    <div class="h2">{{ total }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-success h-100">
+                <div class="card-body">
+                    <div class="text-success text-uppercase mb-1">Pass Rate</div>
+                    <div class="h2">{{ "%.1f"|format(pass_rate) }}%</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-danger h-100">
+                <div class="card-body">
+                    <div class="text-danger text-uppercase mb-1">Failed</div>
+                    <div class="h2">{{ fail_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-camera"></i> Quick Actions
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('inspect') }}" class="btn btn-primary btn-lg w-100 mb-2">
+                        <i class="fas fa-camera"></i> New Inspection
+                    </a>
+                    <a href="{{ url_for('history') }}" class="btn btn-info btn-lg w-100 mb-2">
+                        <i class="fas fa-history"></i> View History
+                    </a>
+                    <a href="{{ url_for('reports') }}" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-file-alt"></i> Generate Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-info-circle"></i> Operator Details
+                </div>
+                <div class="card-body">
+                    <p><i class="fas fa-id-badge"></i> <strong>Operator ID:</strong> {{ current_user.operator_id }}</p>
+                    <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ current_user.operator_name }}</p>
+                    <p><i class="fas fa-credit-card"></i> <strong>NIC:</strong> {{ current_user.nic }}</p>
+                    <p><i class="fas fa-calendar"></i> <strong>Today:</strong> {{ now.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
