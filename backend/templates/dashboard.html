@@ -2,73 +2,473 @@
 
 {% block title %}Dashboard - Garment Detect{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ============================================
+       DASHBOARD PAGE SPECIFIC STYLES
+       ============================================ */
+    
+    .dashboard-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+
+    .page-title small {
+        font-weight: 400;
+        font-size: 1rem;
+        color: #6c757d;
+        display: block;
+        margin-top: 4px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 10px;
+    }
+
+    /* ============================================
+       STATISTICS CARDS
+       ============================================ */
+    
+    .stat-card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .stat-card .card-body {
+        padding: 22px 24px;
+    }
+
+    .stat-card .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: white;
+        margin-bottom: 12px;
+    }
+
+    .stat-card .stat-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 4px 0 0;
+        line-height: 1.2;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    .stat-card .stat-trend {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #2e7d32;
+    }
+
+    /* Individual Stat Card Colors */
+    .stat-primary .stat-icon {
+        background: linear-gradient(135deg, #1a237e, #283593);
+    }
+    .stat-primary .stat-number {
+        color: #1a237e;
+    }
+
+    .stat-success .stat-icon {
+        background: linear-gradient(135deg, #2e7d32, #43a047);
+    }
+    .stat-success .stat-number {
+        color: #2e7d32;
+    }
+
+    .stat-danger .stat-icon {
+        background: linear-gradient(135deg, #c62828, #e53935);
+    }
+    .stat-danger .stat-number {
+        color: #c62828;
+    }
+
+    .stat-warning .stat-icon {
+        background: linear-gradient(135deg, #e65100, #f57c00);
+    }
+    .stat-warning .stat-number {
+        color: #e65100;
+    }
+
+    /* ============================================
+       QUICK ACTIONS CARD
+       ============================================ */
+    
+    .quick-actions-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .quick-actions-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .quick-actions-card .card-header {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .quick-actions-card .card-header i {
+        margin-right: 10px;
+    }
+    .quick-actions-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .quick-actions-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .action-btn {
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        width: 100%;
+        margin-bottom: 10px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .action-btn i {
+        font-size: 18px;
+    }
+
+    .action-btn-primary {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+    }
+
+    .action-btn-primary:hover {
+        background: linear-gradient(135deg, #0d1445, #1a237e);
+        color: white;
+    }
+
+    .action-btn-info {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+        color: white;
+    }
+
+    .action-btn-info:hover {
+        background: linear-gradient(135deg, #0a2a6a, #0d47a1);
+        color: white;
+    }
+
+    .action-btn-success {
+        background: linear-gradient(135deg, #2e7d32, #43a047);
+        color: white;
+    }
+
+    .action-btn-success:hover {
+        background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        color: white;
+    }
+
+    /* ============================================
+       OPERATOR DETAILS CARD
+       ============================================ */
+    
+    .operator-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .operator-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .operator-card .card-header {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .operator-card .card-header i {
+        margin-right: 10px;
+    }
+    .operator-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .operator-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .operator-detail {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .operator-detail:last-child {
+        border-bottom: none;
+    }
+
+    .operator-detail i {
+        width: 28px;
+        color: #1a237e;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .operator-detail strong {
+        color: #333;
+        min-width: 100px;
+    }
+
+    .operator-detail span {
+        color: #555;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.8rem;
+        }
+
+        .stat-card .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .action-btn {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .operator-detail {
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .operator-detail strong {
+            min-width: 80px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .dashboard-container {
+            padding: 10px 0;
+        }
+
+        .stat-card .card-body {
+            padding: 16px 18px;
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .quick-actions-card {
+        animation: fadeInUp 0.5s ease-out 0.3s both;
+    }
+
+    .operator-card {
+        animation: fadeInUp 0.5s ease-out 0.4s both;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
+<div class="dashboard-container">
+    <!-- Page Title -->
     <div class="row">
         <div class="col-12">
-            <h1 class="h3 mb-4">
+            <h1 class="page-title">
                 <i class="fas fa-chart-line"></i> Dashboard
-                <small class="text-muted">Welcome, {{ current_user.operator_name }}!</small>
+                <small>Welcome back, <strong>{{ current_user.operator_name }}</strong>!</small>
             </h1>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card border-left-primary h-100">
+    <!-- Statistics Cards -->
+    <div class="row g-4 mt-2">
+        <div class="col-md-3 col-sm-6">
+            <div class="card stat-card stat-primary shadow-sm">
                 <div class="card-body">
-                    <div class="text-primary text-uppercase mb-1">Total Inspections</div>
-                    <div class="h2">{{ total }}</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="stat-number">{{ total }}</div>
+                    <div class="stat-label">Total Inspections</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card border-left-success h-100">
+        <div class="col-md-3 col-sm-6">
+            <div class="card stat-card stat-success shadow-sm">
                 <div class="card-body">
-                    <div class="text-success text-uppercase mb-1">Pass Rate</div>
-                    <div class="h2">{{ "%.1f"|format(pass_rate) }}%</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number">{{ "%.1f"|format(pass_rate) }}%</div>
+                    <div class="stat-label">Pass Rate</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card border-left-danger h-100">
+        <div class="col-md-3 col-sm-6">
+            <div class="card stat-card stat-danger shadow-sm">
                 <div class="card-body">
-                    <div class="text-danger text-uppercase mb-1">Failed</div>
-                    <div class="h2">{{ fail_count }}</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-number">{{ fail_count }}</div>
+                    <div class="stat-label">Failed Inspections</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card stat-card stat-warning shadow-sm">
+                <div class="card-body">
+                    <div class="stat-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <div class="stat-number">{{ pass_count }}</div>
+                    <div class="stat-label">Passed Inspections</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <i class="fas fa-camera"></i> Quick Actions
+    <!-- Quick Actions & Operator Details -->
+    <div class="row g-4 mt-2">
+        <div class="col-lg-6">
+            <div class="quick-actions-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-camera"></i> Quick Actions</h5>
                 </div>
                 <div class="card-body">
-                    <a href="{{ url_for('inspect') }}" class="btn btn-primary btn-lg w-100 mb-2">
+                    <a href="{{ url_for('inspect') }}" class="action-btn action-btn-primary">
                         <i class="fas fa-camera"></i> New Inspection
                     </a>
-                    <a href="{{ url_for('history') }}" class="btn btn-info btn-lg w-100 mb-2">
+                    <a href="{{ url_for('history') }}" class="action-btn action-btn-info">
                         <i class="fas fa-history"></i> View History
                     </a>
-                    <a href="{{ url_for('reports') }}" class="btn btn-success btn-lg w-100">
+                    <a href="{{ url_for('reports') }}" class="action-btn action-btn-success">
                         <i class="fas fa-file-alt"></i> Generate Report
                     </a>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <i class="fas fa-info-circle"></i> Operator Details
+        <div class="col-lg-6">
+            <div class="operator-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-circle"></i> Operator Details</h5>
                 </div>
                 <div class="card-body">
-                    <p><i class="fas fa-id-badge"></i> <strong>Operator ID:</strong> {{ current_user.operator_id }}</p>
-                    <p><i class="fas fa-user"></i> <strong>Name:</strong> {{ current_user.operator_name }}</p>
-                    <p><i class="fas fa-credit-card"></i> <strong>NIC:</strong> {{ current_user.nic }}</p>
-                    <p><i class="fas fa-calendar"></i> <strong>Today:</strong> {{ now.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <div class="operator-detail">
+                        <i class="fas fa-id-badge"></i>
+                        <strong>Operator ID:</strong>
+                        <span>{{ current_user.operator_id }}</span>
+                    </div>
+                    <div class="operator-detail">
+                        <i class="fas fa-user"></i>
+                        <strong>Name:</strong>
+                        <span>{{ current_user.operator_name }}</span>
+                    </div>
+                    <div class="operator-detail">
+                        <i class="fas fa-credit-card"></i>
+                        <strong>NIC:</strong>
+                        <span>{{ current_user.nic }}</span>
+                    </div>
+                    <div class="operator-detail">
+                        <i class="fas fa-calendar-alt"></i>
+                        <strong>Today:</strong>
+                        <span>{{ now.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
                 </div>
             </div>
         </div>

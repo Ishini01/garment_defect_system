@@ -2,34 +2,515 @@
 
 {% block title %}History - Garment Detect{% endblock %}
 
-{% block content %}
-<div class="container">
-    <h1 class="h3 mb-4"><i class="fas fa-history"></i> Inspection History</h1>
+{% block extra_css %}
+<style>
+    /* ============================================
+       HISTORY PAGE SPECIFIC STYLES
+       ============================================ */
     
-    <div class="card shadow">
+    .history-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 12px;
+    }
+
+    .page-title .badge-count {
+        font-size: 0.9rem;
+        background: #e8eaf6;
+        color: #1a237e;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-left: 12px;
+    }
+
+    /* ============================================
+       FILTER SECTION
+       ============================================ */
+    
+    .filter-section {
+        background: white;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .filter-section .filter-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+
+    .filter-section .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .filter-btn {
+        padding: 6px 18px;
+        border-radius: 20px;
+        border: 2px solid #e8ecf1;
+        background: transparent;
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .filter-btn:hover {
+        border-color: #1a237e;
+        color: #1a237e;
+    }
+
+    .filter-btn.active {
+        background: #1a237e;
+        border-color: #1a237e;
+        color: white;
+    }
+
+    .filter-btn i {
+        margin-right: 6px;
+    }
+
+    .filter-search {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .filter-search input {
+        border: 2px solid #e8ecf1;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        min-width: 200px;
+    }
+
+    .filter-search input:focus {
+        border-color: #1a237e;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
+    }
+
+    .filter-search input::placeholder {
+        color: #a0a8b5;
+    }
+
+    /* ============================================
+       TABLE CARD
+       ============================================ */
+    
+    .history-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .history-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .history-card .card-body {
+        padding: 0;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        padding: 0;
+    }
+
+    .table {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        font-weight: 600;
+        padding: 14px 20px;
+        border: none;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .table thead th i {
+        margin-right: 8px;
+        font-size: 0.8rem;
+    }
+
+    .table tbody td {
+        padding: 14px 20px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f2f5;
+        color: #333;
+    }
+
+    .table tbody tr {
+        transition: background 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background: #f8f9ff;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* ============================================
+       SESSION ID
+       ============================================ */
+    
+    .session-id {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #1a237e;
+        font-size: 0.9rem;
+        background: #e8eaf6;
+        padding: 4px 12px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    /* ============================================
+       BUTTONS COUNT
+       ============================================ */
+    
+    .buttons-count {
+        font-weight: 600;
+    }
+
+    .buttons-count .expected {
+        color: #6c757d;
+        font-weight: 400;
+    }
+
+    .buttons-count .found {
+        color: #1a237e;
+    }
+
+    /* ============================================
+       ALIGNMENT SCORE
+       ============================================ */
+    
+    .alignment-score {
+        font-weight: 600;
+    }
+
+    .alignment-score .score-bar {
+        display: inline-block;
+        width: 60px;
+        height: 6px;
+        border-radius: 3px;
+        background: #e8ecf1;
+        margin-left: 8px;
+        position: relative;
+        vertical-align: middle;
+        overflow: hidden;
+    }
+
+    .alignment-score .score-bar .bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+    }
+
+    .alignment-score .score-bar .bar-fill.high {
+        background: linear-gradient(90deg, #2e7d32, #43a047);
+    }
+
+    .alignment-score .score-bar .bar-fill.medium {
+        background: linear-gradient(90deg, #f57c00, #ffa726);
+    }
+
+    .alignment-score .score-bar .bar-fill.low {
+        background: linear-gradient(90deg, #c62828, #e53935);
+    }
+
+    /* ============================================
+       STATUS BADGE
+       ============================================ */
+    
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-badge i {
+        font-size: 0.7rem;
+    }
+
+    .status-badge.pass {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-badge.fail {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    /* ============================================
+       EMPTY STATE
+       ============================================ */
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 64px;
+        color: #c5cae9;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h5 {
+        color: #1a237e;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    .empty-state .btn-start {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 32px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .empty-state .btn-start:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.3);
+    }
+
+    .empty-state .btn-start i {
+        margin-right: 8px;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    
+    @media (max-width: 992px) {
+        .filter-search {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .filter-search input {
+            width: 100%;
+            min-width: unset;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .page-title .badge-count {
+            font-size: 0.75rem;
+            padding: 2px 10px;
+        }
+
+        .filter-section {
+            padding: 16px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-section .filter-buttons {
+            flex-wrap: wrap;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+        }
+
+        .session-id {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+        }
+
+        .alignment-score .score-bar {
+            width: 40px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .history-container {
+            padding: 10px 0;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 8px 10px;
+            font-size: 0.75rem;
+        }
+
+        .status-badge {
+            padding: 3px 10px;
+            font-size: 0.7rem;
+        }
+
+        .filter-btn {
+            padding: 4px 12px;
+            font-size: 0.75rem;
+        }
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .history-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .filter-section {
+        animation: fadeInUp 0.5s ease-out 0.1s both;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <!-- Page Title -->
+    <div class="row">
+        <div class="col-12">
+            <h1 class="page-title">
+                <i class="fas fa-history"></i> Inspection History
+                <span class="badge-count">{{ inspections|length }} Records</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <span class="filter-label"><i class="fas fa-filter"></i> Filter:</span>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-list"></i> All
+            </button>
+            <button class="filter-btn" data-filter="pass">
+                <i class="fas fa-check-circle"></i> Pass
+            </button>
+            <button class="filter-btn" data-filter="fail">
+                <i class="fas fa-times-circle"></i> Fail
+            </button>
+            <button class="filter-btn" data-filter="today">
+                <i class="fas fa-calendar-day"></i> Today
+            </button>
+            <button class="filter-btn" data-filter="week">
+                <i class="fas fa-calendar-week"></i> This Week
+            </button>
+        </div>
+        <div class="filter-search">
+            <i class="fas fa-search" style="color: #a0a8b5;"></i>
+            <input type="text" id="searchInput" placeholder="Search session ID...">
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="card history-card shadow-sm">
         <div class="card-body">
             {% if inspections %}
-            <div class="table-responsive">
-                <table class="table table-hover">
+            <div class="table-wrapper">
+                <table class="table" id="historyTable">
                     <thead>
                         <tr>
-                            <th>Session ID</th>
-                            <th>Date</th>
-                            <th>Buttons Found</th>
-                            <th>Alignment Score</th>
-                            <th>Result</th>
+                            <th><i class="fas fa-hashtag"></i> Session ID</th>
+                            <th><i class="fas fa-calendar-alt"></i> Date & Time</th>
+                            <th><i class="fas fa-circle"></i> Buttons Found</th>
+                            <th><i class="fas fa-arrows-alt-h"></i> Alignment Score</th>
+                            <th><i class="fas fa-flag-checkered"></i> Result</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for insp in inspections %}
                         <tr>
-                            <td>{{ insp.session_id }}</td>
-                            <td>{{ insp.date.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>{{ insp.button_count }}/{{ insp.expected_count }}</td>
-                            <td>{{ "%.1f"|format(insp.alignment_score or 0) }}%</td>
                             <td>
-                                <span class="badge {% if insp.result_summary == 'PASS' %}bg-success{% else %}bg-danger{% endif %}">
-                                    {{ insp.result_summary }}
+                                <span class="session-id">{{ insp.session_id }}</span>
+                            </td>
+                            <td>{{ insp.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <span class="buttons-count">
+                                    <span class="found">{{ insp.button_count }}</span>
+                                    <span class="expected">/ {{ insp.expected_count }}</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="alignment-score">
+                                    {{ "%.1f"|format(insp.alignment_score or 0) }}%
+                                    <span class="score-bar">
+                                        {% set score = insp.alignment_score or 0 %}
+                                        <span class="bar-fill {% if score >= 70 %}high{% elif score >= 40 %}medium{% else %}low{% endif %}" 
+                                              style="width: {{ score }}%;"></span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge {% if insp.result_summary == 'PASS' %}pass{% else %}fail{% endif %}">
+                                    {% if insp.result_summary == 'PASS' %}
+                                        <i class="fas fa-check-circle"></i> PASS
+                                    {% else %}
+                                        <i class="fas fa-times-circle"></i> FAIL
+                                    {% endif %}
                                 </span>
                             </td>
                         </tr>
@@ -38,9 +519,119 @@
                 </table>
             </div>
             {% else %}
-            <div class="alert alert-info">No inspections recorded yet.</div>
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h5>No Inspections Recorded Yet</h5>
+                <p>Start your first inspection by clicking the button below.</p>
+                <a href="{{ url_for('inspect') }}" class="btn-start">
+                    <i class="fas fa-camera"></i> Start New Inspection
+                </a>
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+    // ============================================
+    // FILTER FUNCTIONALITY
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('searchInput');
+        const rows = document.querySelectorAll('#historyTable tbody tr');
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active state
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                applyFilters(filter, searchInput.value);
+            });
+        });
+
+        // Search input
+        searchInput.addEventListener('input', function() {
+            const activeFilter = document.querySelector('.filter-btn.active');
+            const filter = activeFilter ? activeFilter.dataset.filter : 'all';
+            applyFilters(filter, this.value);
+        });
+
+        function applyFilters(filter, search) {
+            rows.forEach(row => {
+                let show = true;
+                
+                // Status filter
+                if (filter !== 'all') {
+                    const statusBadge = row.querySelector('.status-badge');
+                    if (statusBadge) {
+                        const status = statusBadge.textContent.trim().toLowerCase();
+                        if (filter === 'pass' && !status.includes('pass')) show = false;
+                        if (filter === 'fail' && !status.includes('fail')) show = false;
+                    }
+                }
+
+                // Date filters
+                if (filter === 'today' || filter === 'week') {
+                    const dateCell = row.querySelector('td:nth-child(2)');
+                    if (dateCell) {
+                        const rowDate = new Date(dateCell.textContent);
+                        const now = new Date();
+                        
+                        if (filter === 'today') {
+                            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                            const rowDay = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+                            if (rowDay < today) show = false;
+                        }
+                        
+                        if (filter === 'week') {
+                            const weekAgo = new Date(now);
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            if (rowDate < weekAgo) show = false;
+                        }
+                    }
+                }
+
+                // Search filter
+                if (search.trim() !== '') {
+                    const sessionId = row.querySelector('.session-id');
+                    if (sessionId) {
+                        if (!sessionId.textContent.toLowerCase().includes(search.toLowerCase())) {
+                            show = false;
+                        }
+                    }
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Update record count
+        function updateRecordCount() {
+            const visibleRows = document.querySelectorAll('#historyTable tbody tr[style*="display: none"]');
+            const total = document.querySelectorAll('#historyTable tbody tr').length;
+            const visible = total - visibleRows.length;
+            const badge = document.querySelector('.badge-count');
+            if (badge) {
+                badge.textContent = visible + ' Records';
+            }
+        }
+
+        // Apply filters with count update
+        const originalApply = applyFilters;
+        applyFilters = function(filter, search) {
+            originalApply(filter, search);
+            updateRecordCount();
+        };
+
+        // Initialize
+        applyFilters('all', '');
+    });
+</script>
 {% endblock %}

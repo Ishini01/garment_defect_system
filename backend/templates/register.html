@@ -2,55 +2,476 @@
 
 {% block title %}Register - Garment Detect{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ============================================
+       REGISTER PAGE SPECIFIC STYLES
+       ============================================ */
+    
+    .register-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e8eaf6 0%, #f5f7fa 100%);
+        padding: 20px;
+    }
+
+    .register-card {
+        width: 100%;
+        max-width: 600px;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(26, 35, 126, 0.15);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #ffffff;
+    }
+
+    .register-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 60px rgba(26, 35, 126, 0.2);
+    }
+
+    .register-header {
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        padding: 30px 20px 25px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        transform: rotate(45deg);
+    }
+
+    .register-header .logo-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        font-size: 32px;
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .register-header h4 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .register-header small {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 400;
+        position: relative;
+        z-index: 1;
+    }
+
+    .register-body {
+        padding: 35px 30px 30px;
+    }
+
+    .form-floating {
+        position: relative;
+        margin-bottom: 16px;
+    }
+
+    .form-floating .form-control {
+        border-radius: 12px;
+        padding: 14px 16px;
+        border: 2px solid #e8ecf1;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8f9fe;
+        height: 55px;
+    }
+
+    .form-floating .form-control:focus {
+        border-color: #1a237e;
+        box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
+        background: #ffffff;
+    }
+
+    .form-floating .form-control::placeholder {
+        color: #a0a8b5;
+        font-weight: 400;
+    }
+
+    .form-floating label {
+        padding: 0 12px;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+    }
+
+    .input-icon-wrapper .form-control {
+        padding-left: 48px;
+    }
+
+    .input-icon-wrapper .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0a8b5;
+        font-size: 18px;
+        z-index: 2;
+        transition: color 0.3s ease;
+    }
+
+    .input-icon-wrapper .form-control:focus + .input-icon,
+    .input-icon-wrapper .form-control:focus ~ .input-icon {
+        color: #1a237e;
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.4);
+        background: linear-gradient(135deg, #0d1445 0%, #1a237e 100%);
+        color: white;
+    }
+
+    .btn-register:active {
+        transform: translateY(0);
+    }
+
+    .btn-register i {
+        margin-right: 10px;
+    }
+
+    .login-divider {
+        display: flex;
+        align-items: center;
+        margin: 25px 0 20px;
+        gap: 15px;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #e0e5ec, transparent);
+    }
+
+    .login-divider span {
+        color: #a0a8b5;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .login-link {
+        color: #1a237e;
+        text-decoration: none;
+        font-weight: 700;
+        transition: color 0.3s ease;
+    }
+
+    .login-link:hover {
+        color: #0d1445;
+        text-decoration: underline;
+    }
+
+    /* ============================================
+       PASSWORD VISIBILITY TOGGLE
+       ============================================ */
+    
+    .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #a0a8b5;
+        cursor: pointer;
+        font-size: 18px;
+        z-index: 3;
+        padding: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: #1a237e;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    
+    @media (max-width: 576px) {
+        .register-body {
+            padding: 25px 20px 20px;
+        }
+
+        .register-header {
+            padding: 25px 15px 20px;
+        }
+
+        .register-header .logo-icon {
+            width: 55px;
+            height: 55px;
+            font-size: 26px;
+        }
+
+        .register-header h4 {
+            font-size: 1.2rem;
+        }
+
+        .btn-register {
+            padding: 12px;
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .register-card {
+            border-radius: 24px;
+        }
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .register-card {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .register-container {
+        animation: fadeIn 0.4s ease-in;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow">
-                <div class="card-header bg-success text-white text-center">
-                    <h4><i class="fas fa-user-plus"></i> Operator Registration</h4>
-                </div>
-                <div class="card-body p-4">
-                    <form method="POST">
-                        {{ form.hidden_tag() }}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Operator ID</label>
-                                {{ form.operator_id(class="form-control", placeholder="Enter Operator ID") }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Operator Name</label>
-                                {{ form.operator_name(class="form-control", placeholder="Full Name") }}
-                            </div>
+<div class="register-container">
+    <div class="register-card">
+        <!-- Header -->
+        <div class="register-header">
+            <div class="logo-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h4>Operator Registration</h4>
+            <small>Create your inspection operator account</small>
+        </div>
+
+        <!-- Body -->
+        <div class="register-body">
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
+
+                <!-- Row: Operator ID & Operator Name -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-floating input-icon-wrapper">
+                            {{ form.operator_id(class="form-control", placeholder="Enter Operator ID", id="operator_id") }}
+                            <i class="fas fa-id-badge input-icon"></i>
+                            <label for="operator_id">Operator ID</label>
+                            {% if form.operator_id.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.operator_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">NIC</label>
-                            {{ form.nic(class="form-control", placeholder="Enter NIC number") }}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating input-icon-wrapper">
+                            {{ form.operator_name(class="form-control", placeholder="Full Name", id="operator_name") }}
+                            <i class="fas fa-user input-icon"></i>
+                            <label for="operator_name">Operator Name</label>
+                            {% if form.operator_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.operator_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email (Optional)</label>
-                            {{ form.email(class="form-control", placeholder="Enter email") }}
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">PIN</label>
-                                {{ form.pin(class="form-control", placeholder="Enter PIN (4-10 chars)") }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Confirm PIN</label>
-                                {{ form.confirm_pin(class="form-control", placeholder="Confirm PIN") }}
-                            </div>
-                        </div>
-                        <div class="d-grid gap-2">
-                            {{ form.submit(class="btn btn-success btn-lg") }}
-                        </div>
-                    </form>
-                    <div class="text-center mt-3">
-                        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
                     </div>
                 </div>
-            </div>
+
+                <!-- NIC -->
+                <div class="form-floating input-icon-wrapper">
+                    {{ form.nic(class="form-control", placeholder="Enter NIC number", id="nic") }}
+                    <i class="fas fa-id-card input-icon"></i>
+                    <label for="nic">NIC</label>
+                    {% if form.nic.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.nic.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email (Optional) -->
+                <div class="form-floating input-icon-wrapper">
+                    {{ form.email(class="form-control", placeholder="Enter email (optional)", id="email") }}
+                    <i class="fas fa-envelope input-icon"></i>
+                    <label for="email">Email <span style="color: #a0a8b5; font-weight: 400;">(Optional)</span></label>
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Row: PIN & Confirm PIN -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="form-floating input-icon-wrapper">
+                            {{ form.pin(class="form-control", placeholder="Enter PIN (4-10 chars)", id="pin") }}
+                            <i class="fas fa-lock input-icon"></i>
+                            <label for="pin">PIN</label>
+                            <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            {% if form.pin.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.pin.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating input-icon-wrapper">
+                            {{ form.confirm_pin(class="form-control", placeholder="Confirm PIN", id="confirm_pin") }}
+                            <i class="fas fa-check-circle input-icon"></i>
+                            <label for="confirm_pin">Confirm PIN</label>
+                            <button type="button" class="password-toggle" id="toggleConfirmPassword" aria-label="Toggle password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            {% if form.confirm_pin.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.confirm_pin.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register Button -->
+                <button type="submit" class="btn-register mt-2">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+
+                <!-- Divider -->
+                <div class="login-divider">
+                    <span>Already Registered?</span>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p style="margin-bottom: 0; color: #4a5568; font-size: 0.95rem;">
+                        Already have an account?
+                        <a href="{{ url_for('login') }}" class="login-link">
+                            Login here <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </p>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    // ============================================
+    // PASSWORD VISIBILITY TOGGLE
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle for PIN
+        const toggleBtn = document.getElementById('togglePassword');
+        const pinInput = document.getElementById('pin');
+        
+        if (toggleBtn && pinInput) {
+            toggleBtn.addEventListener('click', function() {
+                const type = pinInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                pinInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Toggle for Confirm PIN
+        const toggleConfirmBtn = document.getElementById('toggleConfirmPassword');
+        const confirmPinInput = document.getElementById('confirm_pin');
+        
+        if (toggleConfirmBtn && confirmPinInput) {
+            toggleConfirmBtn.addEventListener('click', function() {
+                const type = confirmPinInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPinInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Auto-focus on Operator ID field
+        const operatorIdInput = document.getElementById('operator_id');
+        if (operatorIdInput) {
+            operatorIdInput.focus();
+        }
+    });
+</script>
 {% endblock %}

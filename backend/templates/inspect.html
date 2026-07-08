@@ -2,142 +2,922 @@
 
 {% block title %}New Inspection - Garment Detect{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ============================================
+       INSPECTION PAGE SPECIFIC STYLES
+       ============================================ */
+    
+    .inspection-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 12px;
+    }
+
+    /* ============================================
+       CAMERA CARD
+       ============================================ */
+    
+    .camera-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .camera-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .camera-card .card-header {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .camera-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .camera-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .camera-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .video-wrapper {
+        position: relative;
+        background: #0a0a0a;
+        border-radius: 12px;
+        overflow: hidden;
+        min-height: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .video-wrapper video,
+    .video-wrapper img {
+        width: 100%;
+        height: auto;
+        max-height: 450px;
+        object-fit: contain;
+    }
+
+    .video-wrapper .placeholder-text {
+        color: #555;
+        font-size: 1rem;
+        text-align: center;
+        padding: 40px;
+    }
+
+    .video-wrapper .placeholder-text i {
+        font-size: 48px;
+        color: #333;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    .video-overlay {
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .video-overlay .btn {
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .video-overlay .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .video-overlay .btn i {
+        margin-right: 8px;
+    }
+
+    .btn-camera-start {
+        background: linear-gradient(135deg, #2e7d32, #43a047);
+        color: white;
+        border: none;
+    }
+
+    .btn-camera-start:hover {
+        background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        color: white;
+    }
+
+    .btn-camera-stop {
+        background: linear-gradient(135deg, #c62828, #e53935);
+        color: white;
+        border: none;
+    }
+
+    .btn-camera-stop:hover {
+        background: linear-gradient(135deg, #b71c1c, #c62828);
+        color: white;
+    }
+
+    .btn-camera-capture {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        border: none;
+    }
+
+    .btn-camera-capture:hover {
+        background: linear-gradient(135deg, #0d1445, #1a237e);
+        color: white;
+    }
+
+    .btn-camera-reset {
+        background: linear-gradient(135deg, #e65100, #f57c00);
+        color: white;
+        border: none;
+    }
+
+    .btn-camera-reset:hover {
+        background: linear-gradient(135deg, #bf360c, #e65100);
+        color: white;
+    }
+
+    /* ============================================
+       UPLOAD CARD
+       ============================================ */
+    
+    .upload-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .upload-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-card .card-header {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .upload-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .upload-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .upload-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .upload-area {
+        border: 2px dashed #d0d5dd;
+        border-radius: 12px;
+        padding: 30px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #ffffff;
+        margin-bottom: 16px;
+    }
+
+    .upload-area:hover {
+        border-color: #1a237e;
+        background: #f8f9ff;
+    }
+
+    .upload-area.dragover {
+        border-color: #1a237e;
+        background: #e8eaff;
+    }
+
+    .upload-area i {
+        font-size: 40px;
+        color: #a0a8b5;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .upload-area p {
+        color: #6c757d;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .upload-area small {
+        color: #a0a8b5;
+        font-size: 0.8rem;
+    }
+
+    .upload-area input[type="file"] {
+        display: none;
+    }
+
+    .btn-upload {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 600;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(13, 71, 161, 0.3);
+        color: white;
+    }
+
+    .btn-upload i {
+        margin-right: 8px;
+    }
+
+    /* ============================================
+       RESULTS CARD
+       ============================================ */
+    
+    .results-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        animation: slideUp 0.4s ease-out;
+    }
+
+    .results-card .card-header {
+        padding: 14px 24px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .results-card .card-header i {
+        margin-right: 10px;
+    }
+
+    .results-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .result-status {
+        text-align: center;
+        padding: 12px 0 16px;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .result-status.pass {
+        color: #2e7d32;
+    }
+
+    .result-status.fail {
+        color: #c62828;
+    }
+
+    .result-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 16px 0;
+    }
+
+    .result-detail-item {
+        background: white;
+        border-radius: 10px;
+        padding: 12px 16px;
+        text-align: center;
+        border: 1px solid #f0f2f5;
+    }
+
+    .result-detail-item .label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .result-detail-item .value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a237e;
+        margin-top: 2px;
+    }
+
+    .result-detail-item .value .expected {
+        color: #6c757d;
+        font-weight: 400;
+        font-size: 1rem;
+    }
+
+    /* ============================================
+       ALERT CUSTOMIZATIONS
+       ============================================ */
+    
+    .alert-custom {
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-top: 12px;
+        border: none;
+        font-weight: 500;
+    }
+
+    .alert-custom i {
+        margin-right: 8px;
+    }
+
+    .alert-defect {
+        background: #ffebee;
+        color: #c62828;
+        border-left: 4px solid #c62828;
+    }
+
+    .alert-success-custom {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-left: 4px solid #2e7d32;
+    }
+
+    .alert-defect-list {
+        background: #fff8e1;
+        color: #e65100;
+        border-left: 4px solid #e65100;
+        margin-top: 8px;
+        font-size: 0.9rem;
+    }
+
+    .alert-defect-list i {
+        margin-right: 8px;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    
+    @media (max-width: 992px) {
+        .camera-card {
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .video-wrapper {
+            min-height: 250px;
+        }
+
+        .video-overlay {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            transform: none;
+            margin-top: 16px;
+            gap: 8px;
+        }
+
+        .video-overlay .btn {
+            padding: 8px 14px;
+            font-size: 0.8rem;
+        }
+
+        .result-detail-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .result-status {
+            font-size: 1.5rem;
+        }
+
+        .result-detail-item .value {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .inspection-container {
+            padding: 10px 0;
+        }
+
+        .camera-card .card-body,
+        .upload-card .card-body,
+        .results-card .card-body {
+            padding: 16px;
+        }
+
+        .video-wrapper {
+            min-height: 200px;
+        }
+
+        .result-detail-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .result-detail-item {
+            padding: 8px 10px;
+        }
+
+        .result-detail-item .value {
+            font-size: 1rem;
+        }
+
+        .upload-area {
+            padding: 20px 16px;
+        }
+
+        .upload-area i {
+            font-size: 30px;
+        }
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .camera-card {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .upload-card {
+        animation: fadeIn 0.5s ease-out 0.1s both;
+    }
+
+    .results-card {
+        animation: slideUp 0.4s ease-out;
+    }
+
+    /* Spinner */
+    .spinner-custom {
+        width: 3rem;
+        height: 3rem;
+        border: 4px solid #e8ecf1;
+        border-top-color: #1a237e;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .analyzing-text {
+        color: #6c757d;
+        font-weight: 500;
+        margin-top: 12px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
-    <h1 class="h3 mb-4"><i class="fas fa-camera"></i> New Inspection</h1>
+<div class="inspection-container">
+    <!-- Page Title -->
+    <div class="row">
+        <div class="col-12">
+            <h1 class="page-title">
+                <i class="fas fa-camera"></i> New Inspection
+            </h1>
+        </div>
+    </div>
 
     <div class="row">
+        <!-- Camera Section -->
         <div class="col-lg-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <i class="fas fa-video"></i> Camera Feed
+            <div class="card camera-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-video"></i> Camera Feed</h5>
                 </div>
-                <div class="card-body text-center">
-                    <video id="videoFeed" autoplay playsinline style="width:100%; max-height:400px; background:#000; border-radius:8px;"></video>
-                    <canvas id="canvas" style="display:none;"></canvas>
-                    <img id="capturedImage" style="display:none; width:100%; max-height:400px; border-radius:8px;">
-                    <div class="mt-3">
-                        <button class="btn btn-success" onclick="startCamera()"><i class="fas fa-play"></i> Start Camera</button>
-                        <button class="btn btn-danger" onclick="stopCamera()"><i class="fas fa-stop"></i> Stop Camera</button>
-                        <button class="btn btn-primary" onclick="captureImage()"><i class="fas fa-camera"></i> Capture</button>
-                        <button class="btn btn-warning" onclick="resetInspection()"><i class="fas fa-redo"></i> Reset</button>
+                <div class="card-body">
+                    <div class="video-wrapper">
+                        <video id="videoFeed" autoplay playsinline style="display:block; width:100%; max-height:450px; background:#0a0a0a; border-radius:12px;"></video>
+                        <canvas id="canvas" style="display:none;"></canvas>
+                        <img id="capturedImage" style="display:none; width:100%; max-height:450px; border-radius:12px;">
+                        
+                        <!-- Controls -->
+                        <div class="video-overlay">
+                            <button class="btn btn-camera-start" onclick="startCamera()">
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                            <button class="btn btn-camera-stop" onclick="stopCamera()">
+                                <i class="fas fa-stop"></i> Stop
+                            </button>
+                            <button class="btn btn-camera-capture" onclick="captureImage()">
+                                <i class="fas fa-camera"></i> Capture
+                            </button>
+                            <button class="btn btn-camera-reset" onclick="resetInspection()">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Upload & Results Section -->
         <div class="col-lg-4">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <i class="fas fa-upload"></i> Upload Image
+            <!-- Upload Card -->
+            <div class="card upload-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-upload"></i> Upload Image</h5>
                 </div>
                 <div class="card-body">
                     <form id="uploadForm" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <input type="file" class="form-control" id="imageFile" accept="image/*" required>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click or drag to upload</p>
+                            <small>Supports JPG, PNG, JPEG</small>
+                            <input type="file" id="imageFile" accept="image/*" required>
                         </div>
-                        <button type="submit" class="btn btn-info w-100">
+                        <button type="submit" class="btn-upload">
                             <i class="fas fa-upload"></i> Upload & Detect
                         </button>
                     </form>
                 </div>
             </div>
 
-            <div class="card shadow mt-3" id="resultsCard" style="display:none;">
-                <div class="card-header" id="resultsHeader">Results</div>
-                <div class="card-body" id="resultsBody"></div>
+            <!-- Results Card -->
+            <div class="card results-card mt-3" id="resultsCard" style="display:none;">
+                <div class="card-header" id="resultsHeader">
+                    <i class="fas fa-chart-bar"></i> Detection Results
+                </div>
+                <div class="card-body" id="resultsBody">
+                    <div class="text-center py-3">
+                        <div class="spinner-custom"></div>
+                        <p class="analyzing-text">Analyzing garment for defects...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-let stream = null;
-const video = document.getElementById('videoFeed');
-const canvas = document.getElementById('canvas');
-const capturedImg = document.getElementById('capturedImage');
+    // ============================================
+    // CAMERA FUNCTIONS
+    // ============================================
+    let stream = null;
+    const video = document.getElementById('videoFeed');
+    const canvas = document.getElementById('canvas');
+    const capturedImg = document.getElementById('capturedImage');
 
-function startCamera() {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: 'environment',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            } 
+        })
         .then(s => {
             stream = s;
             video.srcObject = stream;
             video.style.display = 'block';
             capturedImg.style.display = 'none';
+            showToast('Camera started successfully!', 'success');
         })
-        .catch(err => alert('Camera error: ' + err.message));
-}
-
-function stopCamera() {
-    if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-        video.srcObject = null;
-    }
-}
-
-function captureImage() {
-    if (!stream) {
-        alert('Start camera first!');
-        return;
-    }
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    capturedImg.src = canvas.toDataURL('image/jpeg');
-    capturedImg.style.display = 'block';
-    video.style.display = 'none';
-}
-
-function resetInspection() {
-    capturedImg.style.display = 'none';
-    video.style.display = 'block';
-    document.getElementById('resultsCard').style.display = 'none';
-    document.getElementById('imageFile').value = '';
-}
-
-document.getElementById('uploadForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const fileInput = document.getElementById('imageFile');
-    if (!fileInput.files[0]) {
-        alert('Please select an image');
-        return;
+        .catch(err => {
+            showToast('Camera error: ' + err.message, 'danger');
+        });
     }
 
-    const formData = new FormData();
-    formData.append('image', fileInput.files[0]);
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+            video.srcObject = null;
+        }
+        showToast('Camera stopped.', 'info');
+    }
 
-    document.getElementById('resultsCard').style.display = 'block';
-    document.getElementById('resultsBody').innerHTML = 
-        '<div class="text-center"><div class="spinner-border text-primary"></div><p>Analyzing...</p></div>';
+    function captureImage() {
+        if (!stream) {
+            showToast('Please start the camera first.', 'warning');
+            return;
+        }
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        capturedImg.src = canvas.toDataURL('image/jpeg');
+        capturedImg.style.display = 'block';
+        video.style.display = 'none';
+        showToast('Image captured! Click "Upload & Detect" or use upload.', 'success');
+    }
 
-    fetch('/api/detect', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        const isPass = data.overall_status === 'PASS';
-        document.getElementById('resultsHeader').className = 
-            `card-header ${isPass ? 'bg-success' : 'bg-danger'}`;
-        document.getElementById('resultsBody').innerHTML = `
-            <h3 class="${isPass ? 'text-success' : 'text-danger'}">${data.overall_status}</h3>
-            <p><strong>Buttons Found:</strong> ${data.button_count} / ${data.expected}</p>
-            <p><strong>Alignment:</strong> ${(data.alignment_score || 0).toFixed(1)}%</p>
-            ${data.has_defect ? 
-                '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Defect Found!</div>' : 
-                '<div class="alert alert-success"><i class="fas fa-check-circle"></i> No defects detected</div>'}
-            ${data.defects ? data.defects.map(d => 
-                `<div class="alert alert-warning"><i class="fas fa-bug"></i> ${d}</div>`
-            ).join('') : ''}
+    function resetInspection() {
+        capturedImg.style.display = 'none';
+        video.style.display = 'block';
+        document.getElementById('resultsCard').style.display = 'none';
+        document.getElementById('imageFile').value = '';
+        showToast('Reset successful.', 'info');
+    }
+
+    // ============================================
+    // TOAST NOTIFICATIONS
+    // ============================================
+    function showToast(message, type = 'info') {
+        const colors = {
+            success: '#2e7d32',
+            danger: '#c62828',
+            warning: '#f57c00',
+            info: '#0d47a1'
+        };
+
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.style.position = 'fixed';
+            container.style.top = '80px';
+            container.style.right = '20px';
+            container.style.zIndex = '9999';
+            container.style.maxWidth = '400px';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white border-0 fade show';
+        toast.style.backgroundColor = colors[type] || colors.info;
+        toast.style.borderRadius = '8px';
+        toast.style.marginBottom = '10px';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'times-circle' : 'info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
         `;
-    })
-    .catch(error => {
-        document.getElementById('resultsBody').innerHTML = 
-            `<div class="alert alert-danger">Error: ${error.message}</div>`;
-    });
-});
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
 
-window.onload = startCamera;
+    // ============================================
+    // UPLOAD & DETECT
+    // ============================================
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('imageFile');
+        if (!fileInput.files[0]) {
+            showToast('Please select an image.', 'warning');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        const resultsCard = document.getElementById('resultsCard');
+        const resultsHeader = document.getElementById('resultsHeader');
+        const resultsBody = document.getElementById('resultsBody');
+
+        resultsCard.style.display = 'block';
+        resultsHeader.className = 'card-header bg-warning text-white';
+        resultsHeader.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        resultsBody.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-custom"></div>
+                <p class="analyzing-text">Analyzing garment for defects...</p>
+            </div>
+        `;
+
+        fetch('/api/detect', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    if (text.includes('login')) {
+                        throw new Error('Please login first.');
+                    }
+                    throw new Error('Server error.');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            const isPass = data.overall_status === 'PASS';
+            resultsHeader.className = `card-header text-white ${isPass ? 'bg-success' : 'bg-danger'}`;
+            resultsHeader.innerHTML = `<i class="fas fa-${isPass ? 'check-circle' : 'times-circle'}"></i> ${data.overall_status}`;
+
+            let defectsHtml = '';
+            if (data.defects && data.defects.length > 0) {
+                defectsHtml = data.defects.map(d => 
+                    `<div class="alert alert-defect-list"><i class="fas fa-bug"></i> ${d}</div>`
+                ).join('');
+            }
+
+            resultsBody.innerHTML = `
+                <div class="result-status ${isPass ? 'pass' : 'fail'}">
+                    ${isPass ? '✅ PASS' : '❌ FAIL'}
+                </div>
+                <div class="result-detail-grid">
+                    <div class="result-detail-item">
+                        <div class="label">Buttons Found</div>
+                        <div class="value">${data.button_count} <span class="expected">/ ${data.expected}</span></div>
+                    </div>
+                    <div class="result-detail-item">
+                        <div class="label">Alignment Score</div>
+                        <div class="value">${(data.alignment_score || 0).toFixed(1)}%</div>
+                    </div>
+                </div>
+                ${data.has_defect ? 
+                    `<div class="alert alert-defect alert-custom"><i class="fas fa-exclamation-triangle"></i> Defect Detected!</div>` : 
+                    `<div class="alert alert-success-custom alert-custom"><i class="fas fa-check-circle"></i> No defects detected</div>`
+                }
+                ${defectsHtml}
+                <div class="d-grid gap-2 mt-3">
+                    <button class="btn btn-primary" onclick="window.location.href='/history'">
+                        <i class="fas fa-history"></i> View History
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="resetInspection()">
+                        <i class="fas fa-redo"></i> New Inspection
+                    </button>
+                </div>
+            `;
+
+            if (data.has_defect) {
+                showToast('⚠️ Defect detected!', 'danger');
+                playAlarm(data.defects);
+            } else {
+                showToast('✅ No defects detected!', 'success');
+            }
+        })
+        .catch(error => {
+            resultsHeader.className = 'card-header bg-danger text-white';
+            resultsHeader.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+            resultsBody.innerHTML = `
+                <div class="alert alert-danger">${error.message}</div>
+                ${error.message.includes('login') ? 
+                    `<div class="text-center mt-2"><a href="/login" class="btn btn-primary">Go to Login</a></div>` : ''}
+            `;
+            showToast('Error: ' + error.message, 'danger');
+        });
+    });
+
+    // ============================================
+    // ALARM SYSTEM
+    // ============================================
+    function playAlarm(defects) {
+        let overlay = document.getElementById('alarmOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'alarmOverlay';
+            overlay.style.cssText = `
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(198, 40, 40, 0.95);
+                color: white;
+                padding: 40px 60px;
+                border-radius: 20px;
+                z-index: 9999;
+                text-align: center;
+                font-size: 24px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            `;
+            overlay.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:60px; display:block; margin-bottom:20px;"></i>
+                <div>⚠️ DEFECT DETECTED!</div>
+                <small style="font-size:16px; display:block; margin-top:10px;"></small>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        overlay.style.display = 'block';
+        overlay.style.animation = 'alarmPulse 0.5s infinite alternate';
+        const small = overlay.querySelector('small');
+        if (small && defects && defects.length > 0) {
+            small.textContent = defects.join(' • ');
+        }
+
+        // Play sound
+        try {
+            const audio = new Audio('/static/sounds/alarm.wav');
+            audio.play().catch(() => {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.frequency.value = 880;
+                    oscillator.type = 'square';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 800);
+                } catch (err) {}
+            });
+        } catch (e) {}
+
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.animation = '';
+        }, 5000);
+    }
+
+    // ============================================
+    // DRAG AND DROP
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('imageFile');
+
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                // Auto-submit
+                document.getElementById('uploadForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Auto-start camera
+        startCamera();
+    });
 </script>
 {% endblock %}

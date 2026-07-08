@@ -2,19 +2,524 @@
 
 {% block title %}Profile - Garment Detect{% endblock %}
 
-{% block content %}
-<div class="container">
-    <h1 class="h3 mb-4"><i class="fas fa-id-card"></i> Operator Profile</h1>
+{% block extra_css %}
+<style>
+    /* ============================================
+       PROFILE PAGE SPECIFIC STYLES
+       ============================================ */
     
-    <div class="card shadow">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Operator ID:</strong> {{ user.operator_id }}</p>
-                    <p><strong>Operator Name:</strong> {{ user.operator_name }}</p>
-                    <p><strong>NIC:</strong> {{ user.nic }}</p>
-                    <p><strong>Email:</strong> {{ user.email if user.email else 'Not provided' }}</p>
-                    <p><strong>Member Since:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+    .profile-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 12px;
+    }
+
+    /* ============================================
+       PROFILE CARD
+       ============================================ */
+    
+    .profile-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .profile-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        padding: 30px 24px 20px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
+        backdrop-filter: blur(10px);
+    }
+
+    .profile-header-info h3 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.4rem;
+    }
+
+    .profile-header-info .operator-id-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 4px;
+    }
+
+    .profile-header-info .operator-id-badge i {
+        margin-right: 6px;
+    }
+
+    /* ============================================
+       PROFILE DETAILS
+       ============================================ */
+    
+    .profile-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .profile-section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 700;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f0f2f5;
+    }
+
+    .profile-detail {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f2f5;
+        transition: background 0.2s ease;
+    }
+
+    .profile-detail:last-child {
+        border-bottom: none;
+    }
+
+    .profile-detail:hover {
+        background: #f8f9ff;
+        margin: 0 -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+        border-radius: 8px;
+    }
+
+    .profile-detail .detail-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .profile-detail .detail-icon.primary {
+        background: #e8eaf6;
+        color: #1a237e;
+    }
+
+    .profile-detail .detail-icon.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .profile-detail .detail-icon.warning {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .profile-detail .detail-icon.info {
+        background: #e3f2fd;
+        color: #0d47a1;
+    }
+
+    .profile-detail .detail-icon.danger {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .profile-detail .detail-label {
+        font-weight: 600;
+        color: #4a5568;
+        min-width: 120px;
+        font-size: 0.9rem;
+    }
+
+    .profile-detail .detail-value {
+        color: #1a237e;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .profile-detail .detail-value .not-provided {
+        color: #a0a8b5;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    /* ============================================
+       PROFILE STATS
+       ============================================ */
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 2px solid #f0f2f5;
+    }
+
+    .profile-stat-item {
+        text-align: center;
+        padding: 12px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #f0f2f5;
+        transition: all 0.3s ease;
+    }
+
+    .profile-stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-color: #1a237e;
+    }
+
+    .profile-stat-item .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a237e;
+    }
+
+    .profile-stat-item .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #6c757d;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    /* ============================================
+       EDIT PROFILE BUTTON
+       ============================================ */
+    
+    .profile-actions {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f2f5;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-edit-profile {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 28px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit-profile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.3);
+        color: white;
+    }
+
+    .btn-edit-profile i {
+        margin-right: 8px;
+    }
+
+    .btn-change-password {
+        background: transparent;
+        border: 2px solid #d0d5dd;
+        border-radius: 10px;
+        padding: 10px 28px;
+        font-weight: 600;
+        color: #4a5568;
+        transition: all 0.3s ease;
+    }
+
+    .btn-change-password:hover {
+        border-color: #1a237e;
+        color: #1a237e;
+        transform: translateY(-2px);
+    }
+
+    .btn-change-password i {
+        margin-right: 8px;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 24px 16px;
+        }
+
+        .profile-avatar {
+            width: 70px;
+            height: 70px;
+            font-size: 28px;
+        }
+
+        .profile-header-info h3 {
+            font-size: 1.2rem;
+        }
+
+        .profile-body {
+            padding: 16px;
+        }
+
+        .profile-detail {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .profile-detail .detail-label {
+            min-width: 100px;
+            font-size: 0.85rem;
+        }
+
+        .profile-detail .detail-value {
+            font-size: 0.9rem;
+        }
+
+        .profile-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .profile-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-edit-profile,
+        .btn-change-password {
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .profile-container {
+            padding: 10px 0;
+        }
+
+        .profile-header {
+            padding: 20px 12px;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+
+        .profile-header-info h3 {
+            font-size: 1rem;
+        }
+
+        .profile-detail .detail-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 14px;
+        }
+
+        .profile-detail .detail-label {
+            min-width: 80px;
+            font-size: 0.8rem;
+        }
+
+        .profile-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .profile-stat-item .stat-number {
+            font-size: 1.2rem;
+        }
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .profile-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .profile-detail {
+        animation: fadeInUp 0.3s ease-out;
+    }
+
+    .profile-detail:nth-child(1) { animation-delay: 0.1s; }
+    .profile-detail:nth-child(2) { animation-delay: 0.15s; }
+    .profile-detail:nth-child(3) { animation-delay: 0.2s; }
+    .profile-detail:nth-child(4) { animation-delay: 0.25s; }
+    .profile-detail:nth-child(5) { animation-delay: 0.3s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Page Title -->
+    <div class="row">
+        <div class="col-12">
+            <h1 class="page-title">
+                <i class="fas fa-id-card"></i> Operator Profile
+            </h1>
+        </div>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="row">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card profile-card">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        {{ user.operator_name[0]|upper }}
+                    </div>
+                    <div class="profile-header-info">
+                        <h3>{{ user.operator_name }}</h3>
+                        <span class="operator-id-badge">
+                            <i class="fas fa-id-badge"></i> {{ user.operator_id }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Profile Body -->
+                <div class="profile-body">
+                    <div class="profile-section-title">
+                        <i class="fas fa-user-circle"></i> Personal Information
+                    </div>
+
+                    <!-- Operator ID -->
+                    <div class="profile-detail">
+                        <div class="detail-icon primary">
+                            <i class="fas fa-id-badge"></i>
+                        </div>
+                        <span class="detail-label">Operator ID</span>
+                        <span class="detail-value">{{ user.operator_id }}</span>
+                    </div>
+
+                    <!-- Operator Name -->
+                    <div class="profile-detail">
+                        <div class="detail-icon success">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="detail-label">Operator Name</span>
+                        <span class="detail-value">{{ user.operator_name }}</span>
+                    </div>
+
+                    <!-- NIC -->
+                    <div class="profile-detail">
+                        <div class="detail-icon warning">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <span class="detail-label">NIC</span>
+                        <span class="detail-value">{{ user.nic }}</span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="profile-detail">
+                        <div class="detail-icon info">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">
+                            {% if user.email %}
+                                {{ user.email }}
+                            {% else %}
+                                <span class="not-provided">Not provided</span>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Member Since -->
+                    <div class="profile-detail">
+                        <div class="detail-icon danger">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <span class="detail-label">Member Since</span>
+                        <span class="detail-value">{{ user.created_at.strftime('%B %d, %Y at %H:%M') }}</span>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="profile-stats">
+                        <div class="profile-stat-item">
+                            <div class="stat-number">{{ total_inspections or 0 }}</div>
+                            <div class="stat-label">Inspections</div>
+                        </div>
+                        <div class="profile-stat-item">
+                            <div class="stat-number">{{ pass_count or 0 }}</div>
+                            <div class="stat-label">Passed</div>
+                        </div>
+                        <div class="profile-stat-item">
+                            <div class="stat-number">{{ fail_count or 0 }}</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                        <div class="profile-stat-item">
+                            <div class="stat-number">{{ "%.1f"|format(pass_rate or 0) }}%</div>
+                            <div class="stat-label">Pass Rate</div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="profile-actions">
+                        <button class="btn-edit-profile" onclick="alert('Edit profile functionality coming soon!')">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                        <button class="btn-change-password" onclick="alert('Change password functionality coming soon!')">
+                            <i class="fas fa-key"></i> Change PIN
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

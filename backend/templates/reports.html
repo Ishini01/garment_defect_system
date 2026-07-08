@@ -2,44 +2,562 @@
 
 {% block title %}Reports - Garment Detect{% endblock %}
 
-{% block content %}
-<div class="container">
-    <h1 class="h3 mb-4"><i class="fas fa-file-alt"></i> Reports</h1>
+{% block extra_css %}
+<style>
+    /* ============================================
+       REPORTS PAGE SPECIFIC STYLES
+       ============================================ */
     
+    .reports-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 12px;
+    }
+
+    /* ============================================
+       REPORT GENERATION CARD
+       ============================================ */
+    
+    .report-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .report-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-card .card-header {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .report-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .report-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .report-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .form-select-custom {
+        border-radius: 10px;
+        padding: 12px 16px;
+        border: 2px solid #e8ecf1;
+        transition: all 0.3s ease;
+        background: white;
+        font-size: 0.95rem;
+        color: #333;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236c757d' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 12px;
+        cursor: pointer;
+    }
+
+    .form-select-custom:focus {
+        border-color: #1a237e;
+        box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
+        outline: none;
+    }
+
+    .form-select-custom option {
+        padding: 8px;
+    }
+
+    .btn-generate {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 14px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.3);
+        color: white;
+    }
+
+    .btn-generate i {
+        font-size: 1.1rem;
+    }
+
+    /* ============================================
+       STATISTICS CARD
+       ============================================ */
+    
+    .stats-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stats-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-card .card-header {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .stats-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .stats-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .stats-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .total-defects {
+        text-align: center;
+        padding: 12px 0 16px;
+        border-bottom: 2px solid #f0f2f5;
+        margin-bottom: 16px;
+    }
+
+    .total-defects .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #c62828;
+        line-height: 1;
+    }
+
+    .total-defects .label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    .defect-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .defect-item {
+        background: white;
+        border-radius: 10px;
+        padding: 12px 16px;
+        border: 1px solid #f0f2f5;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .defect-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-color: #1a237e;
+    }
+
+    .defect-item .defect-name {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .defect-item .defect-count {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a237e;
+        margin-top: 2px;
+    }
+
+    .defect-item .defect-icon {
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        line-height: 32px;
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .defect-item .defect-icon.bug {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .defect-item .defect-icon.missing {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .defect-item .defect-icon.alignment {
+        background: #e3f2fd;
+        color: #0d47a1;
+    }
+
+    .defect-item .defect-icon.other {
+        background: #f3e5f5;
+        color: #6a1b9a;
+    }
+
+    /* ============================================
+       RECENT REPORTS
+       ============================================ */
+    
+    .recent-reports-section {
+        margin-top: 24px;
+    }
+
+    .recent-reports-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .recent-reports-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .recent-reports-card .card-header {
+        background: linear-gradient(135deg, #2e7d32, #43a047);
+        border: none;
+        padding: 16px 24px;
+    }
+
+    .recent-reports-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .recent-reports-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .recent-reports-card .card-body {
+        padding: 16px 24px;
+        background: #fafbff;
+    }
+
+    .report-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f2f5;
+        transition: all 0.2s ease;
+    }
+
+    .report-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .report-list-item:hover {
+        padding-left: 8px;
+        padding-right: 8px;
+        background: #f8f9ff;
+        margin: 0 -8px;
+        border-radius: 8px;
+    }
+
+    .report-list-item .report-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .report-list-item .report-info i {
+        font-size: 24px;
+        color: #c62828;
+    }
+
+    .report-list-item .report-info .report-name {
+        font-weight: 500;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .report-list-item .report-info .report-date {
+        font-size: 0.8rem;
+        color: #6c757d;
+        display: block;
+    }
+
+    .report-list-item .report-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .report-list-item .report-actions .btn-download {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .report-list-item .report-actions .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+        color: white;
+    }
+
+    .report-list-item .report-actions .btn-download i {
+        margin-right: 4px;
+    }
+
+    .no-reports {
+        text-align: center;
+        padding: 30px 20px;
+        color: #6c757d;
+    }
+
+    .no-reports i {
+        font-size: 40px;
+        color: #c5cae9;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    
+    @media (max-width: 992px) {
+        .report-card {
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .report-card .card-body,
+        .stats-card .card-body {
+            padding: 16px;
+        }
+
+        .total-defects .number {
+            font-size: 2rem;
+        }
+
+        .defect-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .defect-item .defect-count {
+            font-size: 1.2rem;
+        }
+
+        .recent-reports-card .card-body {
+            padding: 12px 16px;
+        }
+
+        .report-list-item {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .report-list-item .report-info {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .reports-container {
+            padding: 10px 0;
+        }
+
+        .defect-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .defect-item {
+            padding: 8px 12px;
+        }
+
+        .defect-item .defect-count {
+            font-size: 1rem;
+        }
+
+        .defect-item .defect-name {
+            font-size: 0.7rem;
+        }
+
+        .report-list-item .report-info .report-name {
+            font-size: 0.8rem;
+        }
+
+        .report-list-item .report-actions .btn-download {
+            padding: 4px 12px;
+            font-size: 0.7rem;
+        }
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .report-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .stats-card {
+        animation: fadeInUp 0.5s ease-out 0.1s both;
+    }
+
+    .recent-reports-card {
+        animation: fadeInUp 0.5s ease-out 0.2s both;
+    }
+
+    .defect-item {
+        animation: fadeInUp 0.3s ease-out;
+    }
+
+    .defect-item:nth-child(1) { animation-delay: 0.1s; }
+    .defect-item:nth-child(2) { animation-delay: 0.15s; }
+    .defect-item:nth-child(3) { animation-delay: 0.2s; }
+    .defect-item:nth-child(4) { animation-delay: 0.25s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <!-- Page Title -->
     <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <i class="fas fa-calendar-alt"></i> Generate Report
+        <div class="col-12">
+            <h1 class="page-title">
+                <i class="fas fa-file-alt"></i> Reports
+            </h1>
+        </div>
+    </div>
+
+    <!-- Report Generation & Statistics -->
+    <div class="row">
+        <!-- Report Generation -->
+        <div class="col-lg-6">
+            <div class="card report-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-calendar-alt"></i> Generate Report</h5>
                 </div>
                 <div class="card-body">
                     <form id="reportForm">
-                        <div class="mb-3">
-                            <label class="form-label">Report Period</label>
-                            <select class="form-select" id="period" name="period">
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="annual">Annual</option>
+                        <div class="mb-4">
+                            <label class="form-label-custom">
+                                <i class="fas fa-clock"></i> Report Period
+                            </label>
+                            <select class="form-select-custom w-100" id="period" name="period">
+                                <option value="weekly">📅 Weekly</option>
+                                <option value="monthly">📅 Monthly</option>
+                                <option value="annual">📅 Annual</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-file-export"></i> Generate Report
+                        <button type="submit" class="btn-generate">
+                            <i class="fas fa-file-pdf"></i> Generate Report
                         </button>
                     </form>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <i class="fas fa-chart-bar"></i> Defect Statistics
+
+        <!-- Defect Statistics -->
+        <div class="col-lg-6">
+            <div class="card stats-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Defect Statistics</h5>
                 </div>
                 <div class="card-body" id="defectStats">
-                    <div class="text-center">
-                        <div class="spinner-border text-primary"></div>
-                        <p>Loading stats...</p>
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+                        <p class="mt-2 text-muted">Loading statistics...</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="recent-reports-section">
+        <div class="card recent-reports-card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Reports</h5>
+            </div>
+            <div class="card-body" id="recentReports">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" style="width: 2rem; height: 2rem;" role="status"></div>
+                    <p class="mt-2 text-muted">Loading recent reports...</p>
                 </div>
             </div>
         </div>
@@ -47,55 +565,182 @@
 </div>
 
 <script>
-document.getElementById('reportForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    
-    fetch('/api/generate-report', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('✅ Report generated successfully!');
-            window.location.href = data.download_url;
-        } else {
-            alert('❌ ' + data.error);
-        }
-    })
-    .catch(error => alert('Error: ' + error.message));
-});
-
-function loadDefectStats() {
-    fetch('/api/defect-stats')
+    // ============================================
+    // GENERATE REPORT
+    // ============================================
+    document.getElementById('reportForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const btn = this.querySelector('.btn-generate');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        btn.disabled = true;
+        
+        fetch('/api/generate-report', {
+            method: 'POST',
+            body: formData
+        })
         .then(response => response.json())
         .then(data => {
-            let html = `<h5>Total Defects: <span class="text-danger">${data.total_defects}</span></h5>`;
-            if (data.defect_breakdown && data.defect_breakdown.length > 0) {
-                html += '<div class="row">';
-                data.defect_breakdown.forEach(item => {
-                    html += `
-                        <div class="col-6 mb-2">
-                            <div class="border rounded p-2">
-                                <small class="text-muted">${item.type.replace('_', ' ').title()}</small>
-                                <h5>${item.count}</h5>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
+            if (data.success) {
+                showToast('✅ Report generated successfully!', 'success');
+                window.location.href = data.download_url;
+                loadRecentReports();
             } else {
-                html += '<p class="text-muted">No defects recorded yet.</p>';
+                showToast('❌ ' + data.error, 'danger');
             }
-            document.getElementById('defectStats').innerHTML = html;
         })
         .catch(error => {
-            document.getElementById('defectStats').innerHTML = 
-                `<div class="alert alert-danger">Error loading stats: ${error.message}</div>`;
+            showToast('Error: ' + error.message, 'danger');
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         });
-}
+    });
 
-window.onload = loadDefectStats;
+    // ============================================
+    // LOAD DEFECT STATISTICS
+    // ============================================
+    function loadDefectStats() {
+        fetch('/api/defect-stats')
+            .then(response => response.json())
+            .then(data => {
+                let html = `
+                    <div class="total-defects">
+                        <div class="number">${data.total_defects}</div>
+                        <div class="label">Total Defects Found</div>
+                    </div>
+                `;
+                
+                if (data.defect_breakdown && data.defect_breakdown.length > 0) {
+                    html += '<div class="defect-grid">';
+                    
+                    const icons = ['bug', 'missing', 'alignment', 'other'];
+                    data.defect_breakdown.forEach((item, index) => {
+                        const iconClass = icons[index % icons.length];
+                        html += `
+                            <div class="defect-item">
+                                <div class="defect-icon ${iconClass}">
+                                    <i class="fas fa-${iconClass === 'bug' ? 'bug' : iconClass === 'missing' ? 'times-circle' : iconClass === 'alignment' ? 'arrows-alt-h' : 'exclamation-circle'}"></i>
+                                </div>
+                                <div class="defect-name">${item.type.replace('_', ' ').title()}</div>
+                                <div class="defect-count">${item.count}</div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                } else {
+                    html += `
+                        <div class="text-center py-3">
+                            <i class="fas fa-check-circle" style="font-size: 32px; color: #2e7d32;"></i>
+                            <p class="text-muted mt-2">No defects recorded yet.</p>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('defectStats').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('defectStats').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Error loading stats: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    // ============================================
+    // LOAD RECENT REPORTS
+    // ============================================
+    function loadRecentReports() {
+        fetch('/api/recent-reports')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('recentReports');
+                
+                if (data.reports && data.reports.length > 0) {
+                    let html = '';
+                    data.reports.forEach(report => {
+                        html += `
+                            <div class="report-list-item">
+                                <div class="report-info">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <div>
+                                        <div class="report-name">${report.name}</div>
+                                        <span class="report-date"><i class="far fa-calendar-alt"></i> ${report.date}</span>
+                                    </div>
+                                </div>
+                                <div class="report-actions">
+                                    <a href="${report.url}" class="btn-download">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="no-reports">
+                            <i class="fas fa-inbox"></i>
+                            <p>No reports generated yet.</p>
+                            <small style="color: #a0a8b5;">Generate your first report using the form above.</small>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('recentReports').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Error loading reports: ${error.message}
+                    </div>
+                `;
+            });
+    }
+
+    // ============================================
+    // TOAST NOTIFICATION
+    // ============================================
+    function showToast(message, type = 'info') {
+        const colors = {
+            success: '#2e7d32',
+            danger: '#c62828',
+            warning: '#f57c00',
+            info: '#0d47a1'
+        };
+
+        let container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.style.cssText = 'position:fixed; top:80px; right:20px; z-index:9999; max-width:400px;';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-custom';
+        toast.style.backgroundColor = colors[type] || colors.info;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'times-circle' : 'info-circle'}"></i>
+            ${message}
+        `;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.5s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    }
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    window.onload = function() {
+        loadDefectStats();
+        loadRecentReports();
+    };
 </script>
 {% endblock %}
