@@ -154,7 +154,13 @@
         border: none;
     }
 
-    .btn-camera-capture:hover {
+    .btn-camera-capture:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .btn-camera-capture:hover:not(:disabled) {
         background: linear-gradient(135deg, #0d1445, #1a237e);
         color: white;
     }
@@ -495,6 +501,16 @@
         to { opacity: 1; }
     }
 
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes alarmPulse {
+        from { transform: translate(-50%, -50%) scale(1); }
+        to { transform: translate(-50%, -50%) scale(1.1); }
+    }
+
     .camera-card {
         animation: fadeIn 0.5s ease-out;
     }
@@ -527,6 +543,60 @@
         font-weight: 500;
         margin-top: 12px;
     }
+
+    /* Permission Overlay */
+    .permission-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        z-index: 5;
+        border-radius: 12px;
+    }
+
+    .permission-overlay i {
+        font-size: 48px;
+        color: #f57c00;
+        margin-bottom: 16px;
+    }
+
+    .permission-overlay h4 {
+        color: white;
+        margin-bottom: 12px;
+    }
+
+    .permission-overlay p {
+        color: #ccc;
+        max-width: 400px;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .permission-overlay .btn-refresh {
+        background: #1a237e;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        margin-top: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .permission-overlay .btn-refresh:hover {
+        background: #0d1445;
+        transform: translateY(-2px);
+    }
 </style>
 {% endblock %}
 
@@ -549,20 +619,43 @@
                     <h5><i class="fas fa-video"></i> Camera Feed</h5>
                 </div>
                 <div class="card-body">
-                    <div class="video-wrapper">
-                        <video id="videoFeed" autoplay playsinline style="display:block; width:100%; max-height:450px; background:#0a0a0a; border-radius:12px;"></video>
+                    <div class="video-wrapper" id="videoWrapper">
+                        <!-- Video elements -->
+                        <video id="videoFeed" autoplay playsinline style="display:none; width:100%; max-height:450px; background:#0a0a0a; border-radius:12px;"></video>
                         <canvas id="canvas" style="display:none;"></canvas>
                         <img id="capturedImage" style="display:none; width:100%; max-height:450px; border-radius:12px;">
                         
+                        <!-- Placeholder when camera not started -->
+                        <div id="cameraPlaceholder" class="placeholder-text">
+                            <i class="fas fa-camera"></i>
+                            <p>Click "Start Camera" to begin</p>
+                            <small style="color: #666;">Make sure to allow camera permissions</small>
+                        </div>
+
+                        <!-- Permission Overlay (hidden by default) -->
+                        <div id="permissionOverlay" class="permission-overlay" style="display:none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h4>Camera Access Required</h4>
+                            <p>
+                                1. Click the <strong>🔒 lock icon</strong> in the address bar<br>
+                                2. Click <strong>"Site settings"</strong><br>
+                                3. Find <strong>"Camera"</strong> and change to <strong>"Allow"</strong><br>
+                                4. <strong>Refresh</strong> the page
+                            </p>
+                            <button onclick="location.reload()" class="btn-refresh">
+                                <i class="fas fa-sync"></i> Refresh Page
+                            </button>
+                        </div>
+                        
                         <!-- Controls -->
                         <div class="video-overlay">
-                            <button class="btn btn-camera-start" onclick="startCamera()">
+                            <button class="btn btn-camera-start" onclick="startCamera()" id="startBtn">
                                 <i class="fas fa-play"></i> Start
                             </button>
-                            <button class="btn btn-camera-stop" onclick="stopCamera()">
+                            <button class="btn btn-camera-stop" onclick="stopCamera()" id="stopBtn">
                                 <i class="fas fa-stop"></i> Stop
                             </button>
-                            <button class="btn btn-camera-capture" onclick="captureImage()">
+                            <button class="btn btn-camera-capture" onclick="captureImage()" id="captureBtn" disabled>
                                 <i class="fas fa-camera"></i> Capture
                             </button>
                             <button class="btn btn-camera-reset" onclick="resetInspection()">
@@ -614,61 +707,170 @@
 
 <script>
     // ============================================
-    // CAMERA FUNCTIONS
+    // CAMERA FUNCTIONS WITH PERMISSION HANDLING
     // ============================================
     let stream = null;
     const video = document.getElementById('videoFeed');
     const canvas = document.getElementById('canvas');
     const capturedImg = document.getElementById('capturedImage');
+    const placeholder = document.getElementById('cameraPlaceholder');
+    const permissionOverlay = document.getElementById('permissionOverlay');
+    const captureBtn = document.getElementById('captureBtn');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
 
+    // Check if browser supports getUserMedia
+    function checkCameraSupport() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showToast('Your browser does not support camera access.', 'danger');
+            return false;
+        }
+        return true;
+    }
+
+    // Start Camera Function with Permission Handling
     function startCamera() {
-        navigator.mediaDevices.getUserMedia({ 
-            video: { 
+        if (!checkCameraSupport()) return;
+
+        // Hide placeholder and permission overlay
+        if (placeholder) placeholder.style.display = 'none';
+        if (permissionOverlay) permissionOverlay.style.display = 'none';
+
+        showToast('Requesting camera access...', 'info');
+
+        navigator.mediaDevices.getUserMedia({
+            video: {
                 facingMode: 'environment',
                 width: { ideal: 1280 },
                 height: { ideal: 720 }
-            } 
+            },
+            audio: false
         })
         .then(s => {
             stream = s;
             video.srcObject = stream;
             video.style.display = 'block';
             capturedImg.style.display = 'none';
-            showToast('Camera started successfully!', 'success');
+            if (captureBtn) captureBtn.disabled = false;
+            if (startBtn) startBtn.disabled = true;
+            if (stopBtn) stopBtn.disabled = false;
+            if (placeholder) placeholder.style.display = 'none';
+            if (permissionOverlay) permissionOverlay.style.display = 'none';
+            showToast('✅ Camera started successfully!', 'success');
         })
         .catch(err => {
-            showToast('Camera error: ' + err.message, 'danger');
+            let errorMessage = '';
+            
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                errorMessage = 'Camera permission denied!';
+                showToast('❌ Camera permission denied! Click the lock icon to allow.', 'danger');
+                if (permissionOverlay) permissionOverlay.style.display = 'flex';
+                if (placeholder) placeholder.style.display = 'none';
+                console.error('Camera permission denied. Instructions:');
+                console.error('1. Click the lock icon in address bar');
+                console.error('2. Click "Site settings"');
+                console.error('3. Find "Camera" and change to "Allow"');
+                console.error('4. Refresh the page');
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                errorMessage = 'No camera found. Please connect a camera.';
+                showToast('❌ No camera found!', 'danger');
+            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                errorMessage = 'Camera is in use by another application.';
+                showToast('❌ Camera is busy! Close other apps.', 'danger');
+            } else {
+                errorMessage = err.message;
+                showToast('Camera error: ' + err.message, 'danger');
+            }
+            
+            console.error('Camera error:', err);
+            console.error('Error details:', errorMessage);
+            
+            // Show placeholder
+            if (placeholder) {
+                placeholder.style.display = 'flex';
+                placeholder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: #f57c00;"></i>
+                    <p style="color: #ccc;">${errorMessage}</p>
+                    <small style="color: #666; margin-top: 8px;">Click "Start Camera" to try again</small>
+                `;
+            }
+            
+            if (captureBtn) captureBtn.disabled = true;
+            if (startBtn) startBtn.disabled = false;
+            if (stopBtn) stopBtn.disabled = true;
         });
     }
 
+    // Stop Camera Function
     function stopCamera() {
         if (stream) {
             stream.getTracks().forEach(t => t.stop());
             stream = null;
             video.srcObject = null;
         }
+        video.style.display = 'none';
+        capturedImg.style.display = 'none';
+        if (captureBtn) captureBtn.disabled = true;
+        if (startBtn) startBtn.disabled = false;
+        if (stopBtn) stopBtn.disabled = true;
+        
+        // Show placeholder
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <i class="fas fa-camera"></i>
+                <p>Click "Start Camera" to begin</p>
+                <small style="color: #666;">Make sure to allow camera permissions</small>
+            `;
+        }
+        if (permissionOverlay) permissionOverlay.style.display = 'none';
+        
         showToast('Camera stopped.', 'info');
     }
 
+    // Capture Image Function
     function captureImage() {
         if (!stream) {
             showToast('Please start the camera first.', 'warning');
             return;
         }
+        
+        if (!video.videoWidth || !video.videoHeight) {
+            showToast('Camera not ready. Please wait.', 'warning');
+            return;
+        }
+        
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
         capturedImg.src = canvas.toDataURL('image/jpeg');
         capturedImg.style.display = 'block';
         video.style.display = 'none';
-        showToast('Image captured! Click "Upload & Detect" or use upload.', 'success');
+        if (placeholder) placeholder.style.display = 'none';
+        if (permissionOverlay) permissionOverlay.style.display = 'none';
+        showToast('✅ Image captured! Click "Upload & Detect" or use upload.', 'success');
     }
 
+    // Reset Inspection Function
     function resetInspection() {
         capturedImg.style.display = 'none';
-        video.style.display = 'block';
+        video.style.display = 'none';
         document.getElementById('resultsCard').style.display = 'none';
         document.getElementById('imageFile').value = '';
+        
+        if (placeholder) {
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = `
+                <i class="fas fa-camera"></i>
+                <p>Click "Start Camera" to begin</p>
+                <small style="color: #666;">Make sure to allow camera permissions</small>
+            `;
+        }
+        if (permissionOverlay) permissionOverlay.style.display = 'none';
+        if (captureBtn) captureBtn.disabled = true;
+        if (startBtn) startBtn.disabled = false;
+        if (stopBtn) stopBtn.disabled = true;
+        
         showToast('Reset successful.', 'info');
     }
 
@@ -687,36 +889,37 @@
         if (!container) {
             container = document.createElement('div');
             container.id = 'toastContainer';
-            container.style.position = 'fixed';
-            container.style.top = '80px';
-            container.style.right = '20px';
-            container.style.zIndex = '9999';
-            container.style.maxWidth = '400px';
+            container.style.cssText = 'position:fixed; top:80px; right:20px; z-index:9999; max-width:400px;';
             document.body.appendChild(container);
         }
 
         const toast = document.createElement('div');
-        toast.className = 'toast align-items-center text-white border-0 fade show';
-        toast.style.backgroundColor = colors[type] || colors.info;
-        toast.style.borderRadius = '8px';
-        toast.style.marginBottom = '10px';
-        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'times-circle' : 'info-circle'} me-2"></i>
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
+        toast.style.cssText = `
+            background: ${colors[type] || colors.info};
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: slideDown 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border: none;
         `;
-        
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'times-circle' : 'info-circle'}"></i>
+            ${message}
+        `;
         container.appendChild(toast);
         
         setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 5000);
+            toast.style.transition = 'opacity 0.5s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 6000);
     }
 
     // ============================================
@@ -844,6 +1047,7 @@
                 text-align: center;
                 font-size: 24px;
                 box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                animation: alarmPulse 0.5s infinite alternate;
             `;
             overlay.innerHTML = `
                 <i class="fas fa-exclamation-triangle" style="font-size:60px; display:block; margin-bottom:20px;"></i>
@@ -854,7 +1058,6 @@
         }
         
         overlay.style.display = 'block';
-        overlay.style.animation = 'alarmPulse 0.5s infinite alternate';
         const small = overlay.querySelector('small');
         if (small && defects && defects.length > 0) {
             small.textContent = defects.join(' • ');
@@ -892,32 +1095,45 @@
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('imageFile');
 
-        uploadArea.addEventListener('click', function() {
-            fileInput.click();
-        });
+        if (uploadArea) {
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
 
-        uploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            this.classList.add('dragover');
-        });
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
 
-        uploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            this.classList.remove('dragover');
-        });
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
 
-        uploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            this.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                // Auto-submit
-                document.getElementById('uploadForm').dispatchEvent(new Event('submit'));
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    document.getElementById('uploadForm').dispatchEvent(new Event('submit'));
+                }
+            });
+        }
+
+        // Check if camera is supported
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Auto-start camera on page load
+            setTimeout(startCamera, 1000);
+        } else {
+            if (placeholder) {
+                placeholder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="color: #c62828;"></i>
+                    <p style="color: #ccc;">Camera not supported in this browser</p>
+                    <small style="color: #666;">Please use Chrome, Edge, or Firefox</small>
+                `;
             }
-        });
-
-        // Auto-start camera
-        startCamera();
+            showToast('Camera not supported in this browser.', 'danger');
+        }
     });
 </script>
 {% endblock %}

@@ -184,7 +184,17 @@ def reports():
 @app.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', user=current_user)
+    total = InspectionSession.query.filter_by(operator_id=current_user.operator_id).count()
+    pass_count = InspectionSession.query.filter_by(operator_id=current_user.operator_id, result_summary='PASS').count()
+    fail_count = total - pass_count
+    pass_rate = (pass_count / total * 100) if total > 0 else 0
+    
+    return render_template('profile.html', 
+                          user=current_user,
+                          total_inspections=total,
+                          pass_count=pass_count,
+                          fail_count=fail_count,
+                          pass_rate=pass_rate)
 
 # ============================================
 # API ROUTES
@@ -297,10 +307,13 @@ def generate_report():
             user_name=current_user.operator_name
         )
         
+        # Extract just the filename for download
+        filename_only = os.path.basename(filename)
+        
         return jsonify({
             'success': True,
             'message': 'Report generated successfully!',
-            'download_url': f"/download/{filename.split('/')[-1]}"
+            'download_url': f"/download/{filename_only}"
         })
         
     except Exception as e:
@@ -309,12 +322,27 @@ def generate_report():
 @app.route('/download/<filename>')
 @login_required
 def download_report(filename):
-    return send_file(f'reports/{filename}', as_attachment=True)
+    """Download generated report"""
+    from flask import send_file
+    
+    # Get the root directory of the project
+    # app.py is in backend/, so go up one level to get root
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    file_path = os.path.join(root_dir, 'reports', filename)
+    
+    # Check if file exists
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'Report file not found'}), 404
+    
+    return send_file(file_path, as_attachment=True)
 
 @app.route('/api/recent-reports')
 @login_required
 def recent_reports():
-    reports_dir = 'reports'
+    # Get the root directory
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    reports_dir = os.path.join(root_dir, 'reports')
+    
     if not os.path.exists(reports_dir):
         return jsonify({'reports': []})
     
