@@ -34,7 +34,6 @@
         overflow: hidden;
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
-        height: 100%;
     }
 
     .report-card:hover {
@@ -120,135 +119,6 @@
 
     .btn-generate i {
         font-size: 1.1rem;
-    }
-
-    /* ============================================
-       STATISTICS CARD
-       ============================================ */
-    
-    .stats-card {
-        border: none;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-
-    .stats-card:hover {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-card .card-header {
-        background: linear-gradient(135deg, #0d47a1, #1565c0);
-        border: none;
-        padding: 16px 24px;
-    }
-
-    .stats-card .card-header h5 {
-        color: white;
-        font-weight: 600;
-        margin: 0;
-        font-size: 1.1rem;
-    }
-
-    .stats-card .card-header h5 i {
-        margin-right: 10px;
-    }
-
-    .stats-card .card-body {
-        padding: 24px;
-        background: #fafbff;
-    }
-
-    .total-defects {
-        text-align: center;
-        padding: 12px 0 16px;
-        border-bottom: 2px solid #f0f2f5;
-        margin-bottom: 16px;
-    }
-
-    .total-defects .number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #c62828;
-        line-height: 1;
-    }
-
-    .total-defects .label {
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #6c757d;
-        font-weight: 600;
-        margin-top: 4px;
-    }
-
-    .defect-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .defect-item {
-        background: white;
-        border-radius: 10px;
-        padding: 12px 16px;
-        border: 1px solid #f0f2f5;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .defect-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        border-color: #1a237e;
-    }
-
-    .defect-item .defect-name {
-        font-size: 0.8rem;
-        color: #6c757d;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    .defect-item .defect-count {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #1a237e;
-        margin-top: 2px;
-    }
-
-    .defect-item .defect-icon {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        line-height: 32px;
-        text-align: center;
-        font-size: 14px;
-        margin-bottom: 4px;
-    }
-
-    .defect-item .defect-icon.bug {
-        background: #ffebee;
-        color: #c62828;
-    }
-
-    .defect-item .defect-icon.missing {
-        background: #fff3e0;
-        color: #e65100;
-    }
-
-    .defect-item .defect-icon.alignment {
-        background: #e3f2fd;
-        color: #0d47a1;
-    }
-
-    .defect-item .defect-icon.other {
-        background: #f3e5f5;
-        color: #6a1b9a;
     }
 
     /* ============================================
@@ -380,33 +250,13 @@
        RESPONSIVE
        ============================================ */
     
-    @media (max-width: 992px) {
-        .report-card {
-            margin-bottom: 20px;
-        }
-    }
-
     @media (max-width: 768px) {
         .page-title {
             font-size: 1.4rem;
         }
 
-        .report-card .card-body,
-        .stats-card .card-body {
+        .report-card .card-body {
             padding: 16px;
-        }
-
-        .total-defects .number {
-            font-size: 2rem;
-        }
-
-        .defect-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .defect-item .defect-count {
-            font-size: 1.2rem;
         }
 
         .recent-reports-card .card-body {
@@ -426,23 +276,6 @@
     @media (max-width: 576px) {
         .reports-container {
             padding: 10px 0;
-        }
-
-        .defect-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-
-        .defect-item {
-            padding: 8px 12px;
-        }
-
-        .defect-item .defect-count {
-            font-size: 1rem;
-        }
-
-        .defect-item .defect-name {
-            font-size: 0.7rem;
         }
 
         .report-list-item .report-info .report-name {
@@ -474,22 +307,9 @@
         animation: fadeInUp 0.5s ease-out;
     }
 
-    .stats-card {
+    .recent-reports-card {
         animation: fadeInUp 0.5s ease-out 0.1s both;
     }
-
-    .recent-reports-card {
-        animation: fadeInUp 0.5s ease-out 0.2s both;
-    }
-
-    .defect-item {
-        animation: fadeInUp 0.3s ease-out;
-    }
-
-    .defect-item:nth-child(1) { animation-delay: 0.1s; }
-    .defect-item:nth-child(2) { animation-delay: 0.15s; }
-    .defect-item:nth-child(3) { animation-delay: 0.2s; }
-    .defect-item:nth-child(4) { animation-delay: 0.25s; }
 </style>
 {% endblock %}
 
@@ -504,10 +324,9 @@
         </div>
     </div>
 
-    <!-- Report Generation & Statistics -->
+    <!-- Report Generation -->
     <div class="row">
-        <!-- Report Generation -->
-        <div class="col-lg-6">
+        <div class="col-lg-8 mx-auto">
             <div class="card report-card">
                 <div class="card-header">
                     <h5><i class="fas fa-calendar-alt"></i> Generate Report</h5>
@@ -528,21 +347,6 @@
                             <i class="fas fa-file-pdf"></i> Generate Report
                         </button>
                     </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Defect Statistics -->
-        <div class="col-lg-6">
-            <div class="card stats-card">
-                <div class="card-header">
-                    <h5><i class="fas fa-chart-bar"></i> Defect Statistics</h5>
-                </div>
-                <div class="card-body" id="defectStats">
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
-                        <p class="mt-2 text-muted">Loading statistics...</p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -599,57 +403,6 @@
             btn.disabled = false;
         });
     });
-
-    // ============================================
-    // LOAD DEFECT STATISTICS
-    // ============================================
-    function loadDefectStats() {
-        fetch('/api/defect-stats')
-            .then(response => response.json())
-            .then(data => {
-                let html = `
-                    <div class="total-defects">
-                        <div class="number">${data.total_defects}</div>
-                        <div class="label">Total Defects Found</div>
-                    </div>
-                `;
-                
-                if (data.defect_breakdown && data.defect_breakdown.length > 0) {
-                    html += '<div class="defect-grid">';
-                    
-                    const icons = ['bug', 'missing', 'alignment', 'other'];
-                    data.defect_breakdown.forEach((item, index) => {
-                        const iconClass = icons[index % icons.length];
-                        html += `
-                            <div class="defect-item">
-                                <div class="defect-icon ${iconClass}">
-                                    <i class="fas fa-${iconClass === 'bug' ? 'bug' : iconClass === 'missing' ? 'times-circle' : iconClass === 'alignment' ? 'arrows-alt-h' : 'exclamation-circle'}"></i>
-                                </div>
-                                <div class="defect-name">${item.type.replace('_', ' ').title()}</div>
-                                <div class="defect-count">${item.count}</div>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                } else {
-                    html += `
-                        <div class="text-center py-3">
-                            <i class="fas fa-check-circle" style="font-size: 32px; color: #2e7d32;"></i>
-                            <p class="text-muted mt-2">No defects recorded yet.</p>
-                        </div>
-                    `;
-                }
-                
-                document.getElementById('defectStats').innerHTML = html;
-            })
-            .catch(error => {
-                document.getElementById('defectStats').innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> Error loading stats: ${error.message}
-                    </div>
-                `;
-            });
-    }
 
     // ============================================
     // LOAD RECENT REPORTS
@@ -739,7 +492,6 @@
     // INITIALIZE
     // ============================================
     window.onload = function() {
-        loadDefectStats();
         loadRecentReports();
     };
 </script>
