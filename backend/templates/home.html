@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garment Defect Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👕</text></svg>">
+    <style>
+        /* ============================================
+           HOMEPAGE STYLES
+           ============================================ */
+        
+        :root {
+            --primary: #1a237e;
+            --primary-light: #283593;
+            --secondary: #0d47a1;
+            --success: #2e7d32;
+            --danger: #c62828;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        
+        .navbar {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #0d47a1 100%) !important;
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(26, 35, 126, 0.25);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.02);
+            transition: transform 0.3s ease;
+        }
+
+        .btn-outline-light {
+            border-radius: 10px;
+            padding: 8px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+            padding: 80px 0 60px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero-title .highlight {
+            background: linear-gradient(135deg, #ffd54f, #ff8a65);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .hero-stats .stat-item {
+            text-align: center;
+        }
+
+        .hero-stats .stat-item .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd54f;
+        }
+
+        .hero-stats .stat-item .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .hero-image {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-image .floating-badge {
+            position: absolute;
+            bottom: -20px;
+            left: -20px;
+            background: white;
+            color: #1a237e;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .hero-image .floating-badge i {
+            font-size: 24px;
+            color: #2e7d32;
+        }
+
+        .btn-hero {
+            background: linear-gradient(135deg, #ffd54f, #ff8a65);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a237e;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 213, 79, 0.3);
+            color: #1a237e;
+        }
+
+        .btn-hero-outline {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        /* ============================================
+           FEATURES SECTION
+           ============================================ */
+        
+        .features-section {
+            padding: 80px 0;
+            background: #f5f7fa;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 48px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 24px;
+            text-align: center;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(26, 35, 126, 0.1);
+        }
+
+        .feature-card .icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            color: white;
+        }
+
+        .feature-card .icon.primary {
+            background: linear-gradient(135deg, #1a237e, #283593);
+        }
+
+        .feature-card .icon.success {
+            background: linear-gradient(135deg, #2e7d32, #43a047);
+        }
+
+        .feature-card .icon.warning {
+            background: linear-gradient(135deg, #e65100, #f57c00);
+        }
+
+        .feature-card .icon.info {
+            background: linear-gradient(135deg, #0d47a1, #1565c0);
+        }
+
+        .feature-card .icon.danger {
+            background: linear-gradient(135deg, #c62828, #e53935);
+        }
+
+        .feature-card .icon.purple {
+            background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+        }
+
+        .feature-card h5 {
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* ============================================
+           HOW IT WORKS
+           ============================================ */
+        
+        .how-it-works {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 16px;
+        }
+
+        .step-card h5 {
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        .step-card p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .step-arrow {
+            font-size: 2rem;
+            color: #1a237e;
+            opacity: 0.3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================
+           CTA SECTION
+           ============================================ */
+        
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 24px;
+        }
+
+        .btn-cta {
+            background: white;
+            color: #1a237e;
+            border: none;
+            padding: 14px 48px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+            color: #1a237e;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        
+        .footer {
+            background: #1a1a2e;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 40px 0 20px;
+        }
+
+        .footer h5 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+        .footer .footer-link {
+            display: block;
+            padding: 4px 0;
+        }
+
+        .footer .social-icons a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            text-align: center;
+            line-height: 36px;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-icons a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .footer .footer-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-image .floating-badge {
+                display: none;
+            }
+
+            .hero-stats {
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .step-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0 40px;
+                min-height: auto;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features-section {
+                padding: 60px 0;
+            }
+
+            .how-it-works {
+                padding: 60px 0;
+            }
+
+            .cta-section {
+                padding: 60px 0;
+            }
+
+            .cta-section h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .hero-stats .stat-item .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .feature-card {
+                padding: 20px 16px;
+            }
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .fade-in-up-delay-1 {
+            animation-delay: 0.1s;
+        }
+        .fade-in-up-delay-2 {
+            animation-delay: 0.2s;
+        }
+        .fade-in-up-delay-3 {
+            animation-delay: 0.3s;
+        }
+        .fade-in-up-delay-4 {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-tshirt"></i>
+                <span>Garment Detect</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('register') }}" class="btn btn-light" style="color: #1a237e; font-weight: 600; border-radius: 10px;">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-robot me-2"></i> AI-Powered Quality Control
+                    </div>
+                    <h1 class="hero-title">
+                        Smart Garment<br>
+                        <span class="highlight">Defect Detection</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Automate your quality control process with our deep learning-based system. 
+                        Detect button defects, alignment issues, and more in seconds.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('register') }}" class="btn-hero">
+                            <i class="fas fa-rocket"></i> Get Started Free
+                        </a>
+                        <a href="#features" class="btn-hero-outline">
+                            <i class="fas fa-play-circle"></i> Learn More
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">95%</div>
+                            <div class="stat-label">Detection Accuracy</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">5s</div>
+                            <div class="stat-label">Per Inspection</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Quality Monitoring</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 hero-image text-center">
+                    <div class="position-relative">
+                        <div class="floating-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>99.8% Uptime</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">Why Choose Garment Detect?</h2>
+                <p class="section-subtitle">
+                    Everything you need for automated quality control in one powerful platform.
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card fade-in-up">
+                        <div class="icon primary">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h5>Real-Time Inspection</h5>
+                        <p>Capture and analyze garment images instantly using your webcam or upload existing images.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card fade-in-up fade-in-up-delay-1">
+                        <div class="icon success">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h5>AI-Powered Detection</h5>
+                        <p>Detect missing buttons, misalignments, and other defects with 95% accuracy using deep learning.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card fade-in-up fade-in-up-delay-2">
+                        <div class="icon warning">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h5>Instant Reports</h5>
+                        <p>Generate comprehensive PDF reports with detailed defect analysis and statistics.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card fade-in-up fade-in-up-delay-3">
+                        <div class="icon info">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h5>Inspection History</h5>
+                        <p>Track all past inspections and defects with detailed logs and analytics.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card fade-in-up fade-in-up-delay-4">
+                        <div class="icon danger">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h5>Real-Time Alerts</h5>
+                        <p>Get instant audio and visual alerts when defects are detected during inspection.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card fade-in-up fade-in-up-delay-4">
+                        <div class="icon purple">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>Secure & Private</h5>
+                        <p>Your data is encrypted and stored securely in MySQL with role-based access control.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">
+                    Three simple steps to start detecting garment defects.
+                </p>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h5>Register & Login</h5>
+                        <p>Create your operator account and login to the system.</p>
+                    </div>
+                </div>
+                <div class="col-md-1 text-center step-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h5>Capture or Upload</h5>
+                        <p>Take a photo with your camera or upload an image of the garment.</p>
+                    </div>
+                </div>
+                <div class="col-md-1 text-center step-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h5>Get Results</h5>
+                        <p>View PASS/FAIL status, defect details, and generate reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Your Quality Control?</h2>
+            <p>Join thousands of operators using Garment Detect for automated defect detection.</p>
+            <a href="{{ url_for('register') }}" class="btn-cta">
+                <i class="fas fa-rocket"></i> Get Started Now
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5><i class="fas fa-tshirt"></i> Garment Detect</h5>
+                    <p style="font-size: 0.9rem; max-width: 300px;">
+                        AI-powered garment defect detection system for automated quality control in the textile industry.
+                    </p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Quick Links</h5>
+                    <a href="#features" class="footer-link">Features</a>
+                    <a href="#how-it-works" class="footer-link">How It Works</a>
+                    <a href="{{ url_for('register') }}" class="footer-link">Register</a>
+                    <a href="{{ url_for('login') }}" class="footer-link">Login</a>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Support</h5>
+                    <a href="#" class="footer-link" onclick="alert('Please contact your system administrator.')">Help Center</a>
+                    <a href="{{ url_for('privacy_policy') }}" class="footer-link">Privacy &amp; Policy</a>
+                    <a href="#" class="footer-link" onclick="alert('Please contact your system administrator.')">Contact Support</a>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5>Contact</h5>
+                    <p style="font-size: 0.9rem;">
+                        <i class="fas fa-envelope me-2"></i> support@garmentdetect.com
+                    </p>
+                    <p style="font-size: 0.9rem;">
+                        <i class="fas fa-phone me-2"></i> +94 11 234 5678
+                    </p>
+                    <p style="font-size: 0.9rem;">
+                        <i class="fas fa-map-marker-alt me-2"></i> Rajarata University, Sri Lanka
+                    </p>
+                </div>
+            </div>
+            <hr class="footer-divider">
+            <div class="text-center">
+                <p style="font-size: 0.85rem; margin-bottom: 0;">
+                    &copy; 2026 Garment Defect Detection System. All rights reserved. Team Aurors
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

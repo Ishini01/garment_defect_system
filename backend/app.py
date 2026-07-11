@@ -60,9 +60,11 @@ with app.app_context():
 # ============================================
 
 @app.route('/')
-@login_required
-def index():
-    return redirect(url_for('dashboard'))
+def home():
+    """Homepage - Public access"""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return render_template('home.html')
 
 @app.route('/dashboard')
 @login_required
