@@ -634,9 +634,10 @@
 <body>
     <!-- Navigation -->
     {% if current_user.is_authenticated %}
+    <!-- Navigation for Logged In Users -->
     <nav class="navbar navbar-expand-lg navbar-dark shadow">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
                 <i class="fas fa-tshirt"></i>
                 <span>Garment Detect</span>
             </a>
@@ -645,6 +646,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('dashboard') }}">
                             <i class="fas fa-chart-line"></i> Dashboard

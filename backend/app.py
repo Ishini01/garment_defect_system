@@ -61,9 +61,7 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    """Homepage - Public access"""
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+    """Homepage - Always shows first"""
     return render_template('home.html')
 
 @app.route('/dashboard')
