@@ -424,6 +424,27 @@
             margin: 0 4px;
         }
 
+        .footer .footer-link {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .footer .footer-link:hover {
+            color: #1a237e;
+        }
+
+        .footer .footer-link i {
+            margin-right: 4px;
+        }
+
+        .footer .footer-divider {
+            color: #d0d5dd;
+            margin: 0 10px;
+        }
+
         /* ============================================
            UTILITY CLASSES
            ============================================ */
@@ -486,6 +507,10 @@
 
             .footer .text-muted {
                 font-size: 0.8rem;
+            }
+
+            .footer .footer-divider {
+                margin: 0 6px;
             }
         }
 
@@ -699,10 +724,23 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container text-center">
-            <span class="text-muted">
-                <i class="fas fa-tshirt"></i> Garment Defect Detection System &copy; 2026
-            </span>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span class="text-muted">
+                        <i class="fas fa-tshirt"></i> Garment Defect Detection System &copy; {{ now.year if now else '2026' }}
+                    </span>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="{{ url_for('privacy_policy') }}" class="footer-link">
+                        <i class="fas fa-shield-alt"></i> Privacy &amp; Policy
+                    </a>
+                    <span class="footer-divider">|</span>
+                    <a href="#" class="footer-link" onclick="alert('Please contact your system administrator for support.')">
+                        <i class="fas fa-headset"></i> Support
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 

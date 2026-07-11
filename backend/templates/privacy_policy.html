@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy & Policy - Garment Detect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .policy-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 12px;
+    }
+
+    .policy-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin-bottom: 24px;
+    }
+
+    .policy-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .policy-card .card-header {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        border: none;
+        padding: 16px 24px;
+        color: white;
+    }
+
+    .policy-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .policy-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .policy-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .policy-section {
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .policy-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .policy-section h6 {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.05rem;
+        margin-bottom: 8px;
+    }
+
+    .policy-section h6 i {
+        color: #1a237e;
+        margin-right: 8px;
+        font-size: 0.9rem;
+    }
+
+    .policy-section p {
+        color: #4a5568;
+        line-height: 1.8;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .policy-section ul {
+        color: #4a5568;
+        line-height: 1.8;
+        font-size: 0.95rem;
+        padding-left: 24px;
+        margin-bottom: 4px;
+    }
+
+    .policy-section ul li {
+        margin-bottom: 4px;
+    }
+
+    .policy-section .highlight {
+        background: #e8eaf6;
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: #1a237e;
+        font-weight: 500;
+    }
+
+    .policy-footer {
+        background: #f8f9ff;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-top: 16px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+        border: 1px solid #f0f2f5;
+    }
+
+    .policy-footer i {
+        color: #1a237e;
+        margin-right: 6px;
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .policy-card .card-body {
+            padding: 16px;
+        }
+
+        .policy-section p {
+            font-size: 0.9rem;
+        }
+
+        .policy-section ul {
+            font-size: 0.9rem;
+            padding-left: 18px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .policy-container {
+            padding: 10px 0;
+        }
+
+        .policy-section h6 {
+            font-size: 0.95rem;
+        }
+
+        .policy-footer {
+            font-size: 0.8rem;
+            padding: 12px 16px;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .policy-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="policy-container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="page-title">
+                <i class="fas fa-shield-alt"></i> Privacy &amp; Policy
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card policy-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-file-contract"></i> Privacy &amp; Policy Statement</h5>
+                </div>
+                <div class="card-body">
+                    <div class="policy-section">
+                        <h6><i class="fas fa-info-circle"></i> Introduction</h6>
+                        <p>
+                            At <strong>Garment Defect Detection System</strong>, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our garment defect detection system.
+                        </p>
+                        <p>
+                            By using our system, you agree to the collection and use of information in accordance with this policy. We prioritize transparency and give you control over your personal data.
+                        </p>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-database"></i> Information We Collect</h6>
+                        <p>We collect the following types of information to provide and improve our services:</p>
+                        <ul>
+                            <li><strong>Operator Information:</strong> Operator ID, Operator Name, NIC, Email, and Encrypted PIN for authentication and access control.</li>
+                            <li><strong>Inspection Data:</strong> Session ID, Date/Time, Shirt Count, and Inspection Results (PASS/FAIL).</li>
+                            <li><strong>Defect Records:</strong> Defect Type, Description, Severity, and Status for quality analysis and reporting.</li>
+                            <li><strong>Images:</strong> Garment images captured during inspections for defect analysis (stored securely).</li>
+                            <li><strong>Activity Logs:</strong> Login attempts, inspection sessions, and report generations for accountability.</li>
+                        </ul>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-cogs"></i> How We Use Your Information</h6>
+                        <p>The information we collect is used for the following purposes:</p>
+                        <ul>
+                            <li><strong>To Provide Services:</strong> Processing garment inspections, detecting defects, and generating reports.</li>
+                            <li><strong>To Improve Quality:</strong> Analyzing defect patterns and improving detection accuracy.</li>
+                            <li><strong>To Maintain Security:</strong> Authenticating operators and tracking system usage.</li>
+                            <li><strong>To Generate Reports:</strong> Creating inspection summaries for operational decision-making.</li>
+                            <li><strong>To Communicate:</strong> Notifying operators about system updates and important information.</li>
+                        </ul>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-lock"></i> Data Security</h6>
+                        <p>We implement robust security measures to protect your data:</p>
+                        <ul>
+                            <li><strong>Encryption:</strong> Operator PINs are securely hashed using <span class="highlight">bcrypt</span> before storage.</li>
+                            <li><strong>Access Control:</strong> Only authorized operators can access inspection data and reports.</li>
+                            <li><strong>Input Validation:</strong> All user inputs are validated to prevent <span class="highlight">SQL injection</span> attacks.</li>
+                            <li><strong>Regular Backups:</strong> Database backups are maintained to prevent data loss.</li>
+                            <li><strong>Secure Storage:</strong> Images and inspection data are stored securely on the local workstation.</li>
+                        </ul>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-clock"></i> Data Retention</h6>
+                        <p>We retain your personal data only for as long as necessary to provide our services and fulfill legal obligations:</p>
+                        <ul>
+                            <li><strong>Operator Accounts:</strong> Retained until the operator account is deleted or deactivated.</li>
+                            <li><strong>Inspection Records:</strong> Retained for historical analysis and quality tracking.</li>
+                            <li><strong>Defect Data:</strong> Retained indefinitely for trend analysis and continuous improvement.</li>
+                            <li><strong>Images:</strong> Stored as part of the inspection record for reference and validation.</li>
+                        </ul>
+                        <p>If you wish to have your data removed, please contact your system administrator.</p>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-user-shield"></i> Your Rights</h6>
+                        <p>As an operator of the Garment Defect Detection System, you have the following rights:</p>
+                        <ul>
+                            <li><strong>Access:</strong> You can view your personal information and inspection history.</li>
+                            <li><strong>Correction:</strong> You can request corrections to your personal information.</li>
+                            <li><strong>Deletion:</strong> You can request deletion of your account and associated data.</li>
+                            <li><strong>Portability:</strong> You can request a copy of your inspection data.</li>
+                            <li><strong>Restriction:</strong> You can request limitation of data processing.</li>
+                        </ul>
+                        <p>To exercise any of these rights, please contact your system administrator or supervisor.</p>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-cookie-bite"></i> Cookies &amp; Tracking</h6>
+                        <p>Our system uses session cookies to maintain your login state and provide a seamless experience:</p>
+                        <ul>
+                            <li><strong>Session Cookies:</strong> Used to keep you logged in during your session.</li>
+                            <li><strong>Remember Me:</strong> Optional cookie to remember your login preference.</li>
+                            <li><strong>No Third-Party Cookies:</strong> We do not use third-party tracking cookies.</li>
+                            <li><strong>Opt-Out:</strong> You can disable cookies in your browser settings.</li>
+                        </ul>
+                    </div>
+
+                    <div class="policy-section">
+                        <h6><i class="fas fa-gavel"></i> Policy Updates</h6>
+                        <p>
+                            We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. We will notify you of any significant changes by posting the updated policy on this page.
+                        </p>
+                        <p>
+                            <strong>Last Updated:</strong> <span class="highlight">{{ now.strftime('%B %d, %Y') }}</span>
+                        </p>
+                    </div>
+
+                    <div class="policy-footer">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>If you have any questions about this Privacy Policy, please contact your system administrator.</span>
+                        <br>
+                        <small style="color: #a0a8b5;">
+                            Garment Defect Detection System &copy; {{ now.year }} - All Rights Reserved
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

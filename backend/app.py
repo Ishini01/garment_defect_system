@@ -197,6 +197,15 @@ def profile():
                           pass_rate=pass_rate)
 
 # ============================================
+# PRIVACY POLICY ROUTE
+# ============================================
+
+@app.route('/privacy-policy')
+def privacy_policy():
+    """Privacy and Policy page"""
+    return render_template('privacy_policy.html')
+
+# ============================================
 # API ROUTES
 # ============================================
 
