@@ -1,0 +1,744 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Garment Detect{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        padding: 20px 0;
+    }
+
+    .page-title {
+        color: #1a237e;
+        font-weight: 700;
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .page-title i {
+        color: #1a237e;
+        margin-right: 12px;
+    }
+
+    .settings-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin-bottom: 24px;
+    }
+
+    .settings-card:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .settings-card .card-header {
+        border: none;
+        padding: 16px 24px;
+        color: white;
+    }
+
+    .settings-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .settings-card .card-header h5 i {
+        margin-right: 10px;
+    }
+
+    .settings-card .card-body {
+        padding: 24px;
+        background: #fafbff;
+    }
+
+    .settings-card .card-header.primary {
+        background: linear-gradient(135deg, #1a237e, #283593);
+    }
+
+    .settings-card .card-header.success {
+        background: linear-gradient(135deg, #2e7d32, #43a047);
+    }
+
+    .settings-card .card-header.info {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+    }
+
+    .settings-card .card-header.warning {
+        background: linear-gradient(135deg, #e65100, #f57c00);
+    }
+
+    .settings-card .card-header.danger {
+        background: linear-gradient(135deg, #c62828, #e53935);
+    }
+
+    .setting-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 0;
+        border-bottom: 1px solid #f0f2f5;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+
+    .setting-item .setting-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .setting-item .setting-info .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .setting-item .setting-info .icon.primary {
+        background: #e8eaf6;
+        color: #1a237e;
+    }
+
+    .setting-item .setting-info .icon.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .setting-item .setting-info .icon.warning {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .setting-item .setting-info .icon.danger {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .setting-item .setting-info .icon.info {
+        background: #e3f2fd;
+        color: #0d47a1;
+    }
+
+    .setting-item .setting-info .setting-label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .setting-item .setting-info .setting-description {
+        font-size: 0.85rem;
+        color: #6c757d;
+        display: block;
+    }
+
+    .setting-item .setting-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 48px;
+        height: 26px;
+        background: #ddd;
+        border-radius: 13px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .toggle-switch.active {
+        background: #1a237e;
+    }
+
+    .toggle-switch .toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch.active .toggle-thumb {
+        transform: translateX(22px);
+    }
+
+    .btn-sm-custom {
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-sm-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-sm-custom.primary {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+    }
+
+    .btn-sm-custom.success {
+        background: linear-gradient(135deg, #2e7d32, #43a047);
+        color: white;
+    }
+
+    .btn-sm-custom.danger {
+        background: linear-gradient(135deg, #c62828, #e53935);
+        color: white;
+    }
+
+    .btn-sm-custom.warning {
+        background: linear-gradient(135deg, #e65100, #f57c00);
+        color: white;
+    }
+
+    .form-floating {
+        position: relative;
+        margin-bottom: 16px;
+    }
+
+    .form-floating .form-control {
+        border-radius: 10px;
+        padding: 14px 16px;
+        border: 2px solid #e8ecf1;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8f9fe;
+        height: 55px;
+    }
+
+    .form-floating .form-control:focus {
+        border-color: #1a237e;
+        box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
+        background: #ffffff;
+    }
+
+    .form-floating label {
+        padding: 0 12px;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+    }
+
+    .input-icon-wrapper .form-control {
+        padding-left: 48px;
+    }
+
+    .input-icon-wrapper .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0a8b5;
+        font-size: 18px;
+        z-index: 2;
+        transition: color 0.3s ease;
+    }
+
+    .input-icon-wrapper .form-control:focus ~ .input-icon {
+        color: #1a237e;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #a0a8b5;
+        cursor: pointer;
+        font-size: 18px;
+        z-index: 3;
+        padding: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: #1a237e;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 32px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.3);
+        color: white;
+    }
+
+    .btn-save i {
+        margin-right: 8px;
+    }
+
+    .alert-custom {
+        border-radius: 10px;
+        padding: 14px 18px;
+        border: none;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .settings-card .card-body {
+            padding: 16px;
+        }
+
+        .setting-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .setting-item .setting-control {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .form-floating .form-control {
+            height: 50px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .settings-container {
+            padding: 10px 0;
+        }
+
+        .setting-item .setting-info .setting-label {
+            font-size: 0.9rem;
+        }
+
+        .setting-item .setting-info .setting-description {
+            font-size: 0.8rem;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .settings-card {
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .settings-card:nth-child(1) { animation-delay: 0.05s; }
+    .settings-card:nth-child(2) { animation-delay: 0.1s; }
+    .settings-card:nth-child(3) { animation-delay: 0.15s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- Page Title -->
+    <div class="row">
+        <div class="col-12">
+            <h1 class="page-title">
+                <i class="fas fa-cog"></i> Settings
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Profile Settings -->
+            <div class="card settings-card">
+                <div class="card-header primary">
+                    <h5><i class="fas fa-user-edit"></i> Profile Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm" method="POST" action="{{ url_for('update_profile') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="text" class="form-control" id="operator_id" value="{{ current_user.operator_id }}" readonly>
+                                    <i class="fas fa-id-badge input-icon"></i>
+                                    <label for="operator_id">Operator ID</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="text" class="form-control" id="operator_name" name="operator_name" value="{{ current_user.operator_name }}" required>
+                                    <i class="fas fa-user input-icon"></i>
+                                    <label for="operator_name">Operator Name</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="text" class="form-control" id="nic" name="nic" value="{{ current_user.nic }}" required>
+                                    <i class="fas fa-id-card input-icon"></i>
+                                    <label for="nic">NIC</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email or '' }}" placeholder="Email (optional)">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <label for="email">Email</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save mt-2">
+                            <i class="fas fa-save"></i> Update Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change PIN -->
+            <div class="card settings-card">
+                <div class="card-header success">
+                    <h5><i class="fas fa-key"></i> Change PIN</h5>
+                </div>
+                <div class="card-body">
+                    <form id="pinForm" method="POST" action="{{ url_for('change_pin') }}">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="password" class="form-control" id="current_pin" name="current_pin" placeholder="Current PIN" required>
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <label for="current_pin">Current PIN</label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('current_pin')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="password" class="form-control" id="new_pin" name="new_pin" placeholder="New PIN" required>
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <label for="new_pin">New PIN</label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('new_pin')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating input-icon-wrapper">
+                                    <input type="password" class="form-control" id="confirm_pin" name="confirm_pin" placeholder="Confirm PIN" required>
+                                    <i class="fas fa-check-circle input-icon"></i>
+                                    <label for="confirm_pin">Confirm PIN</label>
+                                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_pin')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save mt-2">
+                            <i class="fas fa-key"></i> Change PIN
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Settings -->
+        <div class="col-lg-4">
+            <!-- Preferences -->
+            <div class="card settings-card">
+                <div class="card-header info">
+                    <h5><i class="fas fa-sliders-h"></i> Preferences</h5>
+                </div>
+                <div class="card-body">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="icon primary">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div>
+                                <div class="setting-label">Notifications</div>
+                                <span class="setting-description">Enable alarm sounds</span>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" id="notificationToggle" onclick="toggleSwitch(this)">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="icon success">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div>
+                                <div class="setting-label">Auto-start Camera</div>
+                                <span class="setting-description">Start camera on inspection page</span>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch active" id="cameraToggle" onclick="toggleSwitch(this)">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="icon warning">
+                                <i class="fas fa-file-export"></i>
+                            </div>
+                            <div>
+                                <div class="setting-label">Auto-generate Reports</div>
+                                <span class="setting-description">Auto-generate after inspection</span>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <div class="toggle-switch" id="reportToggle" onclick="toggleSwitch(this)">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card settings-card">
+                <div class="card-header danger">
+                    <h5><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+                </div>
+                <div class="card-body">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="icon danger">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div>
+                                <div class="setting-label">Clear All Data</div>
+                                <span class="setting-description" style="color: #c62828;">Permanently delete all inspection data</span>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn-sm-custom danger" onclick="confirmClearData()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="icon danger">
+                                <i class="fas fa-user-times"></i>
+                            </div>
+                            <div>
+                                <div class="setting-label">Delete Account</div>
+                                <span class="setting-description" style="color: #c62828;">Permanently delete your account</span>
+                            </div>
+                        </div>
+                        <div class="setting-control">
+                            <button class="btn-sm-custom danger" onclick="confirmDeleteAccount()">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // TOGGLE SWITCH
+    // ============================================
+    function toggleSwitch(element) {
+        element.classList.toggle('active');
+        const isActive = element.classList.contains('active');
+        const label = element.closest('.setting-item').querySelector('.setting-label');
+        if (label) {
+            label.textContent = isActive ? label.textContent.replace('Off', 'On').replace('Disabled', 'Enabled') : 
+                label.textContent.replace('On', 'Off').replace('Enabled', 'Disabled');
+        }
+        // Save preference (you can add API call here)
+        console.log('Toggle changed:', element.id, isActive ? 'ON' : 'OFF');
+    }
+
+    // ============================================
+    // PASSWORD TOGGLE
+    // ============================================
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.parentElement.querySelector('.password-toggle i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // ============================================
+    // CONFIRM CLEAR DATA
+    // ============================================
+    function confirmClearData() {
+        if (confirm('⚠️ WARNING: This will permanently delete ALL inspection data. This action cannot be undone.\n\nAre you sure you want to continue?')) {
+            if (confirm('Are you absolutely sure? This will delete all inspections, defects, and reports.')) {
+                fetch('/api/clear-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✅ All data has been cleared successfully!');
+                        location.reload();
+                    } else {
+                        alert('❌ Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert('❌ Error: ' + error.message);
+                });
+            }
+        }
+    }
+
+    // ============================================
+    // CONFIRM DELETE ACCOUNT
+    // ============================================
+    function confirmDeleteAccount() {
+        if (confirm('⚠️ WARNING: This will permanently delete your account and ALL associated data. This action cannot be undone.\n\nAre you sure you want to continue?')) {
+            if (confirm('Are you absolutely sure? Your account and all data will be permanently deleted.')) {
+                if (confirm('Final confirmation: Type "DELETE" to confirm')) {
+                    const userInput = prompt('Type "DELETE" to confirm account deletion:');
+                    if (userInput === 'DELETE') {
+                        fetch('/api/delete-account', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('✅ Your account has been deleted successfully.');
+                                window.location.href = '/logout';
+                            } else {
+                                alert('❌ Error: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            alert('❌ Error: ' + error.message);
+                        });
+                    } else {
+                        alert('❌ Account deletion cancelled. Please type "DELETE" to confirm.');
+                    }
+                }
+            }
+        }
+    }
+
+    // ============================================
+    // PIN FORM SUBMISSION
+    // ============================================
+    document.getElementById('pinForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newPin = document.getElementById('new_pin').value;
+        const confirmPin = document.getElementById('confirm_pin').value;
+        
+        if (newPin !== confirmPin) {
+            alert('❌ New PIN and Confirm PIN do not match!');
+            return;
+        }
+        
+        if (newPin.length < 4 || newPin.length > 10) {
+            alert('❌ PIN must be between 4 and 10 characters!');
+            return;
+        }
+        
+        const formData = new FormData(this);
+        fetch('/api/change-pin', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ PIN changed successfully!');
+                this.reset();
+            } else {
+                alert('❌ ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('❌ Error: ' + error.message);
+        });
+    });
+
+    // ============================================
+    // PROFILE FORM SUBMISSION
+    // ============================================
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('/api/update-profile', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Profile updated successfully!');
+                location.reload();
+            } else {
+                alert('❌ ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('❌ Error: ' + error.message);
+        });
+    });
+</script>
+{% endblock %}

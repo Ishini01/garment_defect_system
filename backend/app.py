@@ -197,6 +197,86 @@ def profile():
                           pass_rate=pass_rate)
 
 # ============================================
+# SETTINGS ROUTES
+# ============================================
+
+@app.route('/settings')
+@login_required
+def settings():
+    """Settings page"""
+    return render_template('settings.html')
+
+@app.route('/api/update-profile', methods=['POST'])
+@login_required
+def update_profile():
+    """Update user profile"""
+    try:
+        user = User.query.get(current_user.id)
+        user.operator_name = request.form.get('operator_name')
+        user.nic = request.form.get('nic')
+        user.email = request.form.get('email')
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Profile updated successfully!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/change-pin', methods=['POST'])
+@login_required
+def change_pin():
+    """Change user PIN"""
+    try:
+        current_pin = request.form.get('current_pin')
+        new_pin = request.form.get('new_pin')
+        
+        user = User.query.get(current_user.id)
+        if not user.check_pin(current_pin):
+            return jsonify({'error': 'Current PIN is incorrect'}), 400
+        
+        if len(new_pin) < 4 or len(new_pin) > 10:
+            return jsonify({'error': 'PIN must be between 4 and 10 characters'}), 400
+        
+        user.set_pin(new_pin)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'PIN changed successfully!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/clear-data', methods=['POST'])
+@login_required
+def clear_data():
+    """Clear all inspection data"""
+    try:
+        # Delete all defects and inspections for this user
+        inspections = InspectionSession.query.filter_by(operator_id=current_user.operator_id).all()
+        for inspection in inspections:
+            Defect.query.filter_by(session_id=inspection.id).delete()
+            db.session.delete(inspection)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'All data cleared successfully!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    """Delete user account"""
+    try:
+        # Delete all associated data
+        inspections = InspectionSession.query.filter_by(operator_id=current_user.operator_id).all()
+        for inspection in inspections:
+            Defect.query.filter_by(session_id=inspection.id).delete()
+            db.session.delete(inspection)
+        
+        # Delete user
+        user = User.query.get(current_user.id)
+        db.session.delete(user)
+        db.session.commit()
+        logout_user()
+        return jsonify({'success': True, 'message': 'Account deleted successfully!'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============================================
 # PRIVACY POLICY ROUTE
 # ============================================
 
