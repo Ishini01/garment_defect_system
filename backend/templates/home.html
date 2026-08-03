@@ -33,25 +33,25 @@
         }
 
         /* ============================================
-           NAVIGATION
+           NAVIGATION - FULL NAVBAR
            ============================================ */
         
         .navbar {
             background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #0d47a1 100%) !important;
-            padding: 15px 0;
+            padding: 12px 0;
             box-shadow: 0 4px 20px rgba(26, 35, 126, 0.25);
         }
 
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .navbar-brand i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
         }
 
         .navbar-brand:hover {
@@ -59,16 +59,94 @@
             transition: transform 0.3s ease;
         }
 
-        .btn-outline-light {
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            padding: 8px 18px;
             border-radius: 10px;
-            padding: 8px 24px;
-            font-weight: 600;
             transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
 
-        .btn-outline-light:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        .navbar-nav .nav-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .navbar-nav .nav-link i {
+            margin-right: 8px;
+        }
+
+        /* User Avatar */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 0.85rem;
+            margin-right: 8px;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Dropdown */
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 8px 0;
+            margin-top: 8px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 10px 24px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9ff;
+            color: #1a237e;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .dropdown-divider {
+            margin: 6px 16px;
+            border-color: #f0f0f0;
         }
 
         /* ============================================
@@ -81,7 +159,7 @@
             color: white;
             position: relative;
             overflow: hidden;
-            min-height: 600px;
+            min-height: 500px;
             display: flex;
             align-items: center;
         }
@@ -169,37 +247,6 @@
             opacity: 0.7;
         }
 
-        .hero-image {
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-image img {
-            max-width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .hero-image .floating-badge {
-            position: absolute;
-            bottom: -20px;
-            left: -20px;
-            background: white;
-            color: #1a237e;
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-        }
-
-        .hero-image .floating-badge i {
-            font-size: 24px;
-            color: #2e7d32;
-        }
-
         .btn-hero {
             background: linear-gradient(135deg, #ffd54f, #ff8a65);
             border: none;
@@ -245,138 +292,60 @@
         }
 
         /* ============================================
-           FEATURES SECTION
+           RIGHT SIDE - SMALL UPTIME BADGE
            ============================================ */
         
-        .features-section {
-            padding: 80px 0;
-            background: #f5f7fa;
+        .hero-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
         }
 
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a237e;
-            margin-bottom: 12px;
-        }
-
-        .section-subtitle {
-            color: #6c757d;
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 48px;
-        }
-
-        .feature-card {
-            background: white;
+        .uptime-badge {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
-            padding: 30px 24px;
+            padding: 20px 28px;
             text-align: center;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            max-width: 220px;
+            margin-left: auto;
             transition: all 0.3s ease;
-            height: 100%;
-            border: none;
         }
 
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(26, 35, 126, 0.1);
+        .uptime-badge:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
         }
 
-        .feature-card .icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
+        .uptime-badge .icon {
             font-size: 28px;
+            color: #4caf50;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .uptime-badge .number {
+            font-size: 2.2rem;
+            font-weight: 800;
             color: white;
+            line-height: 1;
+            display: block;
         }
 
-        .feature-card .icon.primary {
-            background: linear-gradient(135deg, #1a237e, #283593);
+        .uptime-badge .label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+            display: block;
         }
 
-        .feature-card .icon.success {
-            background: linear-gradient(135deg, #2e7d32, #43a047);
-        }
-
-        .feature-card .icon.warning {
-            background: linear-gradient(135deg, #e65100, #f57c00);
-        }
-
-        .feature-card .icon.info {
-            background: linear-gradient(135deg, #0d47a1, #1565c0);
-        }
-
-        .feature-card .icon.danger {
-            background: linear-gradient(135deg, #c62828, #e53935);
-        }
-
-        .feature-card .icon.purple {
-            background: linear-gradient(135deg, #6a1b9a, #8e24aa);
-        }
-
-        .feature-card h5 {
-            font-weight: 700;
-            color: #1a237e;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            color: #6c757d;
-            font-size: 0.95rem;
-            margin-bottom: 0;
-        }
-
-        /* ============================================
-           HOW IT WORKS
-           ============================================ */
-        
-        .how-it-works {
-            padding: 80px 0;
-            background: white;
-        }
-
-        .step-card {
-            text-align: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        .step-number {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1a237e, #283593);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0 auto 16px;
-        }
-
-        .step-card h5 {
-            font-weight: 700;
-            color: #1a237e;
-        }
-
-        .step-card p {
-            color: #6c757d;
-            font-size: 0.95rem;
-        }
-
-        .step-arrow {
-            font-size: 2rem;
-            color: #1a237e;
-            opacity: 0.3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .uptime-badge .sub-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 2px;
+            display: block;
         }
 
         /* ============================================
@@ -421,55 +390,47 @@
         }
 
         /* ============================================
-           FOOTER
+           FOOTER - CLEAN & MINIMAL
            ============================================ */
         
         .footer {
             background: #1a1a2e;
             color: rgba(255, 255, 255, 0.7);
-            padding: 40px 0 20px;
-        }
-
-        .footer h5 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .footer a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: white;
-        }
-
-        .footer .footer-link {
-            display: block;
-            padding: 4px 0;
-        }
-
-        .footer .social-icons a {
-            display: inline-block;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            text-align: center;
-            line-height: 36px;
-            margin-right: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .footer .social-icons a:hover {
-            background: rgba(255, 255, 255, 0.2);
+            padding: 30px 0 20px;
         }
 
         .footer .footer-divider {
-            border-color: rgba(255, 255, 255, 0.1);
-            margin: 20px 0;
+            border-color: rgba(255, 255, 255, 0.08);
+            margin: 16px 0;
+        }
+
+        .footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .footer .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer .footer-links a:hover {
+            color: white;
+        }
+
+        .footer .footer-links a i {
+            margin-right: 6px;
+        }
+
+        .footer .footer-copyright {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: center;
         }
 
         /* ============================================
@@ -481,17 +442,19 @@
                 font-size: 2.5rem;
             }
 
-            .hero-image .floating-badge {
-                display: none;
-            }
-
             .hero-stats {
                 gap: 20px;
                 flex-wrap: wrap;
             }
 
-            .step-arrow {
-                transform: rotate(90deg);
+            .uptime-badge {
+                margin: 20px auto 0;
+                padding: 16px 24px;
+                max-width: 200px;
+            }
+
+            .uptime-badge .number {
+                font-size: 1.8rem;
             }
         }
 
@@ -509,10 +472,6 @@
                 font-size: 1rem;
             }
 
-            .section-title {
-                font-size: 2rem;
-            }
-
             .hero-buttons {
                 flex-direction: column;
             }
@@ -522,12 +481,22 @@
                 justify-content: center;
             }
 
-            .features-section {
-                padding: 60px 0;
+            .hero-right {
+                min-height: auto;
+                padding-top: 16px;
             }
 
-            .how-it-works {
-                padding: 60px 0;
+            .uptime-badge {
+                padding: 14px 20px;
+                max-width: 180px;
+            }
+
+            .uptime-badge .number {
+                font-size: 1.6rem;
+            }
+
+            .uptime-badge .icon {
+                font-size: 22px;
             }
 
             .cta-section {
@@ -536,6 +505,10 @@
 
             .cta-section h2 {
                 font-size: 2rem;
+            }
+
+            .footer .footer-links {
+                gap: 16px;
             }
         }
 
@@ -548,8 +521,41 @@
                 font-size: 1.5rem;
             }
 
-            .feature-card {
-                padding: 20px 16px;
+            .uptime-badge {
+                padding: 12px 16px;
+                max-width: 150px;
+            }
+
+            .uptime-badge .number {
+                font-size: 1.4rem;
+            }
+
+            .uptime-badge .icon {
+                font-size: 18px;
+            }
+
+            .uptime-badge .label {
+                font-size: 0.7rem;
+            }
+
+            .uptime-badge .sub-label {
+                font-size: 0.6rem;
+            }
+
+            .footer .footer-links {
+                gap: 12px;
+            }
+
+            .footer .footer-links a {
+                font-size: 0.75rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .user-name {
+                font-size: 0.85rem;
             }
         }
 
@@ -571,28 +577,6 @@
         .fade-in-up {
             animation: fadeInUp 0.6s ease-out;
         }
-
-        .fade-in-up-delay-1 {
-            animation-delay: 0.1s;
-        }
-        .fade-in-up-delay-2 {
-            animation-delay: 0.2s;
-        }
-        .fade-in-up-delay-3 {
-            animation-delay: 0.3s;
-        }
-        .fade-in-up-delay-4 {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
-        }
     </style>
 </head>
 <body>
@@ -607,23 +591,73 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#features">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#how-it-works">How It Works</a>
-                    </li>
-                    <li class="nav-item ms-lg-2">
-                        <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">
-                            <i class="fas fa-sign-in-alt"></i> Login
+                        <a class="nav-link" href="{{ url_for('home') }}">
+                            <i class="fas fa-home"></i> Home
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('register') }}" class="btn btn-light" style="color: #1a237e; font-weight: 600; border-radius: 10px;">
-                            <i class="fas fa-user-plus"></i> Register
-                        </a>
-                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('inspect') }}">
+                                <i class="fas fa-camera"></i> New Inspection
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('history') }}">
+                                <i class="fas fa-history"></i> History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('reports') }}">
+                                <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <span class="user-avatar">{{ current_user.operator_name[0]|upper }}</span>
+                                <span class="user-name">{{ current_user.operator_name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('profile') }}">
+                                        <i class="fas fa-id-card"></i> Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('settings') }}">
+                                        <i class="fas fa-cog"></i> Settings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('register') }}" class="btn btn-light" style="color: #1a237e; font-weight: 600; border-radius: 10px;">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -633,7 +667,8 @@
     <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6 hero-content">
+                <!-- Left Content -->
+                <div class="col-lg-8 hero-content">
                     <div class="hero-badge">
                         <i class="fas fa-robot me-2"></i> AI-Powered Quality Control
                     </div>
@@ -646,10 +681,16 @@
                         Detect button defects, alignment issues, and more in seconds.
                     </p>
                     <div class="hero-buttons">
-                        <a href="{{ url_for('register') }}" class="btn-hero">
-                            <i class="fas fa-rocket"></i> Get Started Free
-                        </a>
-                        <a href="#features" class="btn-hero-outline">
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('inspect') }}" class="btn-hero">
+                                <i class="fas fa-camera"></i> Start Inspection
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('register') }}" class="btn-hero">
+                                <i class="fas fa-rocket"></i> Get Started Free
+                            </a>
+                        {% endif %}
+                        <a href="#" class="btn-hero-outline" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'}); return false;">
                             <i class="fas fa-play-circle"></i> Learn More
                         </a>
                     </div>
@@ -668,121 +709,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6 hero-image text-center">
-                    <div class="position-relative">
-                        <div class="floating-badge">
+                <!-- Right Content - Small Uptime Badge -->
+                <div class="col-lg-4 hero-right">
+                    <div class="uptime-badge">
+                        <span class="icon">
                             <i class="fas fa-check-circle"></i>
-                            <span>99.8% Uptime</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section" id="features">
-        <div class="container">
-            <div class="text-center">
-                <h2 class="section-title">Why Choose Garment Detect?</h2>
-                <p class="section-subtitle">
-                    Everything you need for automated quality control in one powerful platform.
-                </p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="feature-card fade-in-up">
-                        <div class="icon primary">
-                            <i class="fas fa-camera"></i>
-                        </div>
-                        <h5>Real-Time Inspection</h5>
-                        <p>Capture and analyze garment images instantly using your webcam or upload existing images.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card fade-in-up fade-in-up-delay-1">
-                        <div class="icon success">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h5>AI-Powered Detection</h5>
-                        <p>Detect missing buttons, misalignments, and other defects with 95% accuracy using deep learning.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card fade-in-up fade-in-up-delay-2">
-                        <div class="icon warning">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <h5>Instant Reports</h5>
-                        <p>Generate comprehensive PDF reports with detailed defect analysis and statistics.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card fade-in-up fade-in-up-delay-3">
-                        <div class="icon info">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <h5>Inspection History</h5>
-                        <p>Track all past inspections and defects with detailed logs and analytics.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card fade-in-up fade-in-up-delay-4">
-                        <div class="icon danger">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <h5>Real-Time Alerts</h5>
-                        <p>Get instant audio and visual alerts when defects are detected during inspection.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="feature-card fade-in-up fade-in-up-delay-4">
-                        <div class="icon purple">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h5>Secure & Private</h5>
-                        <p>Your data is encrypted and stored securely in MySQL with role-based access control.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="container">
-            <div class="text-center">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">
-                    Three simple steps to start detecting garment defects.
-                </p>
-            </div>
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <h5>Register & Login</h5>
-                        <p>Create your operator account and login to the system.</p>
-                    </div>
-                </div>
-                <div class="col-md-1 text-center step-arrow">
-                    <i class="fas fa-arrow-right"></i>
-                </div>
-                <div class="col-md-3">
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <h5>Capture or Upload</h5>
-                        <p>Take a photo with your camera or upload an image of the garment.</p>
-                    </div>
-                </div>
-                <div class="col-md-1 text-center step-arrow">
-                    <i class="fas fa-arrow-right"></i>
-                </div>
-                <div class="col-md-3">
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <h5>Get Results</h5>
-                        <p>View PASS/FAIL status, defect details, and generate reports.</p>
+                        </span>
+                        <span class="number">99.8%</span>
+                        <span class="label">System Uptime</span>
+                        <span class="sub-label">Always Available</span>
                     </div>
                 </div>
             </div>
@@ -794,58 +729,35 @@
         <div class="container">
             <h2>Ready to Transform Your Quality Control?</h2>
             <p>Join thousands of operators using Garment Detect for automated defect detection.</p>
-            <a href="{{ url_for('register') }}" class="btn-cta">
-                <i class="fas fa-rocket"></i> Get Started Now
-            </a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('inspect') }}" class="btn-cta">
+                    <i class="fas fa-camera"></i> Start Inspection Now
+                </a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn-cta">
+                    <i class="fas fa-rocket"></i> Get Started Now
+                </a>
+            {% endif %}
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer - Clean & Minimal -->
     <footer class="footer">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-tshirt"></i> Garment Detect</h5>
-                    <p style="font-size: 0.9rem; max-width: 300px;">
-                        AI-powered garment defect detection system for automated quality control in the textile industry.
-                    </p>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-2 mb-4">
-                    <h5>Quick Links</h5>
-                    <a href="#features" class="footer-link">Features</a>
-                    <a href="#how-it-works" class="footer-link">How It Works</a>
-                    <a href="{{ url_for('register') }}" class="footer-link">Register</a>
-                    <a href="{{ url_for('login') }}" class="footer-link">Login</a>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Support</h5>
-                    <a href="#" class="footer-link" onclick="alert('Please contact your system administrator.')">Help Center</a>
-                    <a href="{{ url_for('privacy_policy') }}" class="footer-link">Privacy &amp; Policy</a>
-                    <a href="#" class="footer-link" onclick="alert('Please contact your system administrator.')">Contact Support</a>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <h5>Contact</h5>
-                    <p style="font-size: 0.9rem;">
-                        <i class="fas fa-envelope me-2"></i> support@garmentdetect.com
-                    </p>
-                    <p style="font-size: 0.9rem;">
-                        <i class="fas fa-phone me-2"></i> +94 11 234 5678
-                    </p>
-                    <p style="font-size: 0.9rem;">
-                        <i class="fas fa-map-marker-alt me-2"></i> Rajarata University, Sri Lanka
-                    </p>
-                </div>
+            <div class="footer-links">
+                <a href="{{ url_for('privacy_policy') }}">
+                    <i class="fas fa-shield-alt"></i> Privacy &amp; Policy
+                </a>
+                <a href="#" onclick="alert('Please contact your system administrator for support.'); return false;">
+                    <i class="fas fa-headset"></i> Support
+                </a>
+                <a href="{{ url_for('home') }}">
+                    <i class="fas fa-home"></i> Home
+                </a>
             </div>
             <hr class="footer-divider">
-            <div class="text-center">
-                <p style="font-size: 0.85rem; margin-bottom: 0;">
-                    &copy; 2026 Garment Defect Detection System. All rights reserved. Team Aurors
-                </p>
+            <div class="footer-copyright">
+                &copy; 2026 Garment Defect Detection System. All rights reserved. Team Aurors
             </div>
         </div>
     </footer>
