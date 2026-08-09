@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 import os
 import uuid
 import json
+import sys
+import gc
 
 from backend.models import db, User, InspectionSession, Defect
 from backend.forms import LoginForm, RegistrationForm, ForgotPasswordForm, ResetPasswordForm
@@ -15,16 +17,20 @@ from backend.utils.report_generator import ReportGenerator
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 # ============================================
-# CONFIGURATION - MYSQL (NO PASSWORD)
+# CONFIGURATION - MYSQL
 # ============================================
 app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
-
-# MySQL Connection - NO PASSWORD (XAMPP default)
-# Note: root:@localhost means username=root, password=blank
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/garment_defect_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
+
+# ============================================
+# IPHONE CAMERA CONFIGURATION
+# ============================================
+CAMERA_TYPE = 'camo'           # 'webcam', 'camo', or 'url'
+CAMERA_INDEX = 1               # iPhone via Camo (index 1)
+PHONE_URL = 'http://localhost:8080/shot.jpg'  # For IP Webcam
 
 # ============================================
 # INITIALIZE EXTENSIONS
@@ -246,7 +252,6 @@ def change_pin():
 def clear_data():
     """Clear all inspection data"""
     try:
-        # Delete all defects and inspections for this user
         inspections = InspectionSession.query.filter_by(operator_id=current_user.operator_id).all()
         for inspection in inspections:
             Defect.query.filter_by(session_id=inspection.id).delete()
@@ -261,13 +266,11 @@ def clear_data():
 def delete_account():
     """Delete user account"""
     try:
-        # Delete all associated data
         inspections = InspectionSession.query.filter_by(operator_id=current_user.operator_id).all()
         for inspection in inspections:
             Defect.query.filter_by(session_id=inspection.id).delete()
             db.session.delete(inspection)
         
-        # Delete user
         user = User.query.get(current_user.id)
         db.session.delete(user)
         db.session.commit()
@@ -286,31 +289,163 @@ def privacy_policy():
     return render_template('privacy_policy.html')
 
 # ============================================
-# API ROUTES
+# IPHONE CAMERA API ROUTES
+# ============================================
+
+@app.route('/api/iphone-status', methods=['GET'])
+@login_required
+def iphone_status():
+    """Check if iPhone camera is connected"""
+    try:
+        detector = ButtonDetector(camera_type='camo', camera_index=1)
+        is_connected = detector.test_camera()
+        
+        # Clean up memory
+        gc.collect()
+        
+        return jsonify({
+            'connected': is_connected,
+            'camera_type': 'camo',
+            'camera_index': 1,
+            'message': 'iPhone camera connected!' if is_connected else 'iPhone camera not connected. Please connect via USB and open Camo.'
+        })
+        
+    except Exception as e:
+        gc.collect()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/capture-phone', methods=['POST'])
+@login_required
+def capture_phone():
+    """API endpoint to capture image from iPhone"""
+    try:
+        print("=" * 50)
+        print("📱 IPHONE CAPTURE REQUEST")
+        print("=" * 50)
+        
+        detector = ButtonDetector(camera_type='camo', camera_index=1)
+        
+        if not detector.test_camera():
+            gc.collect()
+            return jsonify({'error': 'iPhone camera not connected. Please connect via USB and launch Camo app.'}), 500
+        
+        image_path = detector.capture_and_save(prefix='iphone')
+        if image_path is None:
+            gc.collect()
+            return jsonify({'error': 'Could not capture from iPhone.'}), 500
+        
+        print(f"✅ Image captured: {image_path}")
+        print("=" * 50)
+        
+        gc.collect()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Image captured successfully from iPhone!',
+            'image_path': image_path,
+            'image_url': f"/{image_path}"
+        })
+        
+    except Exception as e:
+        print(f"❌ Capture error: {e}")
+        import traceback
+        traceback.print_exc()
+        gc.collect()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/find-camera', methods=['GET'])
+@login_required
+def find_camera():
+    """Find available camera indices"""
+    try:
+        detector = ButtonDetector()
+        available = detector.find_camera_index(max_index=5)
+        
+        gc.collect()
+        
+        return jsonify({
+            'available_indices': available,
+            'message': f'Found {len(available)} camera(s)'
+        })
+        
+    except Exception as e:
+        gc.collect()
+        return jsonify({'error': str(e)}), 500
+
+# ============================================
+# MAIN DETECTION API ROUTE
 # ============================================
 
 @app.route('/api/detect', methods=['POST'])
 @login_required
 def detect_defects():
     try:
-        if 'image' not in request.files:
+        print("=" * 50)
+        print("📷 DETECTION REQUEST")
+        print("=" * 50)
+        
+        image_path = None
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        # Check if image is uploaded
+        if 'image' in request.files:
+            # Uploaded image
+            file = request.files['image']
+            if file.filename == '':
+                gc.collect()
+                return jsonify({'error': 'No file selected'}), 400
+            
+            # Check file size
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+            
+            if file_size > 10 * 1024 * 1024:  # 10MB
+                gc.collect()
+                return jsonify({'error': 'Image too large. Maximum size is 10MB.'}), 400
+            
+            # Check file extension
+            allowed_extensions = {'jpg', 'jpeg', 'png', 'gif', 'bmp'}
+            if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+                gc.collect()
+                return jsonify({'error': 'Invalid file type. Allowed: JPG, PNG, GIF, BMP'}), 400
+            
+            filename = f"{timestamp}_{uuid.uuid4().hex[:8]}.jpg"
+            upload_dir = 'static/uploads'
+            os.makedirs(upload_dir, exist_ok=True)
+            image_path = os.path.join(upload_dir, filename)
+            file.save(image_path)
+            print(f"📤 Uploaded image: {image_path}")
+            
+            # Resize image if too large using OpenCV
+            try:
+                import cv2
+                img = cv2.imread(image_path)
+                if img is not None:
+                    h, w = img.shape[:2]
+                    if w > 2048 or h > 1536:
+                        print(f"📐 Resizing image from {w}x{h}")
+                        new_w = min(w, 2048)
+                        new_h = min(h, 1536)
+                        resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+                        cv2.imwrite(image_path, resized)
+                        print(f"📐 Resized to {new_w}x{new_h}")
+                    # Clean up
+                    del img
+                    gc.collect()
+            except Exception as e:
+                print(f"⚠️ Image resize warning: {e}")
+            
+        else:
+            gc.collect()
             return jsonify({'error': 'No image provided'}), 400
         
-        file = request.files['image']
-        if file.filename == '':
-            return jsonify({'error': 'No file selected'}), 400
-        
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f"{timestamp}_{uuid.uuid4().hex[:8]}.jpg"
-        upload_dir = 'static/uploads'
-        os.makedirs(upload_dir, exist_ok=True)
-        image_path = os.path.join(upload_dir, filename)
-        file.save(image_path)
-        
+        # Detect buttons
         detector = ButtonDetector()
         boxes = detector.detect_buttons(image_path)
         analysis = detector.analyze_buttons(boxes)
         
+        # Save to database
         session_id = f"INS-{timestamp}"
         inspection = InspectionSession(
             session_id=session_id,
@@ -328,7 +463,9 @@ def detect_defects():
         )
         db.session.add(inspection)
         db.session.commit()
+        print(f"💾 Inspection saved: {session_id}")
         
+        # Add defects if found
         if analysis['has_defect']:
             for defect_desc in analysis.get('defects', []):
                 defect = Defect(
@@ -340,8 +477,43 @@ def detect_defects():
                 )
                 db.session.add(defect)
             db.session.commit()
-            alarm = AlarmManager()
-            alarm.play_alarm()
+            print(f"⚠️ Defects saved: {len(analysis.get('defects', []))}")
+            
+            # ============================================
+            # PLAY ALARM - ENHANCED
+            # ============================================
+            print("🔊 ALARM TRIGGERED!")
+            try:
+                alarm = AlarmManager()
+                alarm.play_alarm()
+                print("✅ Server alarm played successfully")
+            except Exception as e:
+                print(f"❌ Alarm error: {e}")
+                # Try simple beep as fallback
+                try:
+                    sys.stdout.write('\a')
+                    sys.stdout.flush()
+                    print("🔔 Terminal bell played")
+                except:
+                    pass
+            
+            # Also try to play sound via system
+            try:
+                import platform
+                if platform.system() == 'Windows':
+                    import winsound
+                    winsound.Beep(880, 400)
+                    winsound.Beep(880, 400)
+                    winsound.Beep(880, 400)
+                    print("🔔 Windows beep played")
+            except:
+                pass
+        
+        print(f"✅ Detection complete: {analysis['overall_status']}")
+        print("=" * 50)
+        
+        # Clean up memory
+        gc.collect()
         
         return jsonify({
             'success': True,
@@ -355,7 +527,15 @@ def detect_defects():
         })
         
     except Exception as e:
+        print(f"❌ Detection error: {e}")
+        import traceback
+        traceback.print_exc()
+        gc.collect()
         return jsonify({'error': str(e)}), 500
+
+# ============================================
+# REPORT ROUTES
+# ============================================
 
 @app.route('/api/generate-report', methods=['POST'])
 @login_required
@@ -386,6 +566,7 @@ def generate_report():
         ).all()
         
         if not inspections:
+            gc.collect()
             return jsonify({'error': 'No inspections found for this period'}), 400
         
         report_gen = ReportGenerator()
@@ -396,8 +577,9 @@ def generate_report():
             user_name=current_user.operator_name
         )
         
-        # Extract just the filename for download
         filename_only = os.path.basename(filename)
+        
+        gc.collect()
         
         return jsonify({
             'success': True,
@@ -406,6 +588,7 @@ def generate_report():
         })
         
     except Exception as e:
+        gc.collect()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/download/<filename>')
@@ -414,25 +597,24 @@ def download_report(filename):
     """Download generated report"""
     from flask import send_file
     
-    # Get the root directory of the project
-    # app.py is in backend/, so go up one level to get root
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_path = os.path.join(root_dir, 'reports', filename)
     
-    # Check if file exists
     if not os.path.exists(file_path):
+        gc.collect()
         return jsonify({'error': 'Report file not found'}), 404
     
+    gc.collect()
     return send_file(file_path, as_attachment=True)
 
 @app.route('/api/recent-reports')
 @login_required
 def recent_reports():
-    # Get the root directory
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     reports_dir = os.path.join(root_dir, 'reports')
     
     if not os.path.exists(reports_dir):
+        gc.collect()
         return jsonify({'reports': []})
     
     files = []
@@ -446,6 +628,7 @@ def recent_reports():
             })
     
     files.sort(key=lambda x: x['date'], reverse=True)
+    gc.collect()
     return jsonify({'reports': files[:10]})
 
 @app.route('/api/defect-stats')
@@ -463,12 +646,15 @@ def defect_stats():
             InspectionSession.operator_id == current_user.operator_id
         ).group_by(Defect.defect_type).all()
         
+        gc.collect()
+        
         return jsonify({
             'total_defects': total_defects,
             'defect_breakdown': [{'type': d[0], 'count': d[1]} for d in defect_counts]
         })
         
     except Exception as e:
+        gc.collect()
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

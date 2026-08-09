@@ -4,10 +4,6 @@
 
 {% block extra_css %}
 <style>
-    /* ============================================
-       INSPECTION PAGE SPECIFIC STYLES
-       ============================================ */
-    
     .inspection-container {
         padding: 20px 0;
     }
@@ -24,10 +20,6 @@
         margin-right: 12px;
     }
 
-    /* ============================================
-       CAMERA CARD
-       ============================================ */
-    
     .camera-card {
         border: none;
         border-radius: 16px;
@@ -176,10 +168,6 @@
         color: white;
     }
 
-    /* ============================================
-       UPLOAD CARD
-       ============================================ */
-    
     .upload-card {
         border: none;
         border-radius: 16px;
@@ -278,10 +266,44 @@
         margin-right: 8px;
     }
 
-    /* ============================================
-       RESULTS CARD
-       ============================================ */
-    
+    .btn-upload:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .preview-container {
+        margin-top: 12px;
+        padding: 15px;
+        background: #f8f9ff;
+        border-radius: 12px;
+        border: 2px solid #e8ecf1;
+        display: none;
+        text-align: center;
+    }
+
+    .preview-container img {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 6px;
+    }
+
+    .preview-container .file-name {
+        font-size: 0.85rem;
+        color: #1a237e;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    .preview-container .preview-actions {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
     .results-card {
         border: none;
         border-radius: 16px;
@@ -357,10 +379,6 @@
         font-size: 1rem;
     }
 
-    /* ============================================
-       ALERT CUSTOMIZATIONS
-       ============================================ */
-    
     .alert-custom {
         border-radius: 10px;
         padding: 14px 18px;
@@ -397,10 +415,26 @@
         margin-right: 8px;
     }
 
-    /* ============================================
-       RESPONSIVE
-       ============================================ */
-    
+    .image-source-badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .badge-camera {
+        background: #1a237e;
+        color: white;
+    }
+
+    .badge-upload {
+        background: #0d47a1;
+        color: white;
+    }
+
     @media (max-width: 992px) {
         .camera-card {
             margin-bottom: 20px;
@@ -479,12 +513,12 @@
         .upload-area i {
             font-size: 30px;
         }
+
+        .preview-container img {
+            max-height: 100px;
+        }
     }
 
-    /* ============================================
-       ANIMATIONS
-       ============================================ */
-    
     @keyframes slideUp {
         from {
             opacity: 0;
@@ -523,7 +557,6 @@
         animation: slideUp 0.4s ease-out;
     }
 
-    /* Spinner */
     .spinner-custom {
         width: 3rem;
         height: 3rem;
@@ -544,7 +577,6 @@
         margin-top: 12px;
     }
 
-    /* Permission Overlay */
     .permission-overlay {
         position: absolute;
         top: 0;
@@ -602,7 +634,6 @@
 
 {% block content %}
 <div class="inspection-container">
-    <!-- Page Title -->
     <div class="row">
         <div class="col-12">
             <h1 class="page-title">
@@ -620,19 +651,16 @@
                 </div>
                 <div class="card-body">
                     <div class="video-wrapper" id="videoWrapper">
-                        <!-- Video elements -->
                         <video id="videoFeed" autoplay playsinline style="display:none; width:100%; max-height:450px; background:#0a0a0a; border-radius:12px;"></video>
                         <canvas id="canvas" style="display:none;"></canvas>
                         <img id="capturedImage" style="display:none; width:100%; max-height:450px; border-radius:12px;">
                         
-                        <!-- Placeholder when camera not started -->
                         <div id="cameraPlaceholder" class="placeholder-text">
                             <i class="fas fa-camera"></i>
                             <p>Click "Start Camera" to begin</p>
                             <small style="color: #666;">Make sure to allow camera permissions</small>
                         </div>
 
-                        <!-- Permission Overlay (hidden by default) -->
                         <div id="permissionOverlay" class="permission-overlay" style="display:none;">
                             <i class="fas fa-exclamation-triangle"></i>
                             <h4>Camera Access Required</h4>
@@ -647,7 +675,6 @@
                             </button>
                         </div>
                         
-                        <!-- Controls -->
                         <div class="video-overlay">
                             <button class="btn btn-camera-start" onclick="startCamera()" id="startBtn">
                                 <i class="fas fa-play"></i> Start
@@ -680,9 +707,21 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                             <p>Click or drag to upload</p>
                             <small>Supports JPG, PNG, JPEG</small>
-                            <input type="file" id="imageFile" accept="image/*" required>
+                            <input type="file" id="imageFile" accept="image/*">
                         </div>
-                        <button type="submit" class="btn-upload">
+                        
+                        <div class="preview-container" id="previewContainer">
+                            <div id="imageSourceBadge" class="image-source-badge"></div>
+                            <img id="previewImage" src="#" alt="Preview">
+                            <div class="file-name" id="fileName">No file selected</div>
+                            <div class="preview-actions">
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearPreview()">
+                                    <i class="fas fa-times"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn-upload" id="uploadBtn" disabled onclick="handleUpload()">
                             <i class="fas fa-upload"></i> Upload & Detect
                         </button>
                     </form>
@@ -707,9 +746,14 @@
 
 <script>
     // ============================================
-    // CAMERA FUNCTIONS WITH PERMISSION HANDLING
+    // GLOBAL VARIABLES
     // ============================================
     let stream = null;
+    let capturedImageBlob = null; // Store captured image as blob
+    let imageSource = null; // Track image source: 'camera' or 'upload'
+    let currentImageData = null; // Store current image data (blob or file)
+    let isProcessing = false;
+    
     const video = document.getElementById('videoFeed');
     const canvas = document.getElementById('canvas');
     const capturedImg = document.getElementById('capturedImage');
@@ -718,8 +762,12 @@
     const captureBtn = document.getElementById('captureBtn');
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('imageFile');
 
-    // Check if browser supports getUserMedia
+    // ============================================
+    // CAMERA FUNCTIONS
+    // ============================================
     function checkCameraSupport() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             showToast('Your browser does not support camera access.', 'danger');
@@ -728,11 +776,8 @@
         return true;
     }
 
-    // Start Camera Function with Permission Handling
     function startCamera() {
         if (!checkCameraSupport()) return;
-
-        // Hide placeholder and permission overlay
         if (placeholder) placeholder.style.display = 'none';
         if (permissionOverlay) permissionOverlay.style.display = 'none';
 
@@ -766,11 +811,7 @@
                 showToast('❌ Camera permission denied! Click the lock icon to allow.', 'danger');
                 if (permissionOverlay) permissionOverlay.style.display = 'flex';
                 if (placeholder) placeholder.style.display = 'none';
-                console.error('Camera permission denied. Instructions:');
-                console.error('1. Click the lock icon in address bar');
-                console.error('2. Click "Site settings"');
-                console.error('3. Find "Camera" and change to "Allow"');
-                console.error('4. Refresh the page');
+                console.error('Camera permission denied.');
             } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
                 errorMessage = 'No camera found. Please connect a camera.';
                 showToast('❌ No camera found!', 'danger');
@@ -783,9 +824,7 @@
             }
             
             console.error('Camera error:', err);
-            console.error('Error details:', errorMessage);
             
-            // Show placeholder
             if (placeholder) {
                 placeholder.style.display = 'flex';
                 placeholder.innerHTML = `
@@ -801,7 +840,6 @@
         });
     }
 
-    // Stop Camera Function
     function stopCamera() {
         if (stream) {
             stream.getTracks().forEach(t => t.stop());
@@ -814,7 +852,6 @@
         if (startBtn) startBtn.disabled = false;
         if (stopBtn) stopBtn.disabled = true;
         
-        // Show placeholder
         if (placeholder) {
             placeholder.style.display = 'flex';
             placeholder.innerHTML = `
@@ -828,7 +865,6 @@
         showToast('Camera stopped.', 'info');
     }
 
-    // Capture Image Function
     function captureImage() {
         if (!stream) {
             showToast('Please start the camera first.', 'warning');
@@ -840,23 +876,47 @@
             return;
         }
         
+        // Draw the video frame to canvas
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        capturedImg.src = canvas.toDataURL('image/jpeg');
-        capturedImg.style.display = 'block';
-        video.style.display = 'none';
-        if (placeholder) placeholder.style.display = 'none';
-        if (permissionOverlay) permissionOverlay.style.display = 'none';
-        showToast('✅ Image captured! Click "Upload & Detect" or use upload.', 'success');
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+        
+        // Convert canvas to blob
+        canvas.toBlob(function(blob) {
+            if (blob) {
+                // Store the blob
+                capturedImageBlob = blob;
+                imageSource = 'camera';
+                
+                // Create URL for preview
+                const imageUrl = URL.createObjectURL(blob);
+                capturedImg.src = imageUrl;
+                capturedImg.style.display = 'block';
+                video.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'none';
+                if (permissionOverlay) permissionOverlay.style.display = 'none';
+                
+                // Show preview with camera badge
+                showPreviewFromDataUrl(imageUrl, 'Camera Capture', 'camera');
+                uploadBtn.disabled = false;
+                showToast('✅ Image captured! Click "Upload & Detect" to analyze.', 'success');
+            } else {
+                showToast('❌ Failed to capture image.', 'danger');
+            }
+        }, 'image/jpeg', 0.95);
     }
 
-    // Reset Inspection Function
     function resetInspection() {
         capturedImg.style.display = 'none';
         video.style.display = 'none';
         document.getElementById('resultsCard').style.display = 'none';
-        document.getElementById('imageFile').value = '';
+        fileInput.value = '';
+        capturedImageBlob = null;
+        imageSource = null;
+        currentImageData = null;
+        isProcessing = false;
+        clearPreview();
         
         if (placeholder) {
             placeholder.style.display = 'flex';
@@ -870,9 +930,350 @@
         if (captureBtn) captureBtn.disabled = true;
         if (startBtn) startBtn.disabled = false;
         if (stopBtn) stopBtn.disabled = true;
+        uploadBtn.disabled = true;
         
         showToast('Reset successful.', 'info');
     }
+
+    // ============================================
+    // PREVIEW FUNCTIONS
+    // ============================================
+    function showPreview(file) {
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const fileName = document.getElementById('fileName');
+        const badge = document.getElementById('imageSourceBadge');
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+                fileName.textContent = file.name;
+                uploadBtn.disabled = false;
+                imageSource = 'upload';
+                currentImageData = file;
+                badge.textContent = '📁 Uploaded Image';
+                badge.className = 'image-source-badge badge-upload';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function showPreviewFromDataUrl(imageUrl, name = 'Captured Image', source = 'camera') {
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const fileName = document.getElementById('fileName');
+        const badge = document.getElementById('imageSourceBadge');
+        
+        previewImage.src = imageUrl;
+        previewContainer.style.display = 'block';
+        fileName.textContent = name;
+        uploadBtn.disabled = false;
+        imageSource = source;
+        
+        if (source === 'camera') {
+            badge.textContent = '📷 Camera Capture';
+            badge.className = 'image-source-badge badge-camera';
+        } else {
+            badge.textContent = '📁 Uploaded Image';
+            badge.className = 'image-source-badge badge-upload';
+        }
+    }
+
+    function clearPreview() {
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const fileName = document.getElementById('fileName');
+        const badge = document.getElementById('imageSourceBadge');
+        
+        previewContainer.style.display = 'none';
+        previewImage.src = '#';
+        fileName.textContent = 'No file selected';
+        uploadBtn.disabled = true;
+        badge.textContent = '';
+        badge.className = 'image-source-badge';
+        fileInput.value = '';
+        capturedImageBlob = null;
+        imageSource = null;
+        currentImageData = null;
+    }
+
+    // ============================================
+    // ALARM SYSTEM
+    // ============================================
+    function playAlarm(defects) {
+        console.log('🔊 ALARM TRIGGERED!');
+        console.log('📋 Defects:', defects);
+        
+        let overlay = document.getElementById('alarmOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'alarmOverlay';
+            overlay.style.cssText = `
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(198, 40, 40, 0.95);
+                color: white;
+                padding: 40px 60px;
+                border-radius: 20px;
+                z-index: 9999;
+                text-align: center;
+                font-size: 24px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                animation: alarmPulse 0.5s infinite alternate;
+            `;
+            overlay.innerHTML = `
+                <i class="fas fa-exclamation-triangle" style="font-size:60px; display:block; margin-bottom:20px;"></i>
+                <div>⚠️ DEFECT DETECTED!</div>
+                <small style="font-size:16px; display:block; margin-top:10px;"></small>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        overlay.style.display = 'block';
+        const small = overlay.querySelector('small');
+        if (small && defects && defects.length > 0) {
+            small.textContent = 'Defects: ' + defects.join(' • ');
+        }
+
+        let alarmPlayed = false;
+
+        // Try HTML5 Audio
+        try {
+            const audio = new Audio('/static/sounds/alarm.wav');
+            audio.play().then(() => {
+                console.log('🔊 Alarm played via HTML5 Audio');
+                alarmPlayed = true;
+            }).catch(() => {
+                console.log('⚠️ HTML5 Audio failed, trying fallback...');
+            });
+        } catch (e) {
+            console.log('⚠️ HTML5 Audio error:', e);
+        }
+
+        // Try Web Audio API as fallback
+        setTimeout(() => {
+            if (!alarmPlayed) {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.frequency.value = 880;
+                    oscillator.type = 'square';
+                    gainNode.gain.value = 0.3;
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 800);
+                    console.log('🔊 Alarm played via Web Audio API');
+                    alarmPlayed = true;
+                } catch (err) {
+                    console.log('⚠️ Web Audio API error:', err);
+                }
+            }
+        }, 200);
+
+        // Try vibration as last resort
+        setTimeout(() => {
+            if (!alarmPlayed) {
+                try {
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200, 100, 200]);
+                        console.log('🔊 Alarm played via vibration');
+                        alarmPlayed = true;
+                    }
+                } catch (e) {
+                    console.log('⚠️ Vibration error:', e);
+                }
+            }
+        }, 400);
+
+        // Auto-dismiss after 6 seconds
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.animation = '';
+        }, 6000);
+    }
+
+    // ============================================
+    // DETECTION FUNCTIONS
+    // ============================================
+    function displayResults(data) {
+        console.log('📊 Displaying results:', data);
+        
+        const isPass = data.overall_status === 'PASS';
+        const resultsHeader = document.getElementById('resultsHeader');
+        const resultsBody = document.getElementById('resultsBody');
+
+        resultsHeader.className = `card-header text-white ${isPass ? 'bg-success' : 'bg-danger'}`;
+        resultsHeader.innerHTML = `<i class="fas fa-${isPass ? 'check-circle' : 'times-circle'}"></i> ${data.overall_status}`;
+
+        let defectsHtml = '';
+        if (data.defects && data.defects.length > 0) {
+            defectsHtml = data.defects.map(d => 
+                `<div class="alert alert-defect-list"><i class="fas fa-bug"></i> ${d}</div>`
+            ).join('');
+        }
+
+        const buttonCount = data.button_count || data.count || 0;
+        const expected = data.expected || 7;
+
+        resultsBody.innerHTML = `
+            <div class="result-status ${isPass ? 'pass' : 'fail'}">
+                ${isPass ? '✅ PASS' : '❌ FAIL'}
+            </div>
+            <div class="result-detail-grid">
+                <div class="result-detail-item">
+                    <div class="label">Buttons Found</div>
+                    <div class="value">${buttonCount} <span class="expected">/ ${expected}</span></div>
+                </div>
+                <div class="result-detail-item">
+                    <div class="label">Alignment Score</div>
+                    <div class="value">${(data.alignment_score || 0).toFixed(1)}%</div>
+                </div>
+            </div>
+            ${data.has_defect ? 
+                `<div class="alert alert-defect alert-custom"><i class="fas fa-exclamation-triangle"></i> Defect Detected!</div>` : 
+                `<div class="alert alert-success-custom alert-custom"><i class="fas fa-check-circle"></i> No defects detected</div>`
+            }
+            ${defectsHtml}
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-primary" onclick="window.location.href='/history'">
+                    <i class="fas fa-history"></i> View History
+                </button>
+                <button class="btn btn-outline-secondary" onclick="resetInspection()">
+                    <i class="fas fa-redo"></i> New Inspection
+                </button>
+            </div>
+        `;
+    }
+
+    function sendDetectionRequest(formData) {
+        console.log('📤 Sending detection request...');
+        
+        const resultsCard = document.getElementById('resultsCard');
+        const resultsHeader = document.getElementById('resultsHeader');
+        const resultsBody = document.getElementById('resultsBody');
+
+        resultsCard.style.display = 'block';
+        resultsHeader.className = 'card-header bg-warning text-white';
+        resultsHeader.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        resultsBody.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-custom"></div>
+                <p class="analyzing-text">Analyzing garment for defects...</p>
+            </div>
+        `;
+
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        fetch('/api/detect', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('📥 Response received:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('📊 Detection data:', data);
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            displayResults(data);
+            
+            if (data.has_defect) {
+                console.log('🔊 Defect detected! Playing alarm...');
+                showToast('⚠️ Defect detected!', 'danger');
+                playAlarm(data.defects);
+            } else {
+                console.log('✅ No defects detected.');
+                showToast('✅ No defects detected!', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Detection error:', error);
+            resultsHeader.className = 'card-header bg-danger text-white';
+            resultsHeader.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+            resultsBody.innerHTML = `
+                <div class="alert alert-danger">${error.message || 'An error occurred during detection'}</div>
+                <button class="btn btn-outline-secondary mt-2" onclick="resetInspection()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            `;
+            showToast('❌ Error: ' + (error.message || 'Detection failed'), 'danger');
+        })
+        .finally(() => {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload & Detect';
+            isProcessing = false;
+        });
+    }
+
+    // ============================================
+    // HANDLE UPLOAD - SUPPORTS BOTH FILE UPLOAD AND CAMERA CAPTURE
+    // ============================================
+    function handleUpload() {
+        // Prevent multiple submissions
+        if (isProcessing) {
+            showToast('Please wait, processing in progress...', 'warning');
+            return;
+        }
+        
+        console.log('📤 Upload button clicked');
+        console.log('Image source:', imageSource);
+        console.log('Has captured blob:', !!capturedImageBlob);
+        console.log('File input has file:', !!fileInput.files[0]);
+        
+        const formData = new FormData();
+        
+        // Check if we have a captured image from camera
+        if (imageSource === 'camera' && capturedImageBlob) {
+            console.log('📷 Using captured image from camera');
+            formData.append('image', capturedImageBlob, 'captured_image.jpg');
+            isProcessing = true;
+            sendDetectionRequest(formData);
+            return;
+        }
+        
+        // Check if we have a file uploaded
+        if (fileInput.files && fileInput.files[0]) {
+            console.log('📁 Uploading file:', fileInput.files[0].name);
+            formData.append('image', fileInput.files[0]);
+            isProcessing = true;
+            sendDetectionRequest(formData);
+            return;
+        }
+        
+        // No image found
+        showToast('Please select or capture an image first.', 'warning');
+    }
+
+    // ============================================
+    // FILE INPUT HANDLER
+    // ============================================
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            // Clear any captured image data
+            capturedImageBlob = null;
+            imageSource = 'upload';
+            showPreview(this.files[0]);
+            // Reset processing state
+            isProcessing = false;
+        } else {
+            clearPreview();
+        }
+    });
 
     // ============================================
     // TOAST NOTIFICATIONS
@@ -923,177 +1324,10 @@
     }
 
     // ============================================
-    // UPLOAD & DETECT
-    // ============================================
-    document.getElementById('uploadForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const fileInput = document.getElementById('imageFile');
-        if (!fileInput.files[0]) {
-            showToast('Please select an image.', 'warning');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
-
-        const resultsCard = document.getElementById('resultsCard');
-        const resultsHeader = document.getElementById('resultsHeader');
-        const resultsBody = document.getElementById('resultsBody');
-
-        resultsCard.style.display = 'block';
-        resultsHeader.className = 'card-header bg-warning text-white';
-        resultsHeader.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        resultsBody.innerHTML = `
-            <div class="text-center py-3">
-                <div class="spinner-custom"></div>
-                <p class="analyzing-text">Analyzing garment for defects...</p>
-            </div>
-        `;
-
-        fetch('/api/detect', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    if (text.includes('login')) {
-                        throw new Error('Please login first.');
-                    }
-                    throw new Error('Server error.');
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            const isPass = data.overall_status === 'PASS';
-            resultsHeader.className = `card-header text-white ${isPass ? 'bg-success' : 'bg-danger'}`;
-            resultsHeader.innerHTML = `<i class="fas fa-${isPass ? 'check-circle' : 'times-circle'}"></i> ${data.overall_status}`;
-
-            let defectsHtml = '';
-            if (data.defects && data.defects.length > 0) {
-                defectsHtml = data.defects.map(d => 
-                    `<div class="alert alert-defect-list"><i class="fas fa-bug"></i> ${d}</div>`
-                ).join('');
-            }
-
-            resultsBody.innerHTML = `
-                <div class="result-status ${isPass ? 'pass' : 'fail'}">
-                    ${isPass ? '✅ PASS' : '❌ FAIL'}
-                </div>
-                <div class="result-detail-grid">
-                    <div class="result-detail-item">
-                        <div class="label">Buttons Found</div>
-                        <div class="value">${data.button_count} <span class="expected">/ ${data.expected}</span></div>
-                    </div>
-                    <div class="result-detail-item">
-                        <div class="label">Alignment Score</div>
-                        <div class="value">${(data.alignment_score || 0).toFixed(1)}%</div>
-                    </div>
-                </div>
-                ${data.has_defect ? 
-                    `<div class="alert alert-defect alert-custom"><i class="fas fa-exclamation-triangle"></i> Defect Detected!</div>` : 
-                    `<div class="alert alert-success-custom alert-custom"><i class="fas fa-check-circle"></i> No defects detected</div>`
-                }
-                ${defectsHtml}
-                <div class="d-grid gap-2 mt-3">
-                    <button class="btn btn-primary" onclick="window.location.href='/history'">
-                        <i class="fas fa-history"></i> View History
-                    </button>
-                    <button class="btn btn-outline-secondary" onclick="resetInspection()">
-                        <i class="fas fa-redo"></i> New Inspection
-                    </button>
-                </div>
-            `;
-
-            if (data.has_defect) {
-                showToast('⚠️ Defect detected!', 'danger');
-                playAlarm(data.defects);
-            } else {
-                showToast('✅ No defects detected!', 'success');
-            }
-        })
-        .catch(error => {
-            resultsHeader.className = 'card-header bg-danger text-white';
-            resultsHeader.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
-            resultsBody.innerHTML = `
-                <div class="alert alert-danger">${error.message}</div>
-                ${error.message.includes('login') ? 
-                    `<div class="text-center mt-2"><a href="/login" class="btn btn-primary">Go to Login</a></div>` : ''}
-            `;
-            showToast('Error: ' + error.message, 'danger');
-        });
-    });
-
-    // ============================================
-    // ALARM SYSTEM
-    // ============================================
-    function playAlarm(defects) {
-        let overlay = document.getElementById('alarmOverlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'alarmOverlay';
-            overlay.style.cssText = `
-                display: none;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(198, 40, 40, 0.95);
-                color: white;
-                padding: 40px 60px;
-                border-radius: 20px;
-                z-index: 9999;
-                text-align: center;
-                font-size: 24px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-                animation: alarmPulse 0.5s infinite alternate;
-            `;
-            overlay.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:60px; display:block; margin-bottom:20px;"></i>
-                <div>⚠️ DEFECT DETECTED!</div>
-                <small style="font-size:16px; display:block; margin-top:10px;"></small>
-            `;
-            document.body.appendChild(overlay);
-        }
-        
-        overlay.style.display = 'block';
-        const small = overlay.querySelector('small');
-        if (small && defects && defects.length > 0) {
-            small.textContent = defects.join(' • ');
-        }
-
-        // Play sound
-        try {
-            const audio = new Audio('/static/sounds/alarm.wav');
-            audio.play().catch(() => {
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.frequency.value = 880;
-                    oscillator.type = 'square';
-                    gainNode.gain.value = 0.3;
-                    oscillator.start();
-                    setTimeout(() => oscillator.stop(), 800);
-                } catch (err) {}
-            });
-        } catch (e) {}
-
-        setTimeout(() => {
-            overlay.style.display = 'none';
-            overlay.style.animation = '';
-        }, 5000);
-    }
-
-    // ============================================
     // DRAG AND DROP
     // ============================================
     document.addEventListener('DOMContentLoaded', function() {
         const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('imageFile');
 
         if (uploadArea) {
             uploadArea.addEventListener('click', function() {
@@ -1114,15 +1348,18 @@
                 e.preventDefault();
                 this.classList.remove('dragover');
                 if (e.dataTransfer.files.length) {
+                    // Clear camera capture data when uploading a file
+                    capturedImageBlob = null;
+                    imageSource = 'upload';
                     fileInput.files = e.dataTransfer.files;
-                    document.getElementById('uploadForm').dispatchEvent(new Event('submit'));
+                    showPreview(e.dataTransfer.files[0]);
+                    isProcessing = false;
                 }
             });
         }
 
-        // Check if camera is supported
+        // Auto-start camera if supported
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Auto-start camera on page load
             setTimeout(startCamera, 1000);
         } else {
             if (placeholder) {
