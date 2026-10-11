@@ -13,6 +13,7 @@
 ![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?logo=opencv&logoColor=white)
 ![Tesseract OCR](https://img.shields.io/badge/OCR-Tesseract-4285F4?logo=google&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![XAMPP](https://img.shields.io/badge/XAMPP-FB7A24?logo=xampp&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Status](https://img.shields.io/badge/status-in%20development-orange)
@@ -44,6 +45,7 @@ Supervised by **Mr. E.A.C.I. Senaratne**
 - [🛠️ Technology Stack](#️-technology-stack)
 - [📁 Repository Structure](#-repository-structure)
 - [⚡ Getting Started](#-getting-started)
+- [🗄️ Database Setup](#️-database-setup)
 - [📊 Dataset](#-dataset)
 - [🧠 Model Training](#-model-training)
 - [📚 Documentation](#-documentation)
@@ -80,9 +82,9 @@ This project delivers a **low-cost, integrated inspection platform** that detect
 - 📷 Real-time image capture (USB/industrial camera) or batch image upload
 - 🤖 Four independent AI defect-detection modules running per inspection
 - ⚖️ Rule-based decision engine aggregating module outputs into a **PASS / FAIL** result
-- 🔐 Operator authentication with PIN-based login and recovery
+- 🔐 Operator authentication with PIN-based login and email-based recovery
 - 🕒 Inspection history tracking and PDF/CSV report generation
-- 🖥️ Desktop dashboard for operators with minimal technical background
+- 🖥️ Web dashboard for operators with minimal technical background
 
 ## 🏗️ System Architecture
 
@@ -117,9 +119,8 @@ Each detection module handles its own preprocessing (resizing, normalization, RO
 ![Tesseract](https://img.shields.io/badge/Tesseract_OCR-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
-![Qt](https://img.shields.io/badge/PyQt-41CD52?style=for-the-badge&logo=qt&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+![XAMPP](https://img.shields.io/badge/XAMPP-FB7A24?style=for-the-badge&logo=xampp&logoColor=white)
 ![Pandas](https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 ![GoogleColab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
@@ -134,9 +135,11 @@ Each detection module handles its own preprocessing (resizing, normalization, RO
 | 🔤 OCR | Tesseract OCR (pytesseract) |
 | 🔄 Data Augmentation | Albumentations, TensorFlow `ImageDataGenerator` |
 | 📈 Supplementary ML | scikit-learn |
-| 🖼️ UI Framework | Tkinter / PyQt (desktop), Flask (web dashboard alternative) |
-| 🗄️ Database | MySQL (design), SQLite (lightweight local deployment) |
+| 🖥️ Web Framework | Flask (Jinja2 templates, Flask-Login, Flask-WTF, Flask-Mail) |
+| 🗄️ Database | **MySQL via XAMPP** (Apache + MySQL + phpMyAdmin stack) |
+| 🔗 ORM | Flask-SQLAlchemy + PyMySQL driver |
 | 📄 Reporting | pandas, ReportLab / fpdf |
+| 📧 Email | Flask-Mail (Gmail SMTP for PIN recovery) |
 | ☁️ Model Training | Google Colab (free GPU access) |
 | 🔀 Version Control | Git / GitHub |
 | 📐 Diagramming | Draw.io / Lucidchart |
@@ -144,14 +147,13 @@ Each detection module handles its own preprocessing (resizing, normalization, RO
 
 ## 📁 Repository Structure
 
-*(Adjust this to match your actual folder layout as the codebase grows.)*
-
 ## ⚡ Getting Started
 
 ### ✅ Prerequisites
 
 - 🐍 Python 3.9+
 - 📦 pip
+- 🗄️ **XAMPP** (for MySQL — see [Database Setup](#️-database-setup))
 - 🎮 (Optional) NVIDIA GPU + CUDA for local training; otherwise use Google Colab
 - 🔤 Tesseract OCR engine installed on the host system (for the label-defect module)
 
@@ -159,5 +161,5 @@ Each detection module handles its own preprocessing (resizing, normalization, RO
 
 ```bash
 git clone https://github.com/<your-org>/<your-repo>.git
-cd <your-repo>
-pip install -r requirements.txt
+cd garment_defect_system
+python -m pip install -r requirements.txt
