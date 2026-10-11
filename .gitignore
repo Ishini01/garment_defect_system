@@ -16,3 +16,4 @@ static/uploads/
 .vscode/
 reports/
 *.pdf
+.venv/
