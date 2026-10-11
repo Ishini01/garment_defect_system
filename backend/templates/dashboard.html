@@ -7,7 +7,7 @@
     /* ============================================
        DASHBOARD PAGE SPECIFIC STYLES
        ============================================ */
-    
+
     .dashboard-container {
         padding: 20px 0;
     }
@@ -35,7 +35,7 @@
     /* ============================================
        STATISTICS CARDS
        ============================================ */
-    
+
     .stat-card {
         border: none;
         border-radius: 16px;
@@ -81,51 +81,23 @@
         margin-top: 2px;
     }
 
-    .stat-card .stat-trend {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 4px 12px;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.9);
-        color: #2e7d32;
-    }
-
     /* Individual Stat Card Colors */
-    .stat-primary .stat-icon {
-        background: linear-gradient(135deg, #1a237e, #283593);
-    }
-    .stat-primary .stat-number {
-        color: #1a237e;
-    }
+    .stat-primary .stat-icon { background: linear-gradient(135deg, #1a237e, #283593); }
+    .stat-primary .stat-number { color: #1a237e; }
 
-    .stat-success .stat-icon {
-        background: linear-gradient(135deg, #2e7d32, #43a047);
-    }
-    .stat-success .stat-number {
-        color: #2e7d32;
-    }
+    .stat-success .stat-icon { background: linear-gradient(135deg, #2e7d32, #43a047); }
+    .stat-success .stat-number { color: #2e7d32; }
 
-    .stat-danger .stat-icon {
-        background: linear-gradient(135deg, #c62828, #e53935);
-    }
-    .stat-danger .stat-number {
-        color: #c62828;
-    }
+    .stat-danger .stat-icon { background: linear-gradient(135deg, #c62828, #e53935); }
+    .stat-danger .stat-number { color: #c62828; }
 
-    .stat-warning .stat-icon {
-        background: linear-gradient(135deg, #e65100, #f57c00);
-    }
-    .stat-warning .stat-number {
-        color: #e65100;
-    }
+    .stat-warning .stat-icon { background: linear-gradient(135deg, #e65100, #f57c00); }
+    .stat-warning .stat-number { color: #e65100; }
 
     /* ============================================
        QUICK ACTIONS CARD
        ============================================ */
-    
+
     .quick-actions-card {
         border: none;
         border-radius: 16px;
@@ -145,9 +117,7 @@
         padding: 16px 24px;
     }
 
-    .quick-actions-card .card-header i {
-        margin-right: 10px;
-    }
+    .quick-actions-card .card-header i { margin-right: 10px; }
     .quick-actions-card .card-header h5 {
         color: white;
         font-weight: 600;
@@ -181,44 +151,21 @@
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
     }
 
-    .action-btn i {
-        font-size: 18px;
-    }
+    .action-btn i { font-size: 18px; }
 
-    .action-btn-primary {
-        background: linear-gradient(135deg, #1a237e, #283593);
-        color: white;
-    }
+    .action-btn-primary { background: linear-gradient(135deg, #1a237e, #283593); color: white; }
+    .action-btn-primary:hover { background: linear-gradient(135deg, #0d1445, #1a237e); color: white; }
 
-    .action-btn-primary:hover {
-        background: linear-gradient(135deg, #0d1445, #1a237e);
-        color: white;
-    }
+    .action-btn-info { background: linear-gradient(135deg, #0d47a1, #1565c0); color: white; }
+    .action-btn-info:hover { background: linear-gradient(135deg, #0a2a6a, #0d47a1); color: white; }
 
-    .action-btn-info {
-        background: linear-gradient(135deg, #0d47a1, #1565c0);
-        color: white;
-    }
-
-    .action-btn-info:hover {
-        background: linear-gradient(135deg, #0a2a6a, #0d47a1);
-        color: white;
-    }
-
-    .action-btn-success {
-        background: linear-gradient(135deg, #2e7d32, #43a047);
-        color: white;
-    }
-
-    .action-btn-success:hover {
-        background: linear-gradient(135deg, #1b5e20, #2e7d32);
-        color: white;
-    }
+    .action-btn-success { background: linear-gradient(135deg, #2e7d32, #43a047); color: white; }
+    .action-btn-success:hover { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; }
 
     /* ============================================
        OPERATOR DETAILS CARD
        ============================================ */
-    
+
     .operator-card {
         border: none;
         border-radius: 16px;
@@ -238,9 +185,7 @@
         padding: 16px 24px;
     }
 
-    .operator-card .card-header i {
-        margin-right: 10px;
-    }
+    .operator-card .card-header i { margin-right: 10px; }
     .operator-card .card-header h5 {
         color: white;
         font-weight: 600;
@@ -261,9 +206,7 @@
         border-bottom: 1px solid #f0f0f0;
     }
 
-    .operator-detail:last-child {
-        border-bottom: none;
-    }
+    .operator-detail:last-child { border-bottom: none; }
 
     .operator-detail i {
         width: 28px;
@@ -272,94 +215,290 @@
         text-align: center;
     }
 
-    .operator-detail strong {
-        color: #333;
-        min-width: 100px;
+    .operator-detail strong { color: #333; min-width: 100px; }
+    .operator-detail span { color: #555; }
+
+    /* ============================================
+       ⭐ 4-MODEL DEFECT SUMMARY CARD
+       ============================================ */
+    .defect-summary-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        margin-top: 24px;
     }
 
-    .operator-detail span {
-        color: #555;
+    .defect-summary-card .card-header {
+        background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+        border: none;
+        padding: 16px 24px;
     }
+
+    .defect-summary-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .defect-summary-card .card-header h5 i { margin-right: 10px; }
+
+    .defect-summary-card .card-body {
+        padding: 20px 24px;
+        background: #faf5ff;
+    }
+
+    .defect-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+
+    .defect-summary-item {
+        text-align: center;
+        padding: 16px 10px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #f0e6fa;
+        transition: all 0.3s ease;
+    }
+
+    .defect-summary-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(106, 27, 154, 0.1);
+    }
+
+    .defect-summary-item .icon {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 8px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white;
+    }
+
+    .defect-summary-item.stitch .icon { background: linear-gradient(135deg, #c62828, #e53935); }
+    .defect-summary-item.button .icon { background: linear-gradient(135deg, #e65100, #f57c00); }
+    .defect-summary-item.label  .icon { background: linear-gradient(135deg, #0d47a1, #1565c0); }
+    .defect-summary-item.color  .icon { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
+
+    .defect-summary-item .num {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1a237e;
+        line-height: 1.1;
+    }
+
+    .defect-summary-item .lbl {
+        font-size: 0.72rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    /* ============================================
+       ⭐ RECENT INSPECTIONS CHECKLIST
+       ============================================ */
+    .recent-inspections-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        margin-top: 24px;
+    }
+
+    .recent-inspections-card .card-header {
+        background: linear-gradient(135deg, #0d47a1, #1565c0);
+        border: none;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .recent-inspections-card .card-header h5 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .recent-inspections-card .card-header h5 i { margin-right: 10px; }
+
+    .recent-inspections-card .card-header .view-all {
+        color: white;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 4px 14px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .recent-inspections-card .card-header .view-all:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .recent-inspections-card .card-body {
+        padding: 0;
+        background: #fafbff;
+    }
+
+    .recent-row {
+        display: grid;
+        grid-template-columns: 1.3fr 1.1fr 2fr 0.8fr;
+        gap: 12px;
+        align-items: center;
+        padding: 14px 24px;
+        border-bottom: 1px solid #f0f2f5;
+        font-size: 0.88rem;
+        transition: background 0.2s ease;
+    }
+
+    .recent-row:last-child { border-bottom: none; }
+    .recent-row:hover { background: #f8f9ff; }
+
+    .recent-row .sid {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #1a237e;
+        background: #e8eaf6;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        display: inline-block;
+    }
+
+    .recent-row .date {
+        color: #6c757d;
+        font-size: 0.82rem;
+    }
+
+    .recent-row .mini-checklist {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .recent-row .mini-checklist .item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    .recent-row .mini-checklist .item i.icon {
+        font-size: 0.7rem;
+        color: #1a237e;
+    }
+
+    .recent-row .mini-checklist .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.55rem;
+        color: white;
+        font-weight: 700;
+    }
+
+    .recent-row .mini-checklist .dot.ok   { background: #2e7d32; }
+    .recent-row .mini-checklist .dot.bad  { background: #c62828; }
+    .recent-row .mini-checklist .dot.na   { background: #a0a8b5; }
+
+    .recent-row .status-mini {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .recent-row .status-mini.pass { background: #e8f5e9; color: #2e7d32; }
+    .recent-row .status-mini.fail { background: #ffebee; color: #c62828; }
 
     /* ============================================
        RESPONSIVE
        ============================================ */
-    
+
+    @media (max-width: 992px) {
+        .defect-summary-grid { grid-template-columns: repeat(2, 1fr); }
+
+        .recent-row {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .recent-row .mini-checklist {
+            grid-column: 1 / -1;
+        }
+    }
+
     @media (max-width: 768px) {
-        .page-title {
-            font-size: 1.4rem;
-        }
+        .page-title { font-size: 1.4rem; }
 
-        .stat-card .stat-number {
-            font-size: 1.8rem;
-        }
+        .stat-card .stat-number { font-size: 1.8rem; }
+        .stat-card .stat-icon { width: 40px; height: 40px; font-size: 18px; }
 
-        .stat-card .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
-        }
+        .action-btn { padding: 12px 16px; font-size: 0.9rem; }
 
-        .action-btn {
+        .operator-detail { flex-wrap: wrap; gap: 4px; }
+        .operator-detail strong { min-width: 80px; }
+
+        .recent-row {
             padding: 12px 16px;
-            font-size: 0.9rem;
-        }
-
-        .operator-detail {
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .operator-detail strong {
-            min-width: 80px;
+            font-size: 0.8rem;
         }
     }
 
     @media (max-width: 576px) {
-        .dashboard-container {
-            padding: 10px 0;
+        .dashboard-container { padding: 10px 0; }
+
+        .stat-card .card-body { padding: 16px 18px; }
+        .stat-card .stat-number { font-size: 1.5rem; }
+
+        .defect-summary-grid { grid-template-columns: 1fr; }
+
+        .recent-row {
+            grid-template-columns: 1fr;
+            gap: 6px;
         }
 
-        .stat-card .card-body {
-            padding: 16px 18px;
-        }
-
-        .stat-card .stat-number {
-            font-size: 1.5rem;
-        }
+        .recent-row .mini-checklist { gap: 8px; }
+        .recent-row .mini-checklist .item { font-size: 0.7rem; }
     }
 
     /* ============================================
        ANIMATIONS
        ============================================ */
-    
+
     @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
-    .stat-card {
-        animation: fadeInUp 0.5s ease-out;
-    }
-
+    .stat-card { animation: fadeInUp 0.5s ease-out; }
     .stat-card:nth-child(1) { animation-delay: 0.1s; }
     .stat-card:nth-child(2) { animation-delay: 0.2s; }
     .stat-card:nth-child(3) { animation-delay: 0.3s; }
     .stat-card:nth-child(4) { animation-delay: 0.4s; }
 
-    .quick-actions-card {
-        animation: fadeInUp 0.5s ease-out 0.3s both;
-    }
-
-    .operator-card {
-        animation: fadeInUp 0.5s ease-out 0.4s both;
-    }
+    .quick-actions-card { animation: fadeInUp 0.5s ease-out 0.3s both; }
+    .operator-card { animation: fadeInUp 0.5s ease-out 0.4s both; }
+    .defect-summary-card { animation: fadeInUp 0.5s ease-out 0.5s both; }
+    .recent-inspections-card { animation: fadeInUp 0.5s ease-out 0.6s both; }
 </style>
 {% endblock %}
 
@@ -369,7 +508,7 @@
     <div class="row">
         <div class="col-12">
             <h1 class="page-title">
-                <i class=  "fas fa-chart-line"></i>   Dashboard
+                <i class="fas fa-chart-line"></i> Dashboard
                 <small>Welcome back, <strong>{{ current_user.operator_name }}</strong>!</small>
             </h1>
         </div>
@@ -380,9 +519,7 @@
         <div class="col-md-3 col-sm-6">
             <div class="card stat-card stat-primary shadow-sm">
                 <div class="card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-clipboard-check"></i></div>
                     <div class="stat-number">{{ total }}</div>
                     <div class="stat-label">Total Inspections</div>
                 </div>
@@ -391,9 +528,7 @@
         <div class="col-md-3 col-sm-6">
             <div class="card stat-card stat-success shadow-sm">
                 <div class="card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                     <div class="stat-number">{{ "%.1f"|format(pass_rate) }}%</div>
                     <div class="stat-label">Pass Rate</div>
                 </div>
@@ -402,9 +537,7 @@
         <div class="col-md-3 col-sm-6">
             <div class="card stat-card stat-danger shadow-sm">
                 <div class="card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
                     <div class="stat-number">{{ fail_count }}</div>
                     <div class="stat-label">Failed Inspections</div>
                 </div>
@@ -413,11 +546,40 @@
         <div class="col-md-3 col-sm-6">
             <div class="card stat-card stat-warning shadow-sm">
                 <div class="card-body">
-                    <div class="stat-icon">
-                        <i class="fas fa-bug"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-bug"></i></div>
                     <div class="stat-number">{{ pass_count }}</div>
                     <div class="stat-label">Passed Inspections</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⭐ 4-Model Defect Summary -->
+    <div class="card defect-summary-card">
+        <div class="card-header">
+            <h5><i class="fas fa-clipboard-check"></i> 4-Model Detection Summary</h5>
+        </div>
+        <div class="card-body">
+            <div class="defect-summary-grid">
+                <div class="defect-summary-item stitch">
+                    <div class="icon"><i class="fas fa-cut"></i></div>
+                    <div class="num">{{ stitch_count|default(0) }}</div>
+                    <div class="lbl">Broken Stitch</div>
+                </div>
+                <div class="defect-summary-item button">
+                    <div class="icon"><i class="fas fa-circle"></i></div>
+                    <div class="num">{{ button_count|default(0) }}</div>
+                    <div class="lbl">Button Defect</div>
+                </div>
+                <div class="defect-summary-item label">
+                    <div class="icon"><i class="fas fa-tag"></i></div>
+                    <div class="num">{{ label_count|default(0) }}</div>
+                    <div class="lbl">Label Defect</div>
+                </div>
+                <div class="defect-summary-item color">
+                    <div class="icon"><i class="fas fa-palette"></i></div>
+                    <div class="num">{{ color_count|default(0) }}</div>
+                    <div class="lbl">Color Imbalance</div>
                 </div>
             </div>
         </div>
@@ -471,6 +633,81 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ⭐ Recent Inspections Checklist -->
+    <div class="card recent-inspections-card">
+        <div class="card-header">
+            <h5><i class="fas fa-clock"></i> Recent Inspections</h5>
+            <a href="{{ url_for('history') }}" class="view-all">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="card-body">
+            {% if recent_inspections %}
+                {% for insp in recent_inspections %}
+                <div class="recent-row">
+                    <div>
+                        <span class="sid">{{ insp.session_id }}</span>
+                    </div>
+                    <div class="date">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ insp.date.strftime('%Y-%m-%d %H:%M') }}
+                    </div>
+                    <div class="mini-checklist">
+                        <div class="item">
+                            <i class="fas fa-cut icon"></i> Stitch
+                            {% if insp.has_broken_stitch %}
+                                <span class="dot bad">✕</span>
+                            {% else %}
+                                <span class="dot ok">✓</span>
+                            {% endif %}
+                        </div>
+                        <div class="item">
+                            <i class="fas fa-circle icon"></i> Button
+                            {% if insp.has_button_defect %}
+                                <span class="dot bad">✕</span>
+                            {% else %}
+                                <span class="dot ok">✓</span>
+                            {% endif %}
+                        </div>
+                        <div class="item">
+                            <i class="fas fa-tag icon"></i> Label
+                            {% if insp.has_label_defect %}
+                                <span class="dot bad">✕</span>
+                            {% else %}
+                                <span class="dot ok">✓</span>
+                            {% endif %}
+                        </div>
+                        <div class="item">
+                            <i class="fas fa-palette icon"></i> Color
+                            {% if insp.color_has_imbalance %}
+                                <span class="dot bad">✕</span>
+                            {% elif insp.color_prediction is none %}
+                                <span class="dot na">—</span>
+                            {% else %}
+                                <span class="dot ok">✓</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="status-mini {% if insp.result_summary == 'PASS' %}pass{% else %}fail{% endif %}">
+                            {{ insp.result_summary }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align:center; padding: 30px 20px; color: #6c757d;">
+                    <i class="fas fa-inbox" style="font-size: 32px; color: #c5cae9; display:block; margin-bottom:10px;"></i>
+                    <p style="margin: 0; font-size: 0.9rem;">No inspections yet.</p>
+                    <a href="{{ url_for('inspect') }}"
+                       style="display:inline-block; margin-top:12px; padding: 8px 20px; background: #1a237e; color: white; border-radius: 8px; text-decoration:none; font-size: 0.85rem; font-weight: 600;">
+                        <i class="fas fa-camera"></i> Start First Inspection
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

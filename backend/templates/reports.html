@@ -7,7 +7,7 @@
     /* ============================================
        REPORTS PAGE SPECIFIC STYLES
        ============================================ */
-    
+
     .reports-container {
         padding: 20px 0;
     }
@@ -27,7 +27,7 @@
     /* ============================================
        REPORT GENERATION CARD
        ============================================ */
-    
+
     .report-card {
         border: none;
         border-radius: 16px;
@@ -122,9 +122,86 @@
     }
 
     /* ============================================
+       ⭐ DETECTION SUMMARY (preview panel)
+       ============================================ */
+    .summary-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        margin-top: 24px;
+    }
+
+    .summary-card .card-header {
+        background: linear-gradient(135deg, #6a1b9a, #8e24aa);
+        border: none;
+        padding: 14px 24px;
+    }
+
+    .summary-card .card-header h6 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .summary-card .card-header h6 i {
+        margin-right: 8px;
+    }
+
+    .summary-card .card-body {
+        padding: 16px 24px;
+        background: #faf5ff;
+    }
+
+    .summary-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-bottom: 12px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .summary-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #f0e6fa;
+        font-size: 0.85rem;
+        color: #4a5568;
+    }
+
+    .summary-item i.icon {
+        color: #6a1b9a;
+        width: 16px;
+        text-align: center;
+    }
+
+    .summary-item .label {
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .summary-item .count {
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 2px 10px;
+        border-radius: 12px;
+        background: #f0e6fa;
+        color: #6a1b9a;
+    }
+
+    /* ============================================
        RECENT REPORTS
        ============================================ */
-    
+
     .recent-reports-section {
         margin-top: 24px;
     }
@@ -249,7 +326,7 @@
     /* ============================================
        RESPONSIVE
        ============================================ */
-    
+
     @media (max-width: 768px) {
         .page-title {
             font-size: 1.4rem;
@@ -271,6 +348,10 @@
         .report-list-item .report-info {
             flex: 1;
         }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 576px) {
@@ -291,7 +372,7 @@
     /* ============================================
        ANIMATIONS
        ============================================ */
-    
+
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -305,6 +386,10 @@
 
     .report-card {
         animation: fadeInUp 0.5s ease-out;
+    }
+
+    .summary-card {
+        animation: fadeInUp 0.5s ease-out 0.05s both;
     }
 
     .recent-reports-card {
@@ -349,6 +434,40 @@
                     </form>
                 </div>
             </div>
+
+            <!-- ⭐ NEW: Detection Summary Preview -->
+            <div class="card summary-card">
+                <div class="card-header">
+                    <h6><i class="fas fa-clipboard-check"></i> Report Includes 4-Model Detection Summary</h6>
+                </div>
+                <div class="card-body">
+                    <p class="summary-hint">
+                        Each inspection in the report will show the following detection results:
+                    </p>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <i class="fas fa-cut icon"></i>
+                            <span class="label">Broken Stitch</span>
+                            <span class="count" id="countStitch">–</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-circle icon"></i>
+                            <span class="label">Button Defect</span>
+                            <span class="count" id="countButton">–</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-tag icon"></i>
+                            <span class="label">Label Defect</span>
+                            <span class="count" id="countLabel">–</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-palette icon"></i>
+                            <span class="label">Color Imbalance</span>
+                            <span class="count" id="countColor">–</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -377,10 +496,10 @@
         const formData = new FormData(this);
         const btn = this.querySelector('.btn-generate');
         const originalText = btn.innerHTML;
-        
+
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
         btn.disabled = true;
-        
+
         fetch('/api/generate-report', {
             method: 'POST',
             body: formData
@@ -412,7 +531,7 @@
             .then(response => response.json())
             .then(data => {
                 const container = document.getElementById('recentReports');
-                
+
                 if (data.reports && data.reports.length > 0) {
                     let html = '';
                     data.reports.forEach(report => {
@@ -454,6 +573,40 @@
     }
 
     // ============================================
+    // ⭐ LOAD DEFECT STATS FOR SUMMARY PREVIEW
+    // ============================================
+    function loadDetectionSummary() {
+        fetch('/api/defect-stats')
+            .then(response => response.json())
+            .then(data => {
+                const breakdown = data.defect_breakdown || [];
+                const counts = {
+                    broken_stitch: 0,
+                    button_defect: 0,
+                    label_defect: 0,
+                    color_imbalance: 0
+                };
+                breakdown.forEach(item => {
+                    if (counts.hasOwnProperty(item.type)) {
+                        counts[item.type] = item.count;
+                    }
+                });
+
+                document.getElementById('countStitch').textContent = counts.broken_stitch + ' detected';
+                document.getElementById('countButton').textContent = counts.button_defect + ' detected';
+                document.getElementById('countLabel').textContent  = counts.label_defect  + ' detected';
+                document.getElementById('countColor').textContent  = counts.color_imbalance + ' detected';
+            })
+            .catch(err => {
+                console.warn('Could not load defect stats:', err);
+                ['countStitch', 'countButton', 'countLabel', 'countColor'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = 'N/A';
+                });
+            });
+    }
+
+    // ============================================
     // TOAST NOTIFICATION
     // ============================================
     function showToast(message, type = 'info') {
@@ -480,7 +633,7 @@
             ${message}
         `;
         container.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.style.transition = 'opacity 0.5s';
             toast.style.opacity = '0';
@@ -493,6 +646,7 @@
     // ============================================
     window.onload = function() {
         loadRecentReports();
+        loadDetectionSummary();
     };
 </script>
 {% endblock %}
