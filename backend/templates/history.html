@@ -89,6 +89,31 @@
         margin-right: 6px;
     }
 
+    /* ⭐ NEW: Color-specific filter button accents */
+    .filter-btn.color-balanced:hover,
+    .filter-btn.color-balanced.active {
+        border-color: #2e7d32;
+        color: #2e7d32;
+        background: #e8f5e9;
+    }
+
+    .filter-btn.color-balanced.active {
+        background: #2e7d32;
+        color: white;
+    }
+
+    .filter-btn.color-imbalanced:hover,
+    .filter-btn.color-imbalanced.active {
+        border-color: #c62828;
+        color: #c62828;
+        background: #ffebee;
+    }
+
+    .filter-btn.color-imbalanced.active {
+        background: #c62828;
+        color: white;
+    }
+
     .filter-search {
         margin-left: auto;
         display: flex;
@@ -157,6 +182,7 @@
         position: sticky;
         top: 0;
         z-index: 2;
+        white-space: nowrap;
     }
 
     .table thead th i {
@@ -251,6 +277,69 @@
 
     .alignment-score .score-bar .bar-fill.low {
         background: linear-gradient(90deg, #c62828, #e53935);
+    }
+
+    /* ============================================
+       ⭐ NEW: COLOR BALANCE CELL STYLES
+       ============================================ */
+    .color-cell {
+        min-width: 130px;
+    }
+
+    .color-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+    }
+
+    .color-badge.balanced {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .color-badge.imbalanced {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .color-badge.na {
+        background: #f0f2f5;
+        color: #a0a8b5;
+    }
+
+    .color-badge i {
+        font-size: 0.7rem;
+    }
+
+    .color-confidence {
+        display: block;
+        font-size: 0.7rem;
+        color: #6c757d;
+        font-weight: 500;
+        margin-top: 4px;
+    }
+
+    .color-swatches-mini {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin-top: 4px;
+    }
+
+    .color-swatch-mini {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1.5px solid #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        display: inline-block;
     }
 
     /* ============================================
@@ -379,6 +468,11 @@
         .alignment-score .score-bar {
             width: 40px;
         }
+
+        .color-badge {
+            font-size: 0.7rem;
+            padding: 3px 9px;
+        }
     }
 
     @media (max-width: 576px) {
@@ -400,6 +494,14 @@
         .filter-btn {
             padding: 4px 12px;
             font-size: 0.75rem;
+        }
+
+        .color-cell {
+            min-width: auto;
+        }
+
+        .color-swatches-mini {
+            display: none;
         }
     }
 
@@ -435,7 +537,7 @@
         <div class="col-12">
             <h1 class="page-title">
                 <i class="fas fa-history"></i> Inspection History
-                <span class="badge-count">{{ inspections|length }} Records</span>
+                <span class="badge-count" id="recordCount">{{ inspections|length }} Records</span>
             </h1>
         </div>
     </div>
@@ -452,6 +554,12 @@
             </button>
             <button class="filter-btn" data-filter="fail">
                 <i class="fas fa-times-circle"></i> Fail
+            </button>
+            <button class="filter-btn color-balanced" data-filter="color-balanced">
+                <i class="fas fa-palette"></i> Color OK
+            </button>
+            <button class="filter-btn color-imbalanced" data-filter="color-imbalanced">
+                <i class="fas fa-exclamation-triangle"></i> Color Issue
             </button>
             <button class="filter-btn" data-filter="today">
                 <i class="fas fa-calendar-day"></i> Today
@@ -475,9 +583,10 @@
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag"></i> Session ID</th>
-                            <th><i class="fas fa-calendar-alt"></i> Date & Time</th>
+                            <th><i class="fas fa-calendar-alt"></i> Date &amp; Time</th>
                             <th><i class="fas fa-circle"></i> Buttons Found</th>
                             <th><i class="fas fa-arrows-alt-h"></i> Alignment Score</th>
+                            <th><i class="fas fa-palette"></i> Color Balance</th>
                             <th><i class="fas fa-flag-checkered"></i> Result</th>
                         </tr>
                     </thead>
@@ -504,6 +613,45 @@
                                     </span>
                                 </span>
                             </td>
+
+                            <!-- ⭐ NEW: Color Balance column -->
+                            <td class="color-cell">
+                                {% if insp.color_prediction %}
+                                    {% if insp.color_has_imbalance %}
+                                        <span class="color-badge imbalanced">
+                                            <i class="fas fa-exclamation-triangle"></i> Imbalanced
+                                        </span>
+                                    {% else %}
+                                        <span class="color-badge balanced">
+                                            <i class="fas fa-check"></i> Balanced
+                                        </span>
+                                    {% endif %}
+
+                                    {% if insp.color_confidence %}
+                                        <span class="color-confidence">
+                                            {{ "%.1f"|format((insp.color_confidence or 0) * 100) }}% confidence
+                                        </span>
+                                    {% endif %}
+
+                                    {% set colors = insp.get_dominant_colors() %}
+                                    {% if colors %}
+                                        <div class="color-swatches-mini">
+                                            {% for c in colors[:4] %}
+                                                {% if c is iterable and c|length >= 3 and c is not string %}
+                                                    <span class="color-swatch-mini"
+                                                          style="background: rgb({{ c[0] }},{{ c[1] }},{{ c[2] }});"
+                                                          title="rgb({{ c[0] }},{{ c[1] }},{{ c[2] }})"></span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="color-badge na">
+                                        <i class="fas fa-minus"></i> N/A
+                                    </span>
+                                {% endif %}
+                            </td>
+
                             <td>
                                 <span class="status-badge {% if insp.result_summary == 'PASS' %}pass{% else %}fail{% endif %}">
                                     {% if insp.result_summary == 'PASS' %}
@@ -542,54 +690,58 @@
     document.addEventListener('DOMContentLoaded', function() {
         const filterBtns = document.querySelectorAll('.filter-btn');
         const searchInput = document.getElementById('searchInput');
-        const rows = document.querySelectorAll('#historyTable tbody tr');
+        const table = document.getElementById('historyTable');
+        const rows = table ? table.querySelectorAll('tbody tr') : [];
 
-        // Filter buttons
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Update active state
-                filterBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const filter = this.dataset.filter;
-                applyFilters(filter, searchInput.value);
-            });
-        });
+        // Track current filter + search globally
+        let currentFilter = 'all';
+        let currentSearch = '';
 
-        // Search input
-        searchInput.addEventListener('input', function() {
-            const activeFilter = document.querySelector('.filter-btn.active');
-            const filter = activeFilter ? activeFilter.dataset.filter : 'all';
-            applyFilters(filter, this.value);
-        });
-
-        function applyFilters(filter, search) {
+        function applyFilters() {
             rows.forEach(row => {
                 let show = true;
-                
-                // Status filter
-                if (filter !== 'all') {
+                const filter = currentFilter;
+                const search = currentSearch;
+
+                // ---- Status filters (pass/fail) ----
+                if (filter === 'pass' || filter === 'fail') {
                     const statusBadge = row.querySelector('.status-badge');
                     if (statusBadge) {
                         const status = statusBadge.textContent.trim().toLowerCase();
                         if (filter === 'pass' && !status.includes('pass')) show = false;
                         if (filter === 'fail' && !status.includes('fail')) show = false;
+                    } else {
+                        show = false;
                     }
                 }
 
-                // Date filters
+                // ---- ⭐ NEW: Color filters ----
+                if (filter === 'color-balanced' || filter === 'color-imbalanced') {
+                    const colorBadge = row.querySelector('.color-badge');
+                    if (colorBadge) {
+                        const cls = colorBadge.className;
+                        if (filter === 'color-balanced' && !cls.includes('balanced')) show = false;
+                        if (filter === 'color-imbalanced' && !cls.includes('imbalanced')) show = false;
+                        // Skip 'na' badges in both cases
+                        if (cls.includes('na')) show = false;
+                    } else {
+                        show = false;
+                    }
+                }
+
+                // ---- Date filters ----
                 if (filter === 'today' || filter === 'week') {
                     const dateCell = row.querySelector('td:nth-child(2)');
                     if (dateCell) {
                         const rowDate = new Date(dateCell.textContent);
                         const now = new Date();
-                        
+
                         if (filter === 'today') {
                             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                             const rowDay = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
                             if (rowDay < today) show = false;
                         }
-                        
+
                         if (filter === 'week') {
                             const weekAgo = new Date(now);
                             weekAgo.setDate(weekAgo.getDate() - 7);
@@ -598,40 +750,53 @@
                     }
                 }
 
-                // Search filter
+                // ---- Search filter ----
                 if (search.trim() !== '') {
                     const sessionId = row.querySelector('.session-id');
                     if (sessionId) {
                         if (!sessionId.textContent.toLowerCase().includes(search.toLowerCase())) {
                             show = false;
                         }
+                    } else {
+                        show = false;
                     }
                 }
 
                 row.style.display = show ? '' : 'none';
             });
+
+            updateRecordCount();
         }
 
-        // Update record count
         function updateRecordCount() {
-            const visibleRows = document.querySelectorAll('#historyTable tbody tr[style*="display: none"]');
-            const total = document.querySelectorAll('#historyTable tbody tr').length;
-            const visible = total - visibleRows.length;
-            const badge = document.querySelector('.badge-count');
+            let visible = 0;
+            rows.forEach(r => {
+                if (r.style.display !== 'none') visible++;
+            });
+            const badge = document.getElementById('recordCount');
             if (badge) {
-                badge.textContent = visible + ' Records';
+                badge.textContent = visible + (visible === 1 ? ' Record' : ' Records');
             }
         }
 
-        // Apply filters with count update
-        const originalApply = applyFilters;
-        applyFilters = function(filter, search) {
-            originalApply(filter, search);
-            updateRecordCount();
-        };
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                applyFilters();
+            });
+        });
+
+        // Search input
+        searchInput.addEventListener('input', function() {
+            currentSearch = this.value;
+            applyFilters();
+        });
 
         // Initialize
-        applyFilters('all', '');
+        applyFilters();
     });
 </script>
 {% endblock %}

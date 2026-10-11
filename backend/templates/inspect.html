@@ -435,6 +435,131 @@
         color: white;
     }
 
+    /* ============================================
+       ⭐ NEW: COLOR IMBALANCE ANALYSIS STYLES
+       ============================================ */
+    .analysis-section {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #f0f2f5;
+        margin-top: 14px;
+    }
+
+    .analysis-section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1a237e;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f0f2f5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .analysis-section-title i {
+        font-size: 1rem;
+    }
+
+    .analysis-section.color-section .analysis-section-title {
+        color: #6a1b9a;
+    }
+
+    .analysis-section.color-section {
+        border-color: #f3e5f5;
+        background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+    }
+
+    .probability-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .prob-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+
+    .prob-label {
+        width: 90px;
+        font-weight: 600;
+        color: #4a5568;
+        flex-shrink: 0;
+    }
+
+    .prob-bar {
+        flex: 1;
+        height: 10px;
+        background: #f0f2f5;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .prob-fill {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.6s ease;
+    }
+
+    .prob-fill.balanced {
+        background: linear-gradient(90deg, #2e7d32, #66bb6a);
+    }
+
+    .prob-fill.imbalanced {
+        background: linear-gradient(90deg, #c62828, #ef5350);
+    }
+
+    .prob-value {
+        width: 55px;
+        text-align: right;
+        font-weight: 700;
+        color: #1a237e;
+        flex-shrink: 0;
+    }
+
+    .color-swatches {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    .color-swatch {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .verdict-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .verdict-pill.pass {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .verdict-pill.fail {
+        background: #ffebee;
+        color: #c62828;
+    }
+
     @media (max-width: 992px) {
         .camera-card {
             margin-bottom: 20px;
@@ -516,6 +641,16 @@
 
         .preview-container img {
             max-height: 100px;
+        }
+
+        .prob-label {
+            width: 70px;
+            font-size: 0.75rem;
+        }
+
+        .prob-value {
+            width: 45px;
+            font-size: 0.75rem;
         }
     }
 
@@ -749,9 +884,9 @@
     // GLOBAL VARIABLES
     // ============================================
     let stream = null;
-    let capturedImageBlob = null; // Store captured image as blob
-    let imageSource = null; // Track image source: 'camera' or 'upload'
-    let currentImageData = null; // Store current image data (blob or file)
+    let capturedImageBlob = null;
+    let imageSource = null;
+    let currentImageData = null;
     let isProcessing = false;
     
     const video = document.getElementById('videoFeed');
@@ -766,7 +901,7 @@
     const fileInput = document.getElementById('imageFile');
 
     // ============================================
-    // CAMERA FUNCTIONS
+    // CAMERA FUNCTIONS (unchanged)
     // ============================================
     function checkCameraSupport() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -876,20 +1011,16 @@
             return;
         }
         
-        // Draw the video frame to canvas
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0);
         
-        // Convert canvas to blob
         canvas.toBlob(function(blob) {
             if (blob) {
-                // Store the blob
                 capturedImageBlob = blob;
                 imageSource = 'camera';
                 
-                // Create URL for preview
                 const imageUrl = URL.createObjectURL(blob);
                 capturedImg.src = imageUrl;
                 capturedImg.style.display = 'block';
@@ -897,7 +1028,6 @@
                 if (placeholder) placeholder.style.display = 'none';
                 if (permissionOverlay) permissionOverlay.style.display = 'none';
                 
-                // Show preview with camera badge
                 showPreviewFromDataUrl(imageUrl, 'Camera Capture', 'camera');
                 uploadBtn.disabled = false;
                 showToast('✅ Image captured! Click "Upload & Detect" to analyze.', 'success');
@@ -936,7 +1066,7 @@
     }
 
     // ============================================
-    // PREVIEW FUNCTIONS
+    // PREVIEW FUNCTIONS (unchanged)
     // ============================================
     function showPreview(file) {
         const previewContainer = document.getElementById('previewContainer');
@@ -1000,7 +1130,7 @@
     }
 
     // ============================================
-    // ALARM SYSTEM
+    // ALARM SYSTEM (unchanged)
     // ============================================
     function playAlarm(defects) {
         console.log('🔊 ALARM TRIGGERED!');
@@ -1042,7 +1172,6 @@
 
         let alarmPlayed = false;
 
-        // Try HTML5 Audio
         try {
             const audio = new Audio('/static/sounds/alarm.wav');
             audio.play().then(() => {
@@ -1055,7 +1184,6 @@
             console.log('⚠️ HTML5 Audio error:', e);
         }
 
-        // Try Web Audio API as fallback
         setTimeout(() => {
             if (!alarmPlayed) {
                 try {
@@ -1077,7 +1205,6 @@
             }
         }, 200);
 
-        // Try vibration as last resort
         setTimeout(() => {
             if (!alarmPlayed) {
                 try {
@@ -1092,7 +1219,6 @@
             }
         }, 400);
 
-        // Auto-dismiss after 6 seconds
         setTimeout(() => {
             overlay.style.display = 'none';
             overlay.style.animation = '';
@@ -1100,7 +1226,8 @@
     }
 
     // ============================================
-    // DETECTION FUNCTIONS
+    // ⭐ UPDATED: DETECTION RESULTS DISPLAY
+    // Handles BOTH button model AND color imbalance model output
     // ============================================
     function displayResults(data) {
         console.log('📊 Displaying results:', data);
@@ -1112,6 +1239,7 @@
         resultsHeader.className = `card-header text-white ${isPass ? 'bg-success' : 'bg-danger'}`;
         resultsHeader.innerHTML = `<i class="fas fa-${isPass ? 'check-circle' : 'times-circle'}"></i> ${data.overall_status}`;
 
+        // -------- Defects list --------
         let defectsHtml = '';
         if (data.defects && data.defects.length > 0) {
             defectsHtml = data.defects.map(d => 
@@ -1119,28 +1247,139 @@
             ).join('');
         }
 
+        // -------- Button model data --------
         const buttonCount = data.button_count || data.count || 0;
         const expected = data.expected || 7;
+        const alignmentScore = (data.alignment_score || 0).toFixed(1);
+
+        // -------- ⭐ Color model data --------
+        const color = data.color_imbalance || {};
+        const colorHasError = !!color.error;
+        const colorHasDefect = !!color.has_defect;
+        const colorConfidence = (color.confidence || 0) * 100;
+        const balancedProb = color.balanced_probability !== undefined 
+            ? color.balanced_probability 
+            : (colorHasError ? 0 : (colorHasDefect ? 100 - colorConfidence : colorConfidence));
+        const imbalancedProb = color.imbalanced_probability !== undefined
+            ? color.imbalanced_probability
+            : (colorHasError ? 0 : (colorHasDefect ? colorConfidence : 100 - colorConfidence));
+        const colorPrediction = color.predicted_class || (colorHasDefect ? 'Imbalanced' : 'Balanced');
+
+        // Build color analysis section HTML
+        let colorSectionHtml = '';
+        if (colorHasError) {
+            colorSectionHtml = `
+                <div class="analysis-section color-section">
+                    <div class="analysis-section-title">
+                        <i class="fas fa-palette"></i> Color Balance Analysis
+                    </div>
+                    <div style="color:#a0a8b5; font-size:0.85rem; text-align:center; padding:8px;">
+                        <i class="fas fa-info-circle"></i> Color model not available
+                    </div>
+                </div>
+            `;
+        } else {
+            const verdictClass = colorHasDefect ? 'fail' : 'pass';
+            const verdictText = colorHasDefect ? 'IMBALANCED' : 'BALANCED';
+            const verdictIcon = colorHasDefect ? 'fa-exclamation-triangle' : 'fa-check';
+
+            // Build swatches if dominant_colors is present
+            let swatchesHtml = '';
+            if (color.dominant_colors && color.dominant_colors.length > 0) {
+                swatchesHtml = `
+                    <div style="margin-top:12px;">
+                        <div style="font-size:0.75rem; color:#6c757d; font-weight:600; margin-bottom:6px;">
+                            Dominant Colors
+                        </div>
+                        <div class="color-swatches">
+                            ${color.dominant_colors.map(c => {
+                                // Accept either [r,g,b] array or 'rgb(...)' string
+                                let rgb = c;
+                                if (Array.isArray(c) && c.length >= 3) {
+                                    rgb = `rgb(${c[0]},${c[1]},${c[2]})`;
+                                } else if (typeof c === 'object' && c.r !== undefined) {
+                                    rgb = `rgb(${c.r},${c.g},${c.b})`;
+                                }
+                                return `<div class="color-swatch" style="background:${rgb};" title="${rgb}"></div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            colorSectionHtml = `
+                <div class="analysis-section color-section">
+                    <div class="analysis-section-title">
+                        <i class="fas fa-palette"></i> Color Balance Analysis
+                        <span class="verdict-pill ${verdictClass}" style="margin-left:auto;">
+                            <i class="fas ${verdictIcon}"></i> ${verdictText}
+                        </span>
+                    </div>
+
+                    <div class="result-detail-grid" style="margin:0 0 12px 0;">
+                        <div class="result-detail-item">
+                            <div class="label">Prediction</div>
+                            <div class="value" style="font-size:1rem;">${colorPrediction}</div>
+                        </div>
+                        <div class="result-detail-item">
+                            <div class="label">Confidence</div>
+                            <div class="value" style="font-size:1rem;">${colorConfidence.toFixed(1)}%</div>
+                        </div>
+                    </div>
+
+                    <div class="probability-bars">
+                        <div class="prob-row">
+                            <span class="prob-label">Balanced</span>
+                            <div class="prob-bar">
+                                <div class="prob-fill balanced" style="width:${balancedProb}%"></div>
+                            </div>
+                            <span class="prob-value">${balancedProb.toFixed(1)}%</span>
+                        </div>
+                        <div class="prob-row">
+                            <span class="prob-label">Imbalanced</span>
+                            <div class="prob-bar">
+                                <div class="prob-fill imbalanced" style="width:${imbalancedProb}%"></div>
+                            </div>
+                            <span class="prob-value">${imbalancedProb.toFixed(1)}%</span>
+                        </div>
+                    </div>
+
+                    ${swatchesHtml}
+                </div>
+            `;
+        }
 
         resultsBody.innerHTML = `
             <div class="result-status ${isPass ? 'pass' : 'fail'}">
                 ${isPass ? '✅ PASS' : '❌ FAIL'}
             </div>
-            <div class="result-detail-grid">
-                <div class="result-detail-item">
-                    <div class="label">Buttons Found</div>
-                    <div class="value">${buttonCount} <span class="expected">/ ${expected}</span></div>
+
+            <!-- Button Detection Section -->
+            <div class="analysis-section">
+                <div class="analysis-section-title">
+                    <i class="fas fa-circle"></i> Button Detection
                 </div>
-                <div class="result-detail-item">
-                    <div class="label">Alignment Score</div>
-                    <div class="value">${(data.alignment_score || 0).toFixed(1)}%</div>
+                <div class="result-detail-grid" style="margin:0;">
+                    <div class="result-detail-item">
+                        <div class="label">Buttons Found</div>
+                        <div class="value">${buttonCount} <span class="expected">/ ${expected}</span></div>
+                    </div>
+                    <div class="result-detail-item">
+                        <div class="label">Alignment Score</div>
+                        <div class="value">${alignmentScore}%</div>
+                    </div>
                 </div>
             </div>
+
+            <!-- ⭐ Color Imbalance Section -->
+            ${colorSectionHtml}
+
             ${data.has_defect ? 
                 `<div class="alert alert-defect alert-custom"><i class="fas fa-exclamation-triangle"></i> Defect Detected!</div>` : 
                 `<div class="alert alert-success-custom alert-custom"><i class="fas fa-check-circle"></i> No defects detected</div>`
             }
             ${defectsHtml}
+
             <div class="d-grid gap-2 mt-3">
                 <button class="btn btn-primary" onclick="window.location.href='/history'">
                     <i class="fas fa-history"></i> View History
@@ -1221,10 +1460,9 @@
     }
 
     // ============================================
-    // HANDLE UPLOAD - SUPPORTS BOTH FILE UPLOAD AND CAMERA CAPTURE
+    // HANDLE UPLOAD (unchanged)
     // ============================================
     function handleUpload() {
-        // Prevent multiple submissions
         if (isProcessing) {
             showToast('Please wait, processing in progress...', 'warning');
             return;
@@ -1237,7 +1475,6 @@
         
         const formData = new FormData();
         
-        // Check if we have a captured image from camera
         if (imageSource === 'camera' && capturedImageBlob) {
             console.log('📷 Using captured image from camera');
             formData.append('image', capturedImageBlob, 'captured_image.jpg');
@@ -1246,7 +1483,6 @@
             return;
         }
         
-        // Check if we have a file uploaded
         if (fileInput.files && fileInput.files[0]) {
             console.log('📁 Uploading file:', fileInput.files[0].name);
             formData.append('image', fileInput.files[0]);
@@ -1255,20 +1491,17 @@
             return;
         }
         
-        // No image found
         showToast('Please select or capture an image first.', 'warning');
     }
 
     // ============================================
-    // FILE INPUT HANDLER
+    // FILE INPUT HANDLER (unchanged)
     // ============================================
     fileInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
-            // Clear any captured image data
             capturedImageBlob = null;
             imageSource = 'upload';
             showPreview(this.files[0]);
-            // Reset processing state
             isProcessing = false;
         } else {
             clearPreview();
@@ -1276,7 +1509,7 @@
     });
 
     // ============================================
-    // TOAST NOTIFICATIONS
+    // TOAST NOTIFICATIONS (unchanged)
     // ============================================
     function showToast(message, type = 'info') {
         const colors = {
@@ -1324,7 +1557,7 @@
     }
 
     // ============================================
-    // DRAG AND DROP
+    // DRAG AND DROP (unchanged)
     // ============================================
     document.addEventListener('DOMContentLoaded', function() {
         const uploadArea = document.getElementById('uploadArea');
@@ -1348,7 +1581,6 @@
                 e.preventDefault();
                 this.classList.remove('dragover');
                 if (e.dataTransfer.files.length) {
-                    // Clear camera capture data when uploading a file
                     capturedImageBlob = null;
                     imageSource = 'upload';
                     fileInput.files = e.dataTransfer.files;
@@ -1358,7 +1590,6 @@
             });
         }
 
-        // Auto-start camera if supported
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             setTimeout(startCamera, 1000);
         } else {

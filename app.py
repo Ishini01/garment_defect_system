@@ -10,11 +10,26 @@ import gc
 from backend.models import db, User, InspectionSession, Defect
 from backend.forms import LoginForm, RegistrationForm, ForgotPasswordForm, ResetPasswordForm
 from backend.utils.button_detector import ButtonDetector
+from backend.utils.color_detector import ColorImbalanceDetector
 from backend.utils.alarm import AlarmManager
 from backend.utils.report_generator import ReportGenerator
 
-# Create Flask app
-app = Flask(__name__, template_folder='templates', static_folder='static')
+# ============================================
+# ⭐ FIX: Use absolute paths for templates/static
+# so Flask finds them no matter where you run the app from.
+# ============================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(__name__,
+            template_folder=os.path.join(BASE_DIR, 'templates'),
+            static_folder=os.path.join(BASE_DIR, 'static'))
+
+# --- Debug prints (delete these 5 lines once it works) ---
+print("=" * 60)
+print(f"RUNNING: {os.path.abspath(__file__)}")
+print(f"TEMPLATES: {app.template_folder}")
+print(f"STATIC: {app.static_folder}")
+print("=" * 60)
 
 # ============================================
 # CONFIGURATION - MYSQL
@@ -22,15 +37,15 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/garment_defect_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'static', 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
 
 # ============================================
 # IPHONE CAMERA CONFIGURATION
 # ============================================
-CAMERA_TYPE = 'camo'           # 'webcam', 'camo', or 'url'
-CAMERA_INDEX = 1               # iPhone via Camo (index 1)
-PHONE_URL = 'http://localhost:8080/shot.jpg'  # For IP Webcam
+CAMERA_TYPE = 'camo'
+CAMERA_INDEX = 1
+PHONE_URL = 'http://localhost:8080/shot.jpg'
 
 # ============================================
 # INITIALIZE EXTENSIONS
@@ -55,11 +70,31 @@ def inject_now():
     return {'now': datetime.now()}
 
 # ============================================
+# LOAD COLOR IMBALANCE MODEL ONCE AT STARTUP
+# ============================================
+color_detector = None
+
+def init_color_detector():
+    """Load the color imbalance model once at app startup."""
+    global color_detector
+    try:
+        color_detector = ColorImbalanceDetector()
+        print("✅ Color Imbalance model loaded successfully!")
+    except FileNotFoundError as e:
+        print(f"⚠️ Color Imbalance model NOT found: {e}")
+        print("   → Color detection will be skipped. Place your .h5 file at the expected path.")
+        color_detector = None
+    except Exception as e:
+        print(f"⚠️ Color Imbalance model failed to load: {e}")
+        color_detector = None
+
+# ============================================
 # CREATE DATABASE TABLES
 # ============================================
 with app.app_context():
     db.create_all()
     print("✅ MySQL Database tables created successfully!")
+    init_color_detector()
 
 # ============================================
 # ROUTES
@@ -77,7 +112,7 @@ def dashboard():
     pass_count = InspectionSession.query.filter_by(operator_id=current_user.operator_id, result_summary='PASS').count()
     fail_count = total - pass_count
     pass_rate = (pass_count / total * 100) if total > 0 else 0
-    
+
     return render_template('dashboard.html',
                           total=total,
                           pass_count=pass_count,
@@ -88,28 +123,46 @@ def dashboard():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
+
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(
-            operator_id=form.operator_id.data,
-            operator_name=form.operator_name.data,
-            email=form.email.data,
-            nic=form.nic.data
-        )
-        user.set_pin(form.pin.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('✅ Registration successful! Please login.', 'success')
-        return redirect(url_for('login'))
-    
+        # ⭐ Check for existing operator_id
+        existing_op = User.query.filter_by(operator_id=form.operator_id.data).first()
+        if existing_op:
+            flash('❌ Operator ID already exists. Please choose another.', 'danger')
+            return render_template('register.html', form=form)
+
+        # ⭐ Check for existing email (only if provided)
+        if form.email.data:
+            existing_email = User.query.filter_by(email=form.email.data).first()
+            if existing_email:
+                flash('❌ This email is already registered. Use a different email or leave it blank.', 'danger')
+                return render_template('register.html', form=form)
+
+        try:
+            user = User(
+                operator_id=form.operator_id.data,
+                operator_name=form.operator_name.data,
+                email=form.email.data or None,
+                nic=form.nic.data
+            )
+            user.set_pin(form.pin.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('✅ Registration successful! Please login.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'❌ Registration failed: {str(e)}', 'danger')
+            return render_template('register.html', form=form)
+
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
+
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(operator_id=form.operator_id.data).first()
@@ -119,7 +172,7 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         flash('❌ Invalid Operator ID or PIN.', 'danger')
-    
+
     return render_template('login.html', form=form)
 
 @app.route('/logout')
@@ -133,7 +186,7 @@ def logout():
 def forgot_password():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
+
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(operator_id=form.operator_id.data, nic=form.nic.data).first()
@@ -142,31 +195,31 @@ def forgot_password():
             flash(f'📧 Reset link: http://localhost:5000/reset-password/{token}', 'info')
             flash('🔑 In production, this would be sent to your email.', 'info')
             return redirect(url_for('login'))
-    
+
     return render_template('forgot_password.html', form=form)
 
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
+
     operator_id = User.verify_reset_token(token)
     if not operator_id:
         flash('❌ Invalid or expired reset link.', 'danger')
         return redirect(url_for('forgot_password'))
-    
+
     user = User.query.filter_by(operator_id=operator_id).first()
     if not user:
         flash('❌ User not found.', 'danger')
         return redirect(url_for('forgot_password'))
-    
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_pin(form.pin.data)
         db.session.commit()
         flash('✅ PIN reset successful! Please login.', 'success')
         return redirect(url_for('login'))
-    
+
     return render_template('reset_password.html', form=form, token=token)
 
 @app.route('/inspect')
@@ -194,8 +247,8 @@ def profile():
     pass_count = InspectionSession.query.filter_by(operator_id=current_user.operator_id, result_summary='PASS').count()
     fail_count = total - pass_count
     pass_rate = (pass_count / total * 100) if total > 0 else 0
-    
-    return render_template('profile.html', 
+
+    return render_template('profile.html',
                           user=current_user,
                           total_inspections=total,
                           pass_count=pass_count,
@@ -233,14 +286,14 @@ def change_pin():
     try:
         current_pin = request.form.get('current_pin')
         new_pin = request.form.get('new_pin')
-        
+
         user = User.query.get(current_user.id)
         if not user.check_pin(current_pin):
             return jsonify({'error': 'Current PIN is incorrect'}), 400
-        
+
         if len(new_pin) < 4 or len(new_pin) > 10:
             return jsonify({'error': 'PIN must be between 4 and 10 characters'}), 400
-        
+
         user.set_pin(new_pin)
         db.session.commit()
         return jsonify({'success': True, 'message': 'PIN changed successfully!'})
@@ -270,7 +323,7 @@ def delete_account():
         for inspection in inspections:
             Defect.query.filter_by(session_id=inspection.id).delete()
             db.session.delete(inspection)
-        
+
         user = User.query.get(current_user.id)
         db.session.delete(user)
         db.session.commit()
@@ -299,17 +352,15 @@ def iphone_status():
     try:
         detector = ButtonDetector(camera_type='camo', camera_index=1)
         is_connected = detector.test_camera()
-        
-        # Clean up memory
         gc.collect()
-        
+
         return jsonify({
             'connected': is_connected,
             'camera_type': 'camo',
             'camera_index': 1,
             'message': 'iPhone camera connected!' if is_connected else 'iPhone camera not connected. Please connect via USB and open Camo.'
         })
-        
+
     except Exception as e:
         gc.collect()
         return jsonify({'error': str(e)}), 500
@@ -322,30 +373,30 @@ def capture_phone():
         print("=" * 50)
         print("📱 IPHONE CAPTURE REQUEST")
         print("=" * 50)
-        
+
         detector = ButtonDetector(camera_type='camo', camera_index=1)
-        
+
         if not detector.test_camera():
             gc.collect()
             return jsonify({'error': 'iPhone camera not connected. Please connect via USB and launch Camo app.'}), 500
-        
+
         image_path = detector.capture_and_save(prefix='iphone')
         if image_path is None:
             gc.collect()
             return jsonify({'error': 'Could not capture from iPhone.'}), 500
-        
+
         print(f"✅ Image captured: {image_path}")
         print("=" * 50)
-        
+
         gc.collect()
-        
+
         return jsonify({
             'success': True,
             'message': 'Image captured successfully from iPhone!',
             'image_path': image_path,
             'image_url': f"/{image_path}"
         })
-        
+
     except Exception as e:
         print(f"❌ Capture error: {e}")
         import traceback
@@ -360,14 +411,50 @@ def find_camera():
     try:
         detector = ButtonDetector()
         available = detector.find_camera_index(max_index=5)
-        
         gc.collect()
-        
+
         return jsonify({
             'available_indices': available,
             'message': f'Found {len(available)} camera(s)'
         })
-        
+
+    except Exception as e:
+        gc.collect()
+        return jsonify({'error': str(e)}), 500
+
+# ============================================
+# STANDALONE COLOR IMBALANCE ENDPOINT
+# ============================================
+@app.route('/api/detect-color', methods=['POST'])
+@login_required
+def detect_color_only():
+    """Test endpoint: run ONLY the color imbalance model on an uploaded image."""
+    if color_detector is None:
+        return jsonify({'error': 'Color model not loaded on server'}), 503
+
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"{timestamp}_color_{uuid.uuid4().hex[:8]}.jpg"
+    upload_dir = os.path.join(BASE_DIR, 'static', 'uploads')
+    os.makedirs(upload_dir, exist_ok=True)
+    image_path = os.path.join(upload_dir, filename)
+    file.save(image_path)
+
+    try:
+        result = color_detector.analyze(image_path)
+        gc.collect()
+        return jsonify({
+            'success': True,
+            'image_path': image_path,
+            'image_url': f"/static/uploads/{filename}",
+            'color_result': result
+        }), 200
     except Exception as e:
         gc.collect()
         return jsonify({'error': str(e)}), 500
@@ -375,7 +462,6 @@ def find_camera():
 # ============================================
 # MAIN DETECTION API ROUTE
 # ============================================
-
 @app.route('/api/detect', methods=['POST'])
 @login_required
 def detect_defects():
@@ -383,69 +469,94 @@ def detect_defects():
         print("=" * 50)
         print("📷 DETECTION REQUEST")
         print("=" * 50)
-        
+
         image_path = None
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        
-        # Check if image is uploaded
+
+        # ---------- 1. SAVE UPLOADED IMAGE ----------
         if 'image' in request.files:
-            # Uploaded image
             file = request.files['image']
             if file.filename == '':
                 gc.collect()
                 return jsonify({'error': 'No file selected'}), 400
-            
-            # Check file size
+
             file.seek(0, os.SEEK_END)
             file_size = file.tell()
             file.seek(0)
-            
-            if file_size > 10 * 1024 * 1024:  # 10MB
+            if file_size > 10 * 1024 * 1024:
                 gc.collect()
                 return jsonify({'error': 'Image too large. Maximum size is 10MB.'}), 400
-            
-            # Check file extension
+
             allowed_extensions = {'jpg', 'jpeg', 'png', 'gif', 'bmp'}
             if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
                 gc.collect()
                 return jsonify({'error': 'Invalid file type. Allowed: JPG, PNG, GIF, BMP'}), 400
-            
+
             filename = f"{timestamp}_{uuid.uuid4().hex[:8]}.jpg"
-            upload_dir = 'static/uploads'
+            upload_dir = os.path.join(BASE_DIR, 'static', 'uploads')
             os.makedirs(upload_dir, exist_ok=True)
             image_path = os.path.join(upload_dir, filename)
             file.save(image_path)
             print(f"📤 Uploaded image: {image_path}")
-            
-            # Resize image if too large using OpenCV
+
             try:
                 import cv2
                 img = cv2.imread(image_path)
                 if img is not None:
                     h, w = img.shape[:2]
                     if w > 2048 or h > 1536:
-                        print(f"📐 Resizing image from {w}x{h}")
                         new_w = min(w, 2048)
                         new_h = min(h, 1536)
                         resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
                         cv2.imwrite(image_path, resized)
                         print(f"📐 Resized to {new_w}x{new_h}")
-                    # Clean up
                     del img
                     gc.collect()
             except Exception as e:
                 print(f"⚠️ Image resize warning: {e}")
-            
         else:
             gc.collect()
             return jsonify({'error': 'No image provided'}), 400
-        
-        # Detect buttons
+
+        # ---------- 2. BUTTON DETECTION (YOLOv11) ----------
         detector = ButtonDetector()
         boxes = detector.detect_buttons(image_path)
         analysis = detector.analyze_buttons(boxes)
-        
-        # Save to database
+        print(f"🔘 Button model: {analysis['count']}/{analysis['expected']} buttons, "
+              f"alignment={analysis.get('alignment_score', 0)}")
+
+        # ---------- 3. COLOR IMBALANCE DETECTION (ResNet50) ----------
+        color_result = None
+        color_has_defect = False
+        color_defect_desc = None
+
+        if color_detector is not None:
+            try:
+                color_result = color_detector.analyze(image_path)
+                color_has_defect = bool(color_result and color_result.get('has_defect'))
+
+                if color_has_defect:
+                    confidence_pct = color_result.get('confidence', 0) * 100
+                    color_defect_desc = f"Color imbalance detected ({confidence_pct:.1f}% confidence)"
+                    print(f"🎨 Color model: DEFECT ({confidence_pct:.1f}%)")
+                else:
+                    print(f"🎨 Color model: OK")
+            except Exception as e:
+                print(f"⚠️ Color detection error: {e}")
+                color_result = {'error': str(e), 'has_defect': False}
+        else:
+            print("⚠️ Color model not loaded — skipping color detection")
+            color_result = {'error': 'Model not loaded on server', 'has_defect': False}
+
+        # ---------- 4. COMBINE VERDICTS ----------
+        combined_defects = list(analysis.get('defects', []))
+        if color_defect_desc:
+            combined_defects.append(color_defect_desc)
+
+        overall_has_defect = analysis['has_defect'] or color_has_defect
+        overall_status = 'FAIL' if overall_has_defect else 'PASS'
+
+        # ---------- 5. SAVE TO DATABASE ----------
         session_id = f"INS-{timestamp}"
         inspection = InspectionSession(
             session_id=session_id,
@@ -453,20 +564,20 @@ def detect_defects():
             date=datetime.utcnow(),
             image_path=image_path,
             shirt_count=1,
-            result_summary=analysis['overall_status'],
-            has_defect=analysis['has_defect'],
+            result_summary=overall_status,
+            has_defect=overall_has_defect,
             button_count=analysis['count'],
             expected_count=analysis['expected'],
             alignment_score=analysis.get('alignment_score', 0),
             spacing_score=analysis.get('spacing_score', 0),
-            defect_details=json.dumps(analysis.get('defects', []))
+            defect_details=json.dumps(combined_defects)
         )
         db.session.add(inspection)
         db.session.commit()
         print(f"💾 Inspection saved: {session_id}")
-        
-        # Add defects if found
-        if analysis['has_defect']:
+
+        # ---------- 6. SAVE DEFECT RECORDS ----------
+        if overall_has_defect:
             for defect_desc in analysis.get('defects', []):
                 defect = Defect(
                     session_id=inspection.id,
@@ -476,28 +587,34 @@ def detect_defects():
                     severity='HIGH' if 'missing' in defect_desc.lower() else 'MEDIUM'
                 )
                 db.session.add(defect)
+
+            if color_defect_desc:
+                defect = Defect(
+                    session_id=inspection.id,
+                    defect_type='color_imbalance',
+                    defect_status='FAIL',
+                    description=color_defect_desc,
+                    severity='MEDIUM'
+                )
+                db.session.add(defect)
+
             db.session.commit()
-            print(f"⚠️ Defects saved: {len(analysis.get('defects', []))}")
-            
-            # ============================================
-            # PLAY ALARM - ENHANCED
-            # ============================================
+            print(f"⚠️ Defects saved: {len(combined_defects)}")
+
+            # ---------- 7. PLAY ALARM ----------
             print("🔊 ALARM TRIGGERED!")
             try:
                 alarm = AlarmManager()
                 alarm.play_alarm()
-                print("✅ Server alarm played successfully")
+                print("✅ Server alarm played")
             except Exception as e:
                 print(f"❌ Alarm error: {e}")
-                # Try simple beep as fallback
                 try:
                     sys.stdout.write('\a')
                     sys.stdout.flush()
-                    print("🔔 Terminal bell played")
                 except:
                     pass
-            
-            # Also try to play sound via system
+
             try:
                 import platform
                 if platform.system() == 'Windows':
@@ -508,24 +625,24 @@ def detect_defects():
                     print("🔔 Windows beep played")
             except:
                 pass
-        
-        print(f"✅ Detection complete: {analysis['overall_status']}")
+
+        print(f"✅ Detection complete: {overall_status}")
         print("=" * 50)
-        
-        # Clean up memory
         gc.collect()
-        
+
+        # ---------- 8. RETURN COMBINED RESPONSE ----------
         return jsonify({
             'success': True,
             'session_id': session_id,
-            'overall_status': analysis['overall_status'],
-            'has_defect': analysis['has_defect'],
+            'overall_status': overall_status,
+            'has_defect': overall_has_defect,
             'button_count': analysis['count'],
             'expected': analysis['expected'],
             'alignment_score': analysis.get('alignment_score', 0),
-            'defects': analysis.get('defects', [])
+            'defects': combined_defects,
+            'color_imbalance': color_result
         })
-        
+
     except Exception as e:
         print(f"❌ Detection error: {e}")
         import traceback
@@ -542,7 +659,7 @@ def detect_defects():
 def generate_report():
     try:
         period = request.form.get('period', 'weekly')
-        
+
         end = datetime.utcnow()
         if period == 'weekly':
             start = end - timedelta(days=7)
@@ -552,23 +669,23 @@ def generate_report():
             start = end - timedelta(days=365)
         else:
             start = end - timedelta(days=7)
-        
+
         inspections = InspectionSession.query.filter(
             InspectionSession.operator_id == current_user.operator_id,
             InspectionSession.date >= start,
             InspectionSession.date <= end
         ).all()
-        
+
         defects = Defect.query.join(InspectionSession).filter(
             InspectionSession.operator_id == current_user.operator_id,
             Defect.created_at >= start,
             Defect.created_at <= end
         ).all()
-        
+
         if not inspections:
             gc.collect()
             return jsonify({'error': 'No inspections found for this period'}), 400
-        
+
         report_gen = ReportGenerator()
         filename = report_gen.generate_report(
             inspections=inspections,
@@ -576,17 +693,16 @@ def generate_report():
             period=period,
             user_name=current_user.operator_name
         )
-        
+
         filename_only = os.path.basename(filename)
-        
         gc.collect()
-        
+
         return jsonify({
             'success': True,
             'message': 'Report generated successfully!',
             'download_url': f"/download/{filename_only}"
         })
-        
+
     except Exception as e:
         gc.collect()
         return jsonify({'error': str(e)}), 500
@@ -595,28 +711,26 @@ def generate_report():
 @login_required
 def download_report(filename):
     """Download generated report"""
-    from flask import send_file
-    
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root_dir = os.path.dirname(BASE_DIR)
     file_path = os.path.join(root_dir, 'reports', filename)
-    
+
     if not os.path.exists(file_path):
         gc.collect()
         return jsonify({'error': 'Report file not found'}), 404
-    
+
     gc.collect()
     return send_file(file_path, as_attachment=True)
 
 @app.route('/api/recent-reports')
 @login_required
 def recent_reports():
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root_dir = os.path.dirname(BASE_DIR)
     reports_dir = os.path.join(root_dir, 'reports')
-    
+
     if not os.path.exists(reports_dir):
         gc.collect()
         return jsonify({'reports': []})
-    
+
     files = []
     for f in os.listdir(reports_dir):
         if f.endswith('.pdf'):
@@ -626,7 +740,7 @@ def recent_reports():
                 'url': f"/download/{f}",
                 'date': datetime.fromtimestamp(os.path.getctime(file_path)).strftime('%Y-%m-%d %H:%M')
             })
-    
+
     files.sort(key=lambda x: x['date'], reverse=True)
     gc.collect()
     return jsonify({'reports': files[:10]})
@@ -638,24 +752,37 @@ def defect_stats():
         total_defects = Defect.query.join(InspectionSession).filter(
             InspectionSession.operator_id == current_user.operator_id
         ).count()
-        
+
         defect_counts = db.session.query(
-            Defect.defect_type, 
+            Defect.defect_type,
             db.func.count(Defect.id)
         ).join(InspectionSession).filter(
             InspectionSession.operator_id == current_user.operator_id
         ).group_by(Defect.defect_type).all()
-        
+
         gc.collect()
-        
+
         return jsonify({
             'total_defects': total_defects,
             'defect_breakdown': [{'type': d[0], 'count': d[1]} for d in defect_counts]
         })
-        
+
     except Exception as e:
         gc.collect()
         return jsonify({'error': str(e)}), 500
+
+# ============================================
+# HEALTH CHECK
+# ============================================
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Quick endpoint to see if both models loaded correctly."""
+    return jsonify({
+        'status': 'ok',
+        'button_model': 'loaded',
+        'color_model': 'loaded' if color_detector is not None else 'NOT loaded',
+        'timestamp': datetime.now().isoformat()
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

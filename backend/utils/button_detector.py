@@ -9,38 +9,92 @@ import base64
 import io
 from PIL import Image
 
+# ============================================
+# TRAINED MODEL LOADING (singleton, loaded once per process)
+# ============================================
+
+DEFAULT_MODEL_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    'models',
+    'button_model.pt'
+)
+
+_yolo_model = None
+_yolo_load_error = None
+
+
+def _get_model():
+    """Lazily load the trained YOLOv11 button-defect model (exported from the
+    Colab training notebook as best.pt) and cache it for the life of the process."""
+    global _yolo_model, _yolo_load_error
+
+    if _yolo_model is not None:
+        return _yolo_model
+    if _yolo_load_error is not None:
+        raise _yolo_load_error
+
+    try:
+        from ultralytics import YOLO
+    except ImportError:
+        _yolo_load_error = RuntimeError(
+            "ultralytics is not installed. Run: pip install ultralytics"
+        )
+        raise _yolo_load_error
+
+    model_path = os.environ.get('BUTTON_MODEL_PATH', DEFAULT_MODEL_PATH)
+
+    if not os.path.exists(model_path):
+        _yolo_load_error = FileNotFoundError(
+            f"Trained button-defect model not found at: {model_path}\n"
+            "Export best.pt from the Colab training notebook (Notebook 1) and place it "
+            "at this path, or point BUTTON_MODEL_PATH to its location."
+        )
+        raise _yolo_load_error
+
+    _yolo_model = YOLO(model_path)
+    print(f"✅ Loaded button-defect model: {model_path}")
+    return _yolo_model
+
+
 class ButtonDetector:
+    # Class names produced by the trained YOLOv11 model
+    CLASS_BUTTON = 'buttons'
+    CLASS_MISALIGNED = 'button_misaligned'
+    CLASS_MISSING_GAP = 'missing_button_gap'
+
     def __init__(self, camera_type='camo', camera_index=1, phone_url='http://localhost:8080/shot.jpg'):
         """
         Initialize Button Detector
-        
+
         Args:
             camera_type: 'webcam' for USB webcam, 'url' for IP Webcam, 'camo' for Camo app
             camera_index: Index of the camera device (0=default, 1=iPhone via Camo)
             phone_url: URL for IP Webcam app (if using URL method)
         """
         self.expected_buttons = 7
-        self.tolerance_angle = 5
-        self.tolerance_spacing = 15
-        
+
+        # Inference settings (match the Colab notebook's deployment config)
+        self.model_img_size = 640
+        self.model_conf_threshold = 0.50
+
         # Camera settings - iPhone is index 1
         self.camera_type = camera_type
         self.camera_index = 1  # iPhone via Camo
         self.phone_url = phone_url
         self.upload_dir = 'static/uploads'
-        
+
         # Image size limits to prevent memory issues
         self.max_image_width = 1280
         self.max_image_height = 960
-        
+
         # Create upload directory if it doesn't exist
         os.makedirs(self.upload_dir, exist_ok=True)
         os.makedirs('static', exist_ok=True)
-    
+
     # ============================================
     # IMAGE RESIZE & MEMORY MANAGEMENT
     # ============================================
-    
+
     def resize_image(self, img):
         """
         Resize image to prevent memory issues
@@ -51,28 +105,28 @@ class ButtonDetector:
         """
         if img is None:
             return None
-        
+
         h, w = img.shape[:2]
-        
+
         # If image is already small enough, return it
         if w <= self.max_image_width and h <= self.max_image_height:
             return img
-        
+
         # Calculate scale factor (maintain aspect ratio)
         scale = min(self.max_image_width / w, self.max_image_height / h)
         new_w = int(w * scale)
         new_h = int(h * scale)
-        
+
         # Resize image using INTER_AREA for downscaling
         resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
         print(f"📐 Resized image from {w}x{h} to {new_w}x{new_h}")
-        
+
         # Free memory
         del img
         gc.collect()
-        
+
         return resized
-    
+
     def _cleanup_memory(self):
         """Clean up memory after processing"""
         try:
@@ -80,11 +134,11 @@ class ButtonDetector:
         except:
             pass
         gc.collect()
-    
+
     # ============================================
     # IMAGE CAPTURE METHODS
     # ============================================
-    
+
     def capture_image(self):
         """
         Capture image from iPhone or webcam
@@ -94,7 +148,7 @@ class ButtonDetector:
             return self._capture_from_url()
         else:
             return self._capture_from_webcam()
-    
+
     def _capture_from_url(self):
         """Capture from IP Webcam URL (via USB forwarding)"""
         try:
@@ -111,23 +165,23 @@ class ButtonDetector:
         except Exception as e:
             print(f"❌ Error capturing from URL: {e}")
         return None
-    
+
     def _capture_from_webcam(self):
         """Capture from iPhone via Camo virtual camera"""
         try:
             # Try iPhone camera indices (1, 2, 3)
             iphone_indices = [1, 2, 3]
-            
+
             for idx in iphone_indices:
                 print(f"🔍 Trying camera index {idx}...")
                 cap = cv2.VideoCapture(idx)
-                
+
                 if cap.isOpened():
                     time.sleep(0.3)
-                    
+
                     ret, frame = cap.read()
                     cap.release()
-                    
+
                     if ret and frame is not None:
                         # Resize to prevent memory issues
                         frame = self.resize_image(frame)
@@ -138,7 +192,7 @@ class ButtonDetector:
                         print(f"⚠️ Camera {idx}: Connected but no image")
                 else:
                     print(f"❌ Camera {idx}: Not available")
-            
+
             # Fallback to webcam
             print("🔄 iPhone not found, trying webcam...")
             cap = cv2.VideoCapture(0)
@@ -150,14 +204,14 @@ class ButtonDetector:
                     print("✅ Using webcam as fallback")
                     self._cleanup_memory()
                     return frame
-            
+
             return None
-            
+
         except Exception as e:
             print(f"❌ Error capturing from iPhone: {e}")
             self._cleanup_memory()
             return None
-    
+
     def capture_and_save(self, prefix='iphone'):
         """
         Capture image and save to file
@@ -170,14 +224,14 @@ class ButtonDetector:
             filepath = os.path.join(self.upload_dir, filename)
             cv2.imwrite(filepath, img)
             print(f"✅ Image saved: {filepath}")
-            
+
             # Free memory
             del img
             self._cleanup_memory()
-            
+
             return filepath
         return None
-    
+
     def capture_from_image(self, image_path):
         """Load image from file path with resizing"""
         img = cv2.imread(image_path)
@@ -188,11 +242,11 @@ class ButtonDetector:
         resized = self.resize_image(img)
         self._cleanup_memory()
         return resized
-    
+
     def process_uploaded_image(self, image_data):
         """
         Process uploaded image from web interface
-        
+
         Args:
             image_data: Can be one of:
                 - File object from Flask request.files
@@ -200,13 +254,13 @@ class ButtonDetector:
                 - Bytes data
                 - File path (string)
                 - OpenCV image (numpy array)
-        
+
         Returns:
             OpenCV image or None
         """
         try:
             img = None
-            
+
             # Check if it's a file object (from Flask)
             if hasattr(image_data, 'read'):
                 # Read file content
@@ -214,7 +268,7 @@ class ButtonDetector:
                 img_array = np.asarray(bytearray(file_bytes), dtype=np.uint8)
                 img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
                 print("✅ Processed uploaded file object")
-            
+
             # Check if it's a base64 string
             elif isinstance(image_data, str) and image_data.startswith('data:image'):
                 # Remove the data URL prefix
@@ -223,27 +277,27 @@ class ButtonDetector:
                 img_array = np.asarray(bytearray(img_bytes), dtype=np.uint8)
                 img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
                 print("✅ Processed base64 image")
-            
+
             # Check if it's bytes
             elif isinstance(image_data, bytes):
                 img_array = np.asarray(bytearray(image_data), dtype=np.uint8)
                 img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
                 print("✅ Processed bytes image")
-            
+
             # Check if it's a file path
             elif isinstance(image_data, str) and os.path.exists(image_data):
                 img = cv2.imread(image_data)
                 print(f"✅ Loaded image from path: {image_data}")
-            
+
             # Check if it's already an OpenCV image
             elif isinstance(image_data, np.ndarray):
                 img = image_data
                 print("✅ Using existing OpenCV image")
-            
+
             else:
                 print(f"❌ Unsupported image data type: {type(image_data)}")
                 return None
-            
+
             # Resize image if needed
             if img is not None:
                 img = self.resize_image(img)
@@ -252,30 +306,27 @@ class ButtonDetector:
             else:
                 print("❌ Failed to decode image")
                 return None
-                
+
         except Exception as e:
             print(f"❌ Error processing uploaded image: {e}")
             import traceback
             traceback.print_exc()
             return None
-    
+
     # ============================================
-    # DETECTION METHODS
+    # DETECTION METHODS (trained YOLOv11 model)
     # ============================================
-    
+
     def detect_buttons(self, image_source):
         """
-        Detect buttons from image source (path, array, upload, or capture)
-        
-        Args:
-            image_source: file path (str), OpenCV image (numpy array), 
-                         uploaded file, base64 string, or None (to capture)
-        
+        Run the trained YOLOv11 button-defect model on an image source
+        (path, array, upload, base64, or None to capture from camera).
+
         Returns:
-            list of bounding boxes [x1, y1, x2, y2]
+            list of detections: [{'class': str, 'confidence': float, 'box': [x1, y1, x2, y2]}, ...]
         """
         img = None
-        
+
         # Determine image source type
         if image_source is None:
             # Capture from camera
@@ -304,48 +355,37 @@ class ButtonDetector:
         else:
             print(f"❌ Unknown image source type: {type(image_source)}")
             return []
-        
+
         if img is None:
             print("❌ No image available for detection")
             return []
-        
+
         try:
-            # Process image - convert to grayscale
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            
-            # Apply Gaussian blur to reduce noise
-            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-            
-            # Use Hough Circle Transform for button detection
-            circles = cv2.HoughCircles(
-                blurred,
-                cv2.HOUGH_GRADIENT,
-                dp=1,
-                minDist=20,
-                param1=50,
-                param2=30,
-                minRadius=8,
-                maxRadius=35
+            model = _get_model()
+
+            results = model.predict(
+                source=img,
+                imgsz=self.model_img_size,
+                conf=self.model_conf_threshold,
+                save=False,
+                verbose=False
             )
-            
-            boxes = []
-            if circles is not None:
-                circles = np.round(circles[0, :]).astype("int")
-                for (x, y, r) in circles:
-                    boxes.append([x-r, y-r, x+r, y+r])
-                print(f"🔍 Detected {len(boxes)} buttons")
-            else:
-                print("🔍 No buttons detected")
-            
-            # Clean up
-            del img
-            if 'gray' in locals(): del gray
-            if 'blurred' in locals(): del blurred
-            if 'circles' in locals(): del circles
-            self._cleanup_memory()
-            
-            return boxes
-            
+
+            detections = []
+            for box in results[0].boxes:
+                class_id = int(box.cls[0])
+                class_name = model.names[class_id]
+                confidence = float(box.conf[0])
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                detections.append({
+                    'class': class_name,
+                    'confidence': confidence,
+                    'box': [x1, y1, x2, y2]
+                })
+
+            print(f"🔍 Detected {len(detections)} object(s)")
+            return detections
+
         except Exception as e:
             print(f"❌ Detection error: {e}")
             import traceback
@@ -353,21 +393,22 @@ class ButtonDetector:
             return []
         finally:
             # Clean up memory
-            if 'img' in locals() and img is not None:
+            if img is not None:
                 del img
             self._cleanup_memory()
-    
-    def analyze_buttons(self, boxes):
+
+    def analyze_buttons(self, detections):
         """
-        Analyze button placements and detect defects
-        
+        Analyze YOLOv11 detections and decide the inspection result.
+
         Args:
-            boxes: list of [x1, y1, x2, y2] bounding boxes
-        
+            detections: list of {'class': str, 'confidence': float, 'box': [...]}
+                        as returned by detect_buttons()
+
         Returns:
             dict with analysis results
         """
-        if len(boxes) == 0:
+        if len(detections) == 0:
             return {
                 'count': 0,
                 'expected': self.expected_buttons,
@@ -381,63 +422,73 @@ class ButtonDetector:
                 'spacing_score': 0,
                 'overall_status': 'FAIL'
             }
-        
-        count_ok = len(boxes) == self.expected_buttons
-        
-        centers = self._get_centers(boxes)
-        alignment_ok, alignment_score = self._check_alignment(centers)
-        spacing_ok, spacing_score = self._check_spacing(centers)
-        
+
+        normal_count = sum(1 for d in detections if d['class'] == self.CLASS_BUTTON)
+        misaligned_count = sum(1 for d in detections if d['class'] == self.CLASS_MISALIGNED)
+        missing_gap_count = sum(1 for d in detections if d['class'] == self.CLASS_MISSING_GAP)
+
+        total_button_count = normal_count + misaligned_count
+
+        count_ok = total_button_count == self.expected_buttons
+        alignment_ok = misaligned_count == 0
+        spacing_ok = missing_gap_count == 0
+
         defects = []
         if not count_ok:
-            defects.append(f"Expected {self.expected_buttons} buttons, found {len(boxes)}")
+            defects.append(f"Expected {self.expected_buttons} buttons, found {total_button_count}")
         if not alignment_ok:
-            defects.append("Buttons are misaligned")
+            defects.append(f"{misaligned_count} misaligned button(s) detected")
         if not spacing_ok:
-            defects.append("Button spacing is uneven")
-        
-        has_defect = len(defects) > 0
-        
+            defects.append(f"{missing_gap_count} missing button gap(s) detected")
+
+        has_defect = not (count_ok and alignment_ok and spacing_ok)
+
+        alignment_score = 100.0 if alignment_ok else max(
+            0.0, 100.0 - (misaligned_count / max(total_button_count, 1)) * 100
+        )
+        spacing_score = 100.0 if spacing_ok else max(
+            0.0, 100.0 - (missing_gap_count / max(self.expected_buttons, 1)) * 100
+        )
+
         result = {
-            'count': len(boxes),
+            'count': total_button_count,
             'expected': self.expected_buttons,
-            'button_count': len(boxes),
+            'button_count': total_button_count,
             'count_ok': count_ok,
             'alignment_ok': alignment_ok,
             'spacing_ok': spacing_ok,
             'has_defect': has_defect,
             'defects': defects,
-            'alignment_score': alignment_score,
-            'spacing_score': spacing_score,
-            'overall_status': 'FAIL' if has_defect else 'PASS'
+            'alignment_score': round(alignment_score, 2),
+            'spacing_score': round(spacing_score, 2),
+            'overall_status': 'FAIL' if has_defect else 'PASS',
+            'misaligned_count': misaligned_count,
+            'missing_gap_count': missing_gap_count,
         }
-        
-        # Clean up
-        del boxes
-        if 'centers' in locals(): del centers
+
         self._cleanup_memory()
-        
+
         return result
-    
+
     # ============================================
     # COMPLETE PROCESSING PIPELINE
     # ============================================
-    
+
     def process_image(self, image_data):
         """
         Complete image processing pipeline:
         1. Load/process image
-        2. Detect buttons
+        2. Detect buttons using the trained YOLOv11 model
         3. Analyze results
-        
+
         Args:
             image_data: Can be file path, uploaded file, base64 string, or None
-        
+
         Returns:
             dict with detection results
         """
         print("🔄 Starting image processing pipeline...")
-        
+
         # Step 1: Get the image
         if image_data is None:
             # Capture from camera
@@ -457,83 +508,26 @@ class ButtonDetector:
                     'error': 'Failed to process uploaded image',
                     'overall_status': 'ERROR'
                 }
-        
+
         # Step 2: Detect buttons
         print("🔍 Detecting buttons...")
-        boxes = self.detect_buttons(img)
+        detections = self.detect_buttons(img)
         del img  # Free memory
-        
+
         # Step 3: Analyze results
         print("📊 Analyzing button placement...")
-        results = self.analyze_buttons(boxes)
-        del boxes  # Free memory
-        
+        results = self.analyze_buttons(detections)
+        del detections  # Free memory
+
         self._cleanup_memory()
         print(f"✅ Processing complete: {results['overall_status']}")
-        
+
         return results
-    
-    # ============================================
-    # HELPER METHODS
-    # ============================================
-    
-    def _get_centers(self, boxes):
-        """Extract center points from bounding boxes"""
-        centers = []
-        for box in boxes:
-            x1, y1, x2, y2 = box
-            centers.append([(x1+x2)/2, (y1+y2)/2])
-        return np.array(centers)
-    
-    def _check_alignment(self, centers):
-        """Check if buttons are vertically aligned"""
-        if len(centers) < 2:
-            return False, 0
-        
-        x_values = centers[:, 0]
-        if np.max(x_values) - np.min(x_values) < 10:
-            return True, 100
-        
-        if len(centers) >= 2:
-            x1, y1 = centers[0]
-            x2, y2 = centers[-1]
-            angle = np.degrees(np.arctan2(abs(x2 - x1), abs(y2 - y1)))
-            deviation = abs(90 - angle) if angle < 90 else abs(angle - 90)
-            score = max(0, 100 - (deviation * 10))
-            return deviation <= self.tolerance_angle, min(100, score)
-        
-        return True, 100
-    
-    def _check_spacing(self, centers):
-        """Check if buttons are evenly spaced"""
-        if len(centers) < 3:
-            return True, 100
-        
-        distances = []
-        for i in range(len(centers) - 1):
-            dist = np.linalg.norm(centers[i] - centers[i+1])
-            distances.append(dist)
-        
-        if len(distances) < 2:
-            return True, 100
-        
-        mean_dist = np.mean(distances)
-        ok = True
-        max_deviation = 0
-        
-        for d in distances:
-            deviation = abs(d - mean_dist)
-            if deviation > self.tolerance_spacing:
-                ok = False
-                max_deviation = max(max_deviation, deviation)
-        
-        score = 100 if ok else max(0, 100 - (max_deviation / mean_dist * 100))
-        return ok, min(100, score)
-    
+
     # ============================================
     # TEST METHODS
     # ============================================
-    
+
     def test_camera(self):
         """Test if iPhone camera is working"""
         print("🔍 Testing iPhone camera...")
@@ -552,13 +546,13 @@ class ButtonDetector:
             print("   3. iPhone is connected via USB-C cable")
             print("   4. You tapped 'Trust' on your iPhone")
             return False
-    
+
     def find_camera_index(self, max_index=5):
         """Find available camera indices"""
         available = []
         print("🔍 Searching for cameras...")
         print("-" * 40)
-        
+
         for i in range(max_index):
             cap = cv2.VideoCapture(i)
             if cap.isOpened():
@@ -577,17 +571,17 @@ class ButtonDetector:
                 print(f"❌ Camera {i}: Not available")
             cap.release()
             self._cleanup_memory()
-        
+
         print("-" * 40)
         if available:
             print(f"✅ Available camera indices: {available}")
             print(f"📱 Your iPhone should be index 1 (with Camo running)")
         else:
             print("❌ No cameras found!")
-        
+
         self._cleanup_memory()
         return available
-    
+
     def test_uploaded_image(self, image_path):
         """Test processing an uploaded image file"""
         print(f"🔍 Testing uploaded image: {image_path}")
