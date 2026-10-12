@@ -1,963 +1,3497 @@
 {% extends "base.html" %}
 
+
+
+
+
+
+
 {% block title %}History - Garment Detect{% endblock %}
 
+
+
+
+
+
+
 {% block extra_css %}
+
+
+
 <style>
+
+
+
     /* ============================================
+
+
+
        HISTORY PAGE SPECIFIC STYLES
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     .history-container {
+
+
+
         padding: 20px 0;
+
+
+
     }
+
+
+
+
+
+
 
     .page-title {
+
+
+
         color: #1a237e;
+
+
+
         font-weight: 700;
+
+
+
         font-size: 1.8rem;
+
+
+
         margin-bottom: 24px;
+
+
+
     }
+
+
+
+
+
+
 
     .page-title i {
+
+
+
         color: #1a237e;
+
+
+
         margin-right: 12px;
+
+
+
     }
+
+
+
+
+
+
 
     .page-title .badge-count {
+
+
+
         font-size: 0.9rem;
+
+
+
         background: #e8eaf6;
+
+
+
         color: #1a237e;
+
+
+
         padding: 4px 14px;
+
+
+
         border-radius: 20px;
+
+
+
         font-weight: 600;
+
+
+
         margin-left: 12px;
+
+
+
     }
+
+
+
+
+
+
 
     /* ============================================
+
+
+
        FILTER SECTION
+
+
+
        ============================================ */
 
+
+
+
+
+
+
     .filter-section {
+
+
+
         background: white;
+
+
+
         border-radius: 16px;
+
+
+
         padding: 20px 24px;
+
+
+
         margin-bottom: 24px;
+
+
+
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+
+
+
         display: flex;
+
+
+
         flex-wrap: wrap;
+
+
+
         align-items: center;
+
+
+
         gap: 16px;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-section .filter-label {
+
+
+
         font-weight: 600;
+
+
+
         color: #4a5568;
+
+
+
         font-size: 0.9rem;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-section .filter-buttons {
+
+
+
         display: flex;
+
+
+
         flex-wrap: wrap;
+
+
+
         gap: 8px;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-btn {
+
+
+
         padding: 6px 18px;
+
+
+
         border-radius: 20px;
+
+
+
         border: 2px solid #e8ecf1;
+
+
+
         background: transparent;
+
+
+
         color: #6c757d;
+
+
+
         font-weight: 500;
+
+
+
         font-size: 0.85rem;
+
+
+
         transition: all 0.3s ease;
+
+
+
         cursor: pointer;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-btn:hover {
+
+
+
         border-color: #1a237e;
+
+
+
         color: #1a237e;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-btn.active {
+
+
+
         background: #1a237e;
+
+
+
         border-color: #1a237e;
+
+
+
         color: white;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-btn i {
+
+
+
         margin-right: 6px;
+
+
+
     }
+
+
+
+
+
+
 
     /* Color-specific filter button accents */
+
+
+
     .filter-btn.color-balanced:hover,
-    .filter-btn.color-balanced.active {
-        border-color: #2e7d32;
-        color: #2e7d32;
-        background: #e8f5e9;
-    }
+
+
 
     .filter-btn.color-balanced.active {
-        background: #2e7d32;
-        color: white;
+
+
+
+        border-color: #2e7d32;
+
+
+
+        color: #2e7d32;
+
+
+
+        background: #e8f5e9;
+
+
+
     }
+
+
+
+
+
+
+
+    .filter-btn.color-balanced.active {
+
+
+
+        background: #2e7d32;
+
+
+
+        color: white;
+
+
+
+    }
+
+
+
+
+
+
 
     .filter-btn.color-imbalanced:hover,
-    .filter-btn.color-imbalanced.active {
-        border-color: #c62828;
-        color: #c62828;
-        background: #ffebee;
-    }
+
+
 
     .filter-btn.color-imbalanced.active {
-        background: #c62828;
-        color: white;
+
+
+
+        border-color: #c62828;
+
+
+
+        color: #c62828;
+
+
+
+        background: #ffebee;
+
+
+
     }
+
+
+
+
+
+
+
+    .filter-btn.color-imbalanced.active {
+
+
+
+        background: #c62828;
+
+
+
+        color: white;
+
+
+
+    }
+
+
+
+
+
+
 
     /* ⭐ NEW: Defect-related filter button accents */
+
+
+
     .filter-btn.defect-any:hover,
-    .filter-btn.defect-any.active {
-        border-color: #c62828;
-        color: #c62828;
-        background: #ffebee;
-    }
+
+
 
     .filter-btn.defect-any.active {
-        background: #c62828;
-        color: white;
+
+
+
+        border-color: #c62828;
+
+
+
+        color: #c62828;
+
+
+
+        background: #ffebee;
+
+
+
     }
+
+
+
+
+
+
+
+    .filter-btn.defect-any.active {
+
+
+
+        background: #c62828;
+
+
+
+        color: white;
+
+
+
+    }
+
+
+
+
+
+
 
     .filter-btn.defect-none:hover,
-    .filter-btn.defect-none.active {
-        border-color: #2e7d32;
-        color: #2e7d32;
-        background: #e8f5e9;
-    }
+
+
 
     .filter-btn.defect-none.active {
-        background: #2e7d32;
-        color: white;
+
+
+
+        border-color: #2e7d32;
+
+
+
+        color: #2e7d32;
+
+
+
+        background: #e8f5e9;
+
+
+
     }
+
+
+
+
+
+
+
+    .filter-btn.defect-none.active {
+
+
+
+        background: #2e7d32;
+
+
+
+        color: white;
+
+
+
+    }
+
+
+
+
+
+
 
     .filter-search {
+
+
+
         margin-left: auto;
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 10px;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-search input {
+
+
+
         border: 2px solid #e8ecf1;
+
+
+
         border-radius: 10px;
+
+
+
         padding: 8px 16px;
+
+
+
         font-size: 0.9rem;
+
+
+
         transition: all 0.3s ease;
+
+
+
         min-width: 200px;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-search input:focus {
+
+
+
         border-color: #1a237e;
+
+
+
         outline: none;
+
+
+
         box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
+
+
+
     }
+
+
+
+
+
+
 
     .filter-search input::placeholder {
+
+
+
         color: #a0a8b5;
+
+
+
     }
+
+
+
+
+
+
 
     /* ============================================
+
+
+
        TABLE CARD
+
+
+
        ============================================ */
 
+
+
+
+
+
+
     .history-card {
+
+
+
         border: none;
+
+
+
         border-radius: 16px;
+
+
+
         overflow: hidden;
+
+
+
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+
+
+
         transition: all 0.3s ease;
+
+
+
     }
+
+
+
+
+
+
 
     .history-card:hover {
+
+
+
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+
+
     }
+
+
+
+
+
+
 
     .history-card .card-body {
+
+
+
         padding: 0;
+
+
+
     }
+
+
+
+
+
+
 
     .table-wrapper {
+
+
+
         overflow-x: auto;
+
+
+
         padding: 0;
+
+
+
     }
+
+
+
+
+
+
 
     .table {
+
+
+
         margin: 0;
+
+
+
         font-size: 0.95rem;
+
+
+
     }
+
+
+
+
+
+
 
     .table thead th {
+
+
+
         background: linear-gradient(135deg, #1a237e, #283593);
+
+
+
         color: white;
+
+
+
         font-weight: 600;
+
+
+
         padding: 14px 20px;
+
+
+
         border: none;
+
+
+
         font-size: 0.85rem;
+
+
+
         text-transform: uppercase;
+
+
+
         letter-spacing: 0.5px;
+
+
+
         position: sticky;
+
+
+
         top: 0;
+
+
+
         z-index: 2;
+
+
+
         white-space: nowrap;
+
+
+
     }
+
+
+
+
+
+
 
     .table thead th i {
+
+
+
         margin-right: 8px;
+
+
+
         font-size: 0.8rem;
+
+
+
     }
+
+
+
+
+
+
 
     .table tbody td {
+
+
+
         padding: 14px 20px;
+
+
+
         vertical-align: middle;
+
+
+
         border-bottom: 1px solid #f0f2f5;
+
+
+
         color: #333;
+
+
+
     }
+
+
+
+
+
+
 
     .table tbody tr {
+
+
+
         transition: background 0.3s ease;
+
+
+
     }
+
+
+
+
+
+
 
     .table tbody tr:hover {
+
+
+
         background: #f8f9ff;
+
+
+
     }
+
+
+
+
+
+
 
     .table tbody tr:last-child td {
+
+
+
         border-bottom: none;
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        SESSION ID
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     .session-id {
+
+
+
         font-family: 'Courier New', monospace;
+
+
+
         font-weight: 600;
+
+
+
         color: #1a237e;
+
+
+
         font-size: 0.9rem;
+
+
+
         background: #e8eaf6;
+
+
+
         padding: 4px 12px;
+
+
+
         border-radius: 6px;
+
+
+
         display: inline-block;
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        BUTTONS COUNT
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     .buttons-count {
+
+
+
         font-weight: 600;
+
+
+
     }
+
+
+
+
+
+
 
     .buttons-count .expected {
+
+
+
         color: #6c757d;
+
+
+
         font-weight: 400;
+
+
+
     }
+
+
+
+
+
+
 
     .buttons-count .found {
+
+
+
         color: #1a237e;
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        ALIGNMENT SCORE
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     .alignment-score {
+
+
+
         font-weight: 600;
+
+
+
     }
+
+
+
+
+
+
 
     .alignment-score .score-bar {
+
+
+
         display: inline-block;
+
+
+
         width: 60px;
+
+
+
         height: 6px;
+
+
+
         border-radius: 3px;
+
+
+
         background: #e8ecf1;
+
+
+
         margin-left: 8px;
+
+
+
         position: relative;
+
+
+
         vertical-align: middle;
+
+
+
         overflow: hidden;
+
+
+
     }
+
+
+
+
+
+
 
     .alignment-score .score-bar .bar-fill {
+
+
+
         height: 100%;
+
+
+
         border-radius: 3px;
+
+
+
         transition: width 0.5s ease;
+
+
+
     }
+
+
+
+
+
+
 
     .alignment-score .score-bar .bar-fill.high {
+
+
+
         background: linear-gradient(90deg, #2e7d32, #43a047);
+
+
+
     }
+
+
+
+
+
+
 
     .alignment-score .score-bar .bar-fill.medium {
+
+
+
         background: linear-gradient(90deg, #f57c00, #ffa726);
+
+
+
     }
+
+
+
+
+
+
 
     .alignment-score .score-bar .bar-fill.low {
+
+
+
         background: linear-gradient(90deg, #c62828, #e53935);
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        ⭐ 4-MODEL CHECKLIST (compact cell)
+
+
+
        ============================================ */
+
+
+
     .checklist-cell {
+
+
+
         min-width: 200px;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini {
+
+
+
         display: flex;
+
+
+
         flex-direction: column;
+
+
+
         gap: 4px;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini .item {
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 6px;
+
+
+
         font-size: 0.75rem;
+
+
+
         color: #4a5568;
+
+
+
         line-height: 1.3;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini .item i.icon {
+
+
+
         width: 12px;
+
+
+
         text-align: center;
+
+
+
         font-size: 0.7rem;
+
+
+
         color: #1a237e;
+
+
+
         flex-shrink: 0;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini .item .tag {
+
+
+
         flex: 1;
+
+
+
         font-weight: 500;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini .item .dot {
+
+
+
         width: 14px;
+
+
+
         height: 14px;
+
+
+
         border-radius: 50%;
+
+
+
         flex-shrink: 0;
+
+
+
         display: inline-flex;
+
+
+
         align-items: center;
+
+
+
         justify-content: center;
+
+
+
         font-size: 0.55rem;
+
+
+
         color: white;
+
+
+
         font-weight: 700;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini .item .dot.ok {
+
+
+
         background: #2e7d32;
+
+
+
     }
+
+
+
+
+
+
 
     .checklist-mini .item .dot.bad {
+
+
+
         background: #c62828;
+
+
+
     }
 
-    .checklist-mini .item .dot.na {
-        background: #a0a8b5;
+
+
+
+
+
+
+    .checklist-mini .item .dot.review {
+        background: #f0ad4e;
+        color: #533500;
     }
+    .checklist-mini .item .dot.na {
+
+
+
+        background: #a0a8b5;
+
+
+
+    }
+
+
+
+
+
+
 
     /* ============================================
+
+
+
        COLOR BALANCE CELL
+
+
+
        ============================================ */
+
+
+
     .color-cell {
+
+
+
         min-width: 130px;
+
+
+
     }
+
+
+
+
+
+
 
     .color-badge {
+
+
+
         display: inline-flex;
+
+
+
         align-items: center;
+
+
+
         gap: 5px;
+
+
+
         padding: 4px 12px;
+
+
+
         border-radius: 20px;
+
+
+
         font-weight: 700;
+
+
+
         font-size: 0.75rem;
+
+
+
         text-transform: uppercase;
+
+
+
         letter-spacing: 0.3px;
+
+
+
         white-space: nowrap;
+
+
+
     }
+
+
+
+
+
+
 
     .color-badge.balanced {
+
+
+
         background: #e8f5e9;
+
+
+
         color: #2e7d32;
+
+
+
     }
+
+
+
+
+
+
 
     .color-badge.imbalanced {
+
+
+
         background: #ffebee;
+
+
+
         color: #c62828;
+
+
+
     }
+
+
+
+
+
+
 
     .color-badge.na {
+
+
+
         background: #f0f2f5;
+
+
+
         color: #a0a8b5;
+
+
+
     }
+
+
+
+
+
+
 
     .color-badge i {
+
+
+
         font-size: 0.7rem;
+
+
+
     }
+
+
+
+
+
+
 
     .color-confidence {
+
+
+
         display: block;
+
+
+
         font-size: 0.7rem;
+
+
+
         color: #6c757d;
+
+
+
         font-weight: 500;
+
+
+
         margin-top: 4px;
+
+
+
     }
+
+
+
+
+
+
 
     .color-swatches-mini {
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 3px;
+
+
+
         margin-top: 4px;
+
+
+
     }
+
+
+
+
+
+
 
     .color-swatch-mini {
+
+
+
         width: 12px;
+
+
+
         height: 12px;
+
+
+
         border-radius: 50%;
+
+
+
         border: 1.5px solid #fff;
+
+
+
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+
+
         display: inline-block;
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        STATUS BADGE
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     .status-badge {
+
+
+
         padding: 6px 16px;
+
+
+
         border-radius: 20px;
+
+
+
         font-weight: 600;
+
+
+
         font-size: 0.8rem;
+
+
+
         letter-spacing: 0.3px;
+
+
+
         text-transform: uppercase;
+
+
+
         display: inline-flex;
+
+
+
         align-items: center;
+
+
+
         gap: 6px;
+
+
+
     }
+
+
+
+
+
+
 
     .status-badge i {
+
+
+
         font-size: 0.7rem;
+
+
+
     }
+
+
+
+
+
+
 
     .status-badge.pass {
+
+
+
         background: #e8f5e9;
+
+
+
         color: #2e7d32;
+
+
+
     }
+
+
+
+
+
+
 
     .status-badge.fail {
+
+
+
         background: #ffebee;
+
+
+
         color: #c62828;
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        EMPTY STATE
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     .empty-state {
+
+
+
         text-align: center;
+
+
+
         padding: 60px 20px;
+
+
+
     }
+
+
+
+
+
+
 
     .empty-state .empty-icon {
+
+
+
         font-size: 64px;
+
+
+
         color: #c5cae9;
+
+
+
         margin-bottom: 16px;
+
+
+
     }
+
+
+
+
+
+
 
     .empty-state h5 {
+
+
+
         color: #1a237e;
+
+
+
         font-weight: 600;
+
+
+
         margin-bottom: 8px;
+
+
+
     }
+
+
+
+
+
+
 
     .empty-state p {
+
+
+
         color: #6c757d;
+
+
+
         font-size: 0.95rem;
+
+
+
         margin-bottom: 20px;
+
+
+
     }
+
+
+
+
+
+
 
     .empty-state .btn-start {
+
+
+
         background: linear-gradient(135deg, #1a237e, #283593);
+
+
+
         color: white;
+
+
+
         border: none;
+
+
+
         border-radius: 12px;
+
+
+
         padding: 12px 32px;
+
+
+
         font-weight: 600;
+
+
+
         transition: all 0.3s ease;
+
+
+
     }
+
+
+
+
+
+
 
     .empty-state .btn-start:hover {
+
+
+
         transform: translateY(-2px);
+
+
+
         box-shadow: 0 8px 25px rgba(26, 35, 126, 0.3);
+
+
+
     }
+
+
+
+
+
+
 
     .empty-state .btn-start i {
+
+
+
         margin-right: 8px;
+
+
+
     }
 
+
+
+
+
+
+
     /* ============================================
+
+
+
        RESPONSIVE
+
+
+
        ============================================ */
+
+
+
+
+
+
 
     @media (max-width: 992px) {
+
+
+
         .filter-search {
+
+
+
             margin-left: 0;
+
+
+
             width: 100%;
+
+
+
         }
+
+
+
+
+
+
 
         .filter-search input {
+
+
+
             width: 100%;
+
+
+
             min-width: unset;
+
+
+
         }
+
+
+
     }
+
+
+
+
+
+
 
     @media (max-width: 768px) {
+
+
+
         .page-title {
+
+
+
             font-size: 1.4rem;
+
+
+
         }
+
+
+
+
+
+
 
         .page-title .badge-count {
+
+
+
             font-size: 0.75rem;
+
+
+
             padding: 2px 10px;
+
+
+
         }
+
+
+
+
+
+
 
         .filter-section {
+
+
+
             padding: 16px;
+
+
+
             flex-direction: column;
+
+
+
             align-items: stretch;
+
+
+
         }
+
+
+
+
+
+
 
         .filter-section .filter-buttons {
+
+
+
             flex-wrap: wrap;
+
+
+
         }
 
+
+
+
+
+
+
         .table thead th,
+
+
+
         .table tbody td {
+
+
+
             padding: 10px 12px;
+
+
+
             font-size: 0.85rem;
+
+
+
         }
+
+
+
+
+
+
 
         .session-id {
+
+
+
             font-size: 0.75rem;
+
+
+
             padding: 2px 8px;
+
+
+
         }
+
+
+
+
+
+
 
         .alignment-score .score-bar {
+
+
+
             width: 40px;
+
+
+
         }
+
+
+
+
+
+
 
         .color-badge {
+
+
+
             font-size: 0.7rem;
+
+
+
             padding: 3px 9px;
+
+
+
         }
 
+
+
+
+
+
+
         .checklist-cell {
+
+
+
             min-width: 170px;
+
+
+
         }
+
+
+
     }
+
+
+
+
+
+
 
     @media (max-width: 576px) {
+
+
+
         .history-container {
+
+
+
             padding: 10px 0;
+
+
+
         }
+
+
+
+
+
+
 
         .table thead th,
+
+
+
         .table tbody td {
+
+
+
             padding: 8px 10px;
+
+
+
             font-size: 0.75rem;
+
+
+
         }
+
+
+
+
+
+
 
         .status-badge {
+
+
+
             padding: 3px 10px;
+
+
+
             font-size: 0.7rem;
+
+
+
         }
+
+
+
+
+
+
 
         .filter-btn {
+
+
+
             padding: 4px 12px;
+
+
+
             font-size: 0.75rem;
+
+
+
         }
+
+
+
+
+
+
 
         .color-cell {
+
+
+
             min-width: auto;
+
+
+
         }
+
+
+
+
+
+
 
         .color-swatches-mini {
+
+
+
             display: none;
+
+
+
         }
+
+
+
+
+
+
 
         .checklist-cell {
+
+
+
             min-width: 140px;
+
+
+
         }
+
+
+
+
+
+
 
         .checklist-mini .item {
+
+
+
             font-size: 0.68rem;
+
+
+
         }
+
+
+
     }
+
+
+
+
+
+
 
     /* ============================================
+
+
+
        ANIMATIONS
+
+
+
        ============================================ */
 
+
+
+
+
+
+
     @keyframes fadeInUp {
+
+
+
         from {
+
+
+
             opacity: 0;
+
+
+
             transform: translateY(20px);
+
+
+
         }
+
+
+
         to {
+
+
+
             opacity: 1;
+
+
+
             transform: translateY(0);
+
+
+
         }
+
+
+
     }
+
+
+
+
+
+
 
     .history-card {
+
+
+
         animation: fadeInUp 0.5s ease-out;
+
+
+
     }
+
+
+
+
+
+
 
     .filter-section {
+
+
+
         animation: fadeInUp 0.5s ease-out 0.1s both;
+
+
+
     }
+
+
+
 </style>
+
+
+
 {% endblock %}
 
+
+
+
+
+
+
 {% block content %}
+
+
+
 <div class="history-container">
+
+
+
     <!-- Page Title -->
+
+
+
     <div class="row">
+
+
+
         <div class="col-12">
+
+
+
             <h1 class="page-title">
+
+
+
                 <i class="fas fa-history"></i> Inspection History
+
+
+
                 <span class="badge-count" id="recordCount">{{ inspections|length }} Records</span>
+
+
+
             </h1>
+
+
+
         </div>
+
+
+
     </div>
+
+
+
+
+
+
 
     <!-- Filter Section -->
+
+
+
     <div class="filter-section">
+
+
+
         <span class="filter-label"><i class="fas fa-filter"></i> Filter:</span>
+
+
+
         <div class="filter-buttons">
+
+
+
             <button class="filter-btn active" data-filter="all">
+
+
+
                 <i class="fas fa-list"></i> All
+
+
+
             </button>
+
+
+
             <button class="filter-btn" data-filter="pass">
+
+
+
                 <i class="fas fa-check-circle"></i> Pass
+
+
+
             </button>
+
+
+
             <button class="filter-btn" data-filter="fail">
+
+
+
                 <i class="fas fa-times-circle"></i> Fail
+
+
+
             </button>
+
+
+
             <button class="filter-btn defect-any" data-filter="defect-any">
+
+
+
                 <i class="fas fa-bug"></i> Any Defect
+
+
+
             </button>
+
+
+
             <button class="filter-btn defect-none" data-filter="defect-none">
+
+
+
                 <i class="fas fa-shield-alt"></i> All Clear
+
+
+
             </button>
+
+
+
             <button class="filter-btn color-balanced" data-filter="color-balanced">
+
+
+
                 <i class="fas fa-palette"></i> Color OK
+
+
+
             </button>
+
+
+
             <button class="filter-btn color-imbalanced" data-filter="color-imbalanced">
+
+
+
                 <i class="fas fa-exclamation-triangle"></i> Color Issue
+
+
+
             </button>
+
+
+
             <button class="filter-btn" data-filter="today">
+
+
+
                 <i class="fas fa-calendar-day"></i> Today
+
+
+
             </button>
+
+
+
             <button class="filter-btn" data-filter="week">
+
+
+
                 <i class="fas fa-calendar-week"></i> This Week
+
+
+
             </button>
+
+
+
         </div>
+
+
+
         <div class="filter-search">
+
+
+
             <i class="fas fa-search" style="color: #a0a8b5;"></i>
+
+
+
             <input type="text" id="searchInput" placeholder="Search session ID...">
+
+
+
         </div>
+
+
+
     </div>
+
+
+
+
+
+
 
     <!-- History Table -->
+
+
+
     <div class="card history-card shadow-sm">
+
+
+
         <div class="card-body">
+
+
+
             {% if inspections %}
+
+
+
             <div class="table-wrapper">
+
+
+
                 <table class="table" id="historyTable">
+
+
+
                     <thead>
+
+
+
                         <tr>
+
+
+
                             <th><i class="fas fa-hashtag"></i> Session ID</th>
+
+
+
                             <th><i class="fas fa-calendar-alt"></i> Date &amp; Time</th>
+
+
+
                             <th><i class="fas fa-circle"></i> Buttons</th>
+
+
+
                             <th><i class="fas fa-clipboard-check"></i> Detection Checklist</th>
+
+
+
                             <th><i class="fas fa-palette"></i> Color Balance</th>
+
+
+
                             <th><i class="fas fa-flag-checkered"></i> Result</th>
+
+
+
                         </tr>
+
+
+
                     </thead>
+
+
+
                     <tbody>
+
+
+
                         {% for insp in inspections %}
+
                         <tr>
-                            <td>
-                                <span class="session-id">{{ insp.session_id }}</span>
-                            </td>
-                            <td>{{ insp.date.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>
-                                <span class="buttons-count">
-                                    <span class="found">{{ insp.button_count }}</span>
-                                    <span class="expected">/ {{ insp.expected_count }}</span>
-                                </span>
-                            </td>
 
-                            <!-- ⭐ 4-Model Detection Checklist -->
-                            <td class="checklist-cell">
-                                <div class="checklist-mini">
-                                    <!-- Broken Stitch -->
-                                    <div class="item">
-                                        <i class="fas fa-cut icon"></i>
-                                        <span class="tag">Stitch</span>
-                                        {% if insp.has_broken_stitch %}
-                                            <span class="dot bad" title="Broken stitch detected">✕</span>
-                                        {% else %}
-                                            <span class="dot ok" title="No broken stitch">✓</span>
-                                        {% endif %}
-                                    </div>
+                            <td><span class="session-id">{{ insp.session_id }}</span></td>
 
-                                    <!-- Button Defect -->
-                                    <div class="item">
-                                        <i class="fas fa-circle icon"></i>
-                                        <span class="tag">Button</span>
-                                        {% if insp.has_button_defect %}
-                                            <span class="dot bad" title="Button defect detected">✕</span>
-                                        {% else %}
-                                            <span class="dot ok" title="No button defect">✓</span>
-                                        {% endif %}
-                                    </div>
+                            <td>{% if insp.local_date %}{{ insp.local_date.strftime('%Y-%m-%d %I:%M %p') }}{% else %}N/A{% endif %}</td>
 
-                                    <!-- Label Defect -->
-                                    <div class="item">
-                                        <i class="fas fa-tag icon"></i>
-                                        <span class="tag">Label</span>
-                                        {% if insp.has_label_defect %}
-                                            <span class="dot bad" title="Label defect detected">✕</span>
-                                        {% else %}
-                                            <span class="dot ok" title="No label defect">✓</span>
-                                        {% endif %}
-                                    </div>
+                            <td><span class="buttons-count">
 
-                                    <!-- Color Imbalance -->
-                                    <div class="item">
-                                        <i class="fas fa-palette icon"></i>
-                                        <span class="tag">Color</span>
-                                        {% if insp.color_has_imbalance %}
-                                            <span class="dot bad" title="Color imbalance">✕</span>
-                                        {% elif insp.color_prediction is none %}
-                                            <span class="dot na" title="Not analyzed">—</span>
-                                        {% else %}
-                                            <span class="dot ok" title="Color balanced">✓</span>
-                                        {% endif %}
-                                    </div>
+                                {% if insp.history_button_count is not none %}
+
+                                <span class="found">{{ insp.history_button_count }}</span>
+
+                                <span class="expected">/ {{ insp.history_expected_count if insp.history_expected_count is not none else '?' }}</span>
+
+                                {% else %}<span class="expected">Not recorded</span>{% endif %}
+
+                            </span></td>
+
+                            <td class="checklist-cell"><div class="checklist-mini">
+
+                                {% for item in insp.history_checklist %}
+
+                                <div class="item">
+
+                                    <i class="fas {{ item.icon }} icon"></i>
+
+                                    <span class="tag">{{ item.name }}</span>
+
+                                    {% if item.status == 'FAIL' %}
+
+                                        <span class="dot bad" title="Defect detected">✕</span>
+
+                                    {% elif item.status == 'PASS' %}
+
+                                        <span class="dot ok" title="Check passed">✓</span>
+
+                                    {% elif item.status == 'REVIEW' %}
+
+                                        <span class="dot review" title="Review required">!</span>
+
+                                    {% else %}
+
+                                        <span class="dot na" title="Not tested or not recorded">—</span>
+
+                                    {% endif %}
+
                                 </div>
-                            </td>
 
-                            <!-- Color Balance cell (existing, kept) -->
+                                {% endfor %}
+
+                            </div><small class="text-muted d-block mt-1">Label: PASS = both predicted; REVIEW = uncertain; FAIL = confirmed missing.</small></td>
+
                             <td class="color-cell">
-                                {% if insp.color_prediction %}
-                                    {% if insp.color_has_imbalance %}
-                                        <span class="color-badge imbalanced">
-                                            <i class="fas fa-exclamation-triangle"></i> Imbalanced
-                                        </span>
-                                    {% else %}
-                                        <span class="color-badge balanced">
-                                            <i class="fas fa-check"></i> Balanced
-                                        </span>
-                                    {% endif %}
 
-                                    {% if insp.color_confidence %}
-                                        <span class="color-confidence">
-                                            {{ "%.1f"|format((insp.color_confidence or 0) * 100) }}% confidence
-                                        </span>
-                                    {% endif %}
+                                {% if insp.history_color_status == 'FAIL' %}
 
-                                    {% set colors = insp.get_dominant_colors() %}
-                                    {% if colors %}
-                                        <div class="color-swatches-mini">
-                                            {% for c in colors[:4] %}
-                                                {% if c is iterable and c|length >= 3 and c is not string %}
-                                                    <span class="color-swatch-mini"
-                                                          style="background: rgb({{ c[0] }},{{ c[1] }},{{ c[2] }});"
-                                                          title="rgb({{ c[0] }},{{ c[1] }},{{ c[2] }})"></span>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+                                    <span class="color-badge imbalanced"><i class="fas fa-exclamation-triangle"></i> Imbalanced</span>
+
+                                {% elif insp.history_color_status == 'PASS' %}
+
+                                    <span class="color-badge balanced"><i class="fas fa-check"></i> Balanced</span>
+
                                 {% else %}
-                                    <span class="color-badge na">
-                                        <i class="fas fa-minus"></i> N/A
-                                    </span>
+
+                                    <span class="color-badge na"><i class="fas fa-minus"></i> Not Tested</span>
+
                                 {% endif %}
+
+                                {% if insp.history_color_confidence is not none %}
+
+                                <span class="color-confidence">{{ '%.1f'|format(insp.history_color_confidence * 100) }}% confidence</span>
+
+                                {% endif %}
+
                             </td>
 
                             <td>
-                                <span class="status-badge {% if insp.result_summary == 'PASS' %}pass{% else %}fail{% endif %}">
-                                    {% if insp.result_summary == 'PASS' %}
-                                        <i class="fas fa-check-circle"></i> PASS
-                                    {% else %}
-                                        <i class="fas fa-times-circle"></i> FAIL
-                                    {% endif %}
+
+                                <span class="status-badge {{ 'pass' if insp.overall_status == 'PASS' else 'fail' }}">
+
+                                {% if insp.overall_status == 'PASS' %}<i class="fas fa-check-circle"></i> PASS
+
+                                {% else %}<i class="fas fa-times-circle"></i> FAIL{% endif %}
+
                                 </span>
+
                             </td>
+
                         </tr>
+
                         {% endfor %}
+
+
+
                     </tbody>
+
+
+
                 </table>
+
+
+
             </div>
+
+
+
             {% else %}
+
+
+
             <!-- Empty State -->
+
+
+
             <div class="empty-state">
+
+
+
                 <div class="empty-icon">
+
+
+
                     <i class="fas fa-inbox"></i>
+
+
+
                 </div>
+
+
+
                 <h5>No Inspections Recorded Yet</h5>
+
+
+
                 <p>Start your first inspection by clicking the button below.</p>
+
+
+
                 <a href="{{ url_for('inspect') }}" class="btn-start">
+
+
+
                     <i class="fas fa-camera"></i> Start New Inspection
+
+
+
                 </a>
+
+
+
             </div>
+
+
+
             {% endif %}
+
+
+
         </div>
+
+
+
     </div>
+
+
+
 </div>
 
+
+
+
+
+
+
 <script>
+
+
+
     // ============================================
+
+
+
     // FILTER FUNCTIONALITY
+
+
+
     // ============================================
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
+
+
+
         const filterBtns = document.querySelectorAll('.filter-btn');
+
+
+
         const searchInput = document.getElementById('searchInput');
+
+
+
         const table = document.getElementById('historyTable');
+
+
+
         const rows = table ? table.querySelectorAll('tbody tr') : [];
 
+
+
+
+
+
+
         // Track current filter + search globally
+
+
+
         let currentFilter = 'all';
+
+
+
         let currentSearch = '';
 
+
+
+
+
+
+
         function rowHasAnyDefect(row) {
+
+
+
             // Check the 4 dots in the checklist cell
+
+
+
             const dots = row.querySelectorAll('.checklist-cell .dot');
+
+
+
             for (const dot of dots) {
+
+
+
                 if (dot.classList.contains('bad')) return true;
+
+
+
             }
+
+
+
             return false;
+
+
+
         }
+
+
+
+
+
+
 
         function applyFilters() {
+
+
+
             rows.forEach(row => {
+
+
+
                 let show = true;
+
+
+
                 const filter = currentFilter;
+
+
+
                 const search = currentSearch;
 
+
+
+
+
+
+
                 // ---- Status filters (pass/fail) ----
+
+
+
                 if (filter === 'pass' || filter === 'fail') {
+
+
+
                     const statusBadge = row.querySelector('.status-badge');
+
+
+
                     if (statusBadge) {
+
+
+
                         const status = statusBadge.textContent.trim().toLowerCase();
+
+
+
                         if (filter === 'pass' && !status.includes('pass')) show = false;
+
+
+
                         if (filter === 'fail' && !status.includes('fail')) show = false;
+
+
+
                     } else {
+
+
+
                         show = false;
+
+
+
                     }
+
+
+
                 }
+
+
+
+
+
+
 
                 // ---- ⭐ Defect filters ----
+
+
+
                 if (filter === 'defect-any') {
+
+
+
                     if (!rowHasAnyDefect(row)) show = false;
+
+
+
                 }
+
+
+
                 if (filter === 'defect-none') {
-                    if (rowHasAnyDefect(row)) show = false;
+
+
+
+                    if (rowHasAnyDefect(row) || row.querySelector('.checklist-cell .dot.na')) show = false;
+
+
+
                 }
+
+
+
+
+
+
 
                 // ---- Color filters ----
+
+
+
                 if (filter === 'color-balanced' || filter === 'color-imbalanced') {
+
+
+
                     const colorBadge = row.querySelector('.color-badge');
+
+
+
                     if (colorBadge) {
+
+
+
                         const cls = colorBadge.className;
-                        if (filter === 'color-balanced' && !cls.includes('balanced')) show = false;
-                        if (filter === 'color-imbalanced' && !cls.includes('imbalanced')) show = false;
+
+
+
+                        if (filter === 'color-balanced' && !colorBadge.classList.contains('balanced')) show = false;
+
+
+
+                        if (filter === 'color-imbalanced' && !colorBadge.classList.contains('imbalanced')) show = false;
+
+
+
                         // Skip 'na' badges in both cases
+
+
+
                         if (cls.includes('na')) show = false;
+
+
+
                     } else {
+
+
+
                         show = false;
+
+
+
                     }
+
+
+
                 }
+
+
+
+
+
+
 
                 // ---- Date filters ----
+
+
+
                 if (filter === 'today' || filter === 'week') {
+
+
+
                     const dateCell = row.querySelector('td:nth-child(2)');
+
+
+
                     if (dateCell) {
+
+
+
                         const rowDate = new Date(dateCell.textContent);
+
+
+
                         const now = new Date();
 
+
+
+
+
+
+
                         if (filter === 'today') {
+
+
+
                             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+
+
                             const rowDay = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+
+
+
                             if (rowDay < today) show = false;
+
+
+
                         }
+
+
+
+
+
+
 
                         if (filter === 'week') {
+
+
+
                             const weekAgo = new Date(now);
+
+
+
                             weekAgo.setDate(weekAgo.getDate() - 7);
+
+
+
                             if (rowDate < weekAgo) show = false;
+
+
+
                         }
+
+
+
                     }
+
+
+
                 }
+
+
+
+
+
+
 
                 // ---- Search filter ----
+
+
+
                 if (search.trim() !== '') {
+
+
+
                     const sessionId = row.querySelector('.session-id');
+
+
+
                     if (sessionId) {
+
+
+
                         if (!sessionId.textContent.toLowerCase().includes(search.toLowerCase())) {
+
+
+
                             show = false;
+
+
+
                         }
+
+
+
                     } else {
+
+
+
                         show = false;
+
+
+
                     }
+
+
+
                 }
 
+
+
+
+
+
+
                 row.style.display = show ? '' : 'none';
+
+
+
             });
+
+
+
+
+
+
 
             updateRecordCount();
+
+
+
         }
+
+
+
+
+
+
 
         function updateRecordCount() {
+
+
+
             let visible = 0;
+
+
+
             rows.forEach(r => {
+
+
+
                 if (r.style.display !== 'none') visible++;
+
+
+
             });
+
+
+
             const badge = document.getElementById('recordCount');
+
+
+
             if (badge) {
+
+
+
                 badge.textContent = visible + (visible === 1 ? ' Record' : ' Records');
+
+
+
             }
+
+
+
         }
 
+
+
+
+
+
+
         // Filter buttons
+
+
+
         filterBtns.forEach(btn => {
+
+
+
             btn.addEventListener('click', function() {
+
+
+
                 filterBtns.forEach(b => b.classList.remove('active'));
+
+
+
                 this.classList.add('active');
+
+
+
                 currentFilter = this.dataset.filter;
+
+
+
                 applyFilters();
+
+
+
             });
+
+
+
         });
+
+
+
+
+
+
 
         // Search input
+
+
+
         searchInput.addEventListener('input', function() {
+
+
+
             currentSearch = this.value;
+
+
+
             applyFilters();
+
+
+
         });
 
+
+
+
+
+
+
         // Initialize
+
+
+
         applyFilters();
+
+
+
     });
+
+
+
 </script>
+
+
+
 {% endblock %}

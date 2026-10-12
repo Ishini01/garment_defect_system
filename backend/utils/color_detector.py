@@ -11,26 +11,27 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 MODEL_PATH = BASE_DIR / "models" / "color_imbalance_model.h5"
 
-# Load the model only once
+IMG_SIZE = (224, 224)
+THRESHOLD = 0.5
+
+# Load the model once
 color_model = tf.keras.models.load_model(
     str(MODEL_PATH),
     compile=False
 )
 
-IMG_SIZE = (224, 224)
-
 
 def predict_color_imbalance(image_bytes):
-    # Open uploaded image and convert to RGB
+    # Read uploaded image
     image = Image.open(BytesIO(image_bytes)).convert("RGB")
 
-    # Resize to model input dimensions
+    # Resize to the model's input size
     image = image.resize(IMG_SIZE)
 
-    # Convert image to NumPy array
+    # Convert to float32
     image_array = np.asarray(image, dtype=np.float32)
 
-    # ResNet50 preprocessing
+    # Apply ResNet50 preprocessing
     image_array = tf.keras.applications.resnet50.preprocess_input(
         image_array
     )
@@ -38,7 +39,7 @@ def predict_color_imbalance(image_bytes):
     # Add batch dimension
     image_array = np.expand_dims(image_array, axis=0)
 
-    # Make prediction
+    # Run inference
     prediction = color_model.predict(
         image_array,
         verbose=0
@@ -46,7 +47,18 @@ def predict_color_imbalance(image_bytes):
 
     score = float(prediction[0][0])
 
+    # Assumes class 0 = Balanced, class 1 = Imbalanced
+    is_imbalanced = score > THRESHOLD
+
+    label = "Imbalanced" if is_imbalanced else "Balanced"
+    status = "FAIL" if is_imbalanced else "PASS"
+    confidence = score if is_imbalanced else 1.0 - score
+
     return {
         "model": "color_imbalance",
-        "raw_score": score
+        "raw_score": score,
+        "label": label,
+        "status": status,
+        "color_balanced": not is_imbalanced,
+        "confidence": confidence
     }

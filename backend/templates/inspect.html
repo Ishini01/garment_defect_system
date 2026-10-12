@@ -1,1682 +1,6002 @@
 {% extends "base.html" %}
 
+
+
 {% block title %}New Inspection - Garment Detect{% endblock %}
 
+
+
 {% block extra_css %}
+
+
+
 <style>
+
+
+
     .inspection-container {
+
+
+
         padding: 20px 0;
+
+
+
     }
+
+
 
     .page-title {
+
+
+
         color: #1a237e;
+
+
+
         font-weight: 700;
+
+
+
         font-size: 1.8rem;
+
+
+
         margin-bottom: 24px;
+
+
+
     }
+
+
 
     .page-title i {
+
+
+
         color: #1a237e;
+
+
+
         margin-right: 12px;
+
+
+
     }
 
+
+
     .camera-card {
+
+
+
         border: none;
+
+
+
         border-radius: 16px;
+
+
+
         overflow: hidden;
+
+
+
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+
+
+
         transition: all 0.3s ease;
+
+
+
         height: 100%;
+
+
+
     }
+
+
 
     .camera-card:hover {
+
+
+
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+
+
     }
+
+
 
     .camera-card .card-header {
+
+
+
         background: linear-gradient(135deg, #1a237e, #283593);
+
+
+
         border: none;
+
+
+
         padding: 16px 24px;
+
+
+
     }
+
+
 
     .camera-card .card-header h5 {
+
+
+
         color: white;
+
+
+
         font-weight: 600;
+
+
+
         margin: 0;
+
+
+
         font-size: 1.1rem;
+
+
+
     }
+
+
 
     .camera-card .card-header h5 i {
+
+
+
         margin-right: 10px;
+
+
+
     }
+
+
 
     .camera-card .card-body {
+
+
+
         padding: 24px;
+
+
+
         background: #fafbff;
+
+
+
     }
+
+
 
     .video-wrapper {
+
+
+
         position: relative;
+
+
+
         background: #0a0a0a;
+
+
+
         border-radius: 12px;
+
+
+
         overflow: hidden;
+
+
+
         min-height: 350px;
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         justify-content: center;
+
+
+
     }
+
+
 
     .video-wrapper video,
+
+
+
     .video-wrapper img {
+
+
+
         width: 100%;
+
+
+
         height: auto;
+
+
+
         max-height: 450px;
+
+
+
         object-fit: contain;
+
+
+
     }
+
+
 
     .video-wrapper .placeholder-text {
+
+
+
         color: #555;
+
+
+
         font-size: 1rem;
+
+
+
         text-align: center;
+
+
+
         padding: 40px;
+
+
+
     }
+
+
 
     .video-wrapper .placeholder-text i {
+
+
+
         font-size: 48px;
+
+
+
         color: #333;
+
+
+
         display: block;
+
+
+
         margin-bottom: 12px;
+
+
+
     }
+
+
 
     .video-overlay {
+
+
+
         position: absolute;
+
+
+
         bottom: 16px;
+
+
+
         left: 50%;
+
+
+
         transform: translateX(-50%);
+
+
+
         display: flex;
+
+
+
         gap: 10px;
+
+
+
         z-index: 10;
+
+
+
         flex-wrap: wrap;
+
+
+
         justify-content: center;
+
+
+
     }
+
+
 
     .video-overlay .btn {
+
+
+
         border-radius: 10px;
+
+
+
         padding: 10px 20px;
+
+
+
         font-weight: 600;
+
+
+
         font-size: 0.9rem;
+
+
+
         transition: all 0.3s ease;
+
+
+
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+
+
     }
+
+
 
     .video-overlay .btn:hover {
+
+
+
         transform: translateY(-2px);
+
+
+
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+
+
+
     }
+
+
 
     .video-overlay .btn i {
+
+
+
         margin-right: 8px;
+
+
+
     }
+
+
 
     .btn-camera-start {
+
+
+
         background: linear-gradient(135deg, #2e7d32, #43a047);
+
+
+
         color: white;
+
+
+
         border: none;
+
+
+
     }
+
+
 
     .btn-camera-start:hover {
+
+
+
         background: linear-gradient(135deg, #1b5e20, #2e7d32);
+
+
+
         color: white;
+
+
+
     }
+
+
 
     .btn-camera-stop {
+
+
+
         background: linear-gradient(135deg, #c62828, #e53935);
+
+
+
         color: white;
+
+
+
         border: none;
+
+
+
     }
+
+
 
     .btn-camera-stop:hover {
+
+
+
         background: linear-gradient(135deg, #b71c1c, #c62828);
+
+
+
         color: white;
+
+
+
     }
+
+
 
     .btn-camera-capture {
+
+
+
         background: linear-gradient(135deg, #1a237e, #283593);
+
+
+
         color: white;
+
+
+
         border: none;
+
+
+
     }
+
+
 
     .btn-camera-capture:disabled {
+
+
+
         opacity: 0.5;
+
+
+
         cursor: not-allowed;
+
+
+
         transform: none !important;
+
+
+
     }
+
+
 
     .btn-camera-capture:hover:not(:disabled) {
+
+
+
         background: linear-gradient(135deg, #0d1445, #1a237e);
+
+
+
         color: white;
+
+
+
     }
+
+
 
     .btn-camera-reset {
+
+
+
         background: linear-gradient(135deg, #e65100, #f57c00);
+
+
+
         color: white;
+
+
+
         border: none;
+
+
+
     }
+
+
 
     .btn-camera-reset:hover {
+
+
+
         background: linear-gradient(135deg, #bf360c, #e65100);
+
+
+
         color: white;
+
+
+
     }
 
+
+
     .upload-card {
+
+
+
         border: none;
+
+
+
         border-radius: 16px;
+
+
+
         overflow: hidden;
+
+
+
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+
+
+
         transition: all 0.3s ease;
+
+
+
     }
+
+
 
     .upload-card:hover {
+
+
+
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+
+
     }
+
+
 
     .upload-card .card-header {
+
+
+
         background: linear-gradient(135deg, #0d47a1, #1565c0);
+
+
+
         border: none;
+
+
+
         padding: 16px 24px;
+
+
+
     }
+
+
 
     .upload-card .card-header h5 {
+
+
+
         color: white;
+
+
+
         font-weight: 600;
+
+
+
         margin: 0;
+
+
+
         font-size: 1.1rem;
+
+
+
     }
+
+
 
     .upload-card .card-header h5 i {
+
+
+
         margin-right: 10px;
+
+
+
     }
+
+
 
     .upload-card .card-body {
+
+
+
         padding: 24px;
+
+
+
         background: #fafbff;
+
+
+
     }
+
+
 
     .upload-area {
+
+
+
         border: 2px dashed #d0d5dd;
+
+
+
         border-radius: 12px;
+
+
+
         padding: 30px 20px;
+
+
+
         text-align: center;
+
+
+
         cursor: pointer;
+
+
+
         transition: all 0.3s ease;
+
+
+
         background: #ffffff;
+
+
+
         margin-bottom: 16px;
+
+
+
     }
+
+
 
     .upload-area:hover {
+
+
+
         border-color: #1a237e;
+
+
+
         background: #f8f9ff;
+
+
+
     }
+
+
 
     .upload-area.dragover {
+
+
+
         border-color: #1a237e;
+
+
+
         background: #e8eaff;
+
+
+
     }
+
+
 
     .upload-area i {
+
+
+
         font-size: 40px;
+
+
+
         color: #a0a8b5;
+
+
+
         display: block;
+
+
+
         margin-bottom: 8px;
+
+
+
     }
+
+
 
     .upload-area p {
+
+
+
         color: #6c757d;
+
+
+
         margin-bottom: 4px;
+
+
+
         font-weight: 500;
+
+
+
     }
+
+
 
     .upload-area small {
+
+
+
         color: #a0a8b5;
+
+
+
         font-size: 0.8rem;
+
+
+
     }
+
+
 
     .upload-area input[type="file"] {
+
+
+
         display: none;
+
+
+
     }
+
+
 
     .btn-upload {
+
+
+
         background: linear-gradient(135deg, #0d47a1, #1565c0);
+
+
+
         color: white;
+
+
+
         border: none;
+
+
+
         border-radius: 10px;
+
+
+
         padding: 12px;
+
+
+
         font-weight: 600;
+
+
+
         width: 100%;
+
+
+
         transition: all 0.3s ease;
+
+
+
     }
+
+
 
     .btn-upload:hover {
+
+
+
         transform: translateY(-2px);
+
+
+
         box-shadow: 0 8px 25px rgba(13, 71, 161, 0.3);
+
+
+
         color: white;
+
+
+
     }
+
+
 
     .btn-upload i {
+
+
+
         margin-right: 8px;
+
+
+
     }
+
+
 
     .btn-upload:disabled {
+
+
+
         opacity: 0.6;
+
+
+
         cursor: not-allowed;
+
+
+
         transform: none !important;
+
+
+
     }
+
+
 
     .preview-container {
+
+
+
         margin-top: 12px;
+
+
+
         padding: 15px;
+
+
+
         background: #f8f9ff;
+
+
+
         border-radius: 12px;
+
+
+
         border: 2px solid #e8ecf1;
+
+
+
         display: none;
+
+
+
         text-align: center;
+
+
+
     }
+
+
 
     .preview-container img {
+
+
+
         max-width: 100%;
+
+
+
         max-height: 150px;
+
+
+
         border-radius: 8px;
+
+
+
         border: 1px solid #e0e0e0;
+
+
+
         margin-bottom: 6px;
+
+
+
     }
+
+
 
     .preview-container .file-name {
+
+
+
         font-size: 0.85rem;
+
+
+
         color: #1a237e;
+
+
+
         font-weight: 600;
+
+
+
         margin-top: 4px;
+
+
+
     }
+
+
 
     .preview-container .preview-actions {
+
+
+
         margin-top: 8px;
+
+
+
         display: flex;
+
+
+
         gap: 8px;
+
+
+
         justify-content: center;
+
+
+
     }
 
+
+
     .results-card {
+
+
+
         border: none;
+
+
+
         border-radius: 16px;
+
+
+
         overflow: hidden;
+
+
+
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+
+
+
         transition: all 0.3s ease;
+
+
+
         animation: slideUp 0.4s ease-out;
+
+
+
     }
+
+
 
     .results-card .card-header {
+
+
+
         padding: 14px 24px;
+
+
+
         font-weight: 600;
+
+
+
         font-size: 1rem;
+
+
+
     }
+
+
 
     .results-card .card-header i {
+
+
+
         margin-right: 10px;
+
+
+
     }
+
+
 
     .results-card .card-body {
+
+
+
         padding: 24px;
+
+
+
         background: #fafbff;
+
+
+
     }
+
+
 
     .result-status {
+
+
+
         text-align: center;
+
+
+
         padding: 12px 0 16px;
+
+
+
         font-size: 2rem;
+
+
+
         font-weight: 700;
+
+
+
     }
+
+
 
     .result-status.pass {
+
+
+
         color: #2e7d32;
+
+
+
     }
+
+
 
     .result-status.fail {
+
+
+
         color: #c62828;
+
+
+
     }
+
+
 
     .result-detail-grid {
+
+
+
         display: grid;
+
+
+
         grid-template-columns: 1fr 1fr;
+
+
+
         gap: 12px;
+
+
+
         margin: 16px 0;
+
+
+
     }
+
+
 
     .result-detail-item {
+
+
+
         background: white;
+
+
+
         border-radius: 10px;
+
+
+
         padding: 12px 16px;
+
+
+
         text-align: center;
+
+
+
         border: 1px solid #f0f2f5;
+
+
+
     }
+
+
 
     .result-detail-item .label {
+
+
+
         font-size: 0.75rem;
+
+
+
         color: #6c757d;
+
+
+
         text-transform: uppercase;
+
+
+
         letter-spacing: 0.5px;
+
+
+
         font-weight: 600;
+
+
+
     }
+
+
 
     .result-detail-item .value {
+
+
+
         font-size: 1.4rem;
+
+
+
         font-weight: 700;
+
+
+
         color: #1a237e;
+
+
+
         margin-top: 2px;
+
+
+
     }
+
+
 
     .result-detail-item .value .expected {
+
+
+
         color: #6c757d;
+
+
+
         font-weight: 400;
+
+
+
         font-size: 1rem;
+
+
+
     }
+
+
 
     .alert-custom {
+
+
+
         border-radius: 10px;
+
+
+
         padding: 14px 18px;
+
+
+
         margin-top: 12px;
+
+
+
         border: none;
+
+
+
         font-weight: 500;
+
+
+
     }
+
+
 
     .alert-custom i {
+
+
+
         margin-right: 8px;
+
+
+
     }
+
+
 
     .alert-defect {
+
+
+
         background: #ffebee;
+
+
+
         color: #c62828;
+
+
+
         border-left: 4px solid #c62828;
+
+
+
     }
+
+
 
     .alert-success-custom {
+
+
+
         background: #e8f5e9;
+
+
+
         color: #2e7d32;
+
+
+
         border-left: 4px solid #2e7d32;
+
+
+
     }
+
+
 
     .alert-defect-list {
+
+
+
         background: #fff8e1;
+
+
+
         color: #e65100;
+
+
+
         border-left: 4px solid #e65100;
+
+
+
         margin-top: 8px;
+
+
+
         font-size: 0.9rem;
+
+
+
     }
+
+
 
     .alert-defect-list i {
+
+
+
         margin-right: 8px;
+
+
+
     }
+
+
 
     .image-source-badge {
+
+
+
         display: inline-block;
+
+
+
         padding: 3px 12px;
+
+
+
         border-radius: 20px;
+
+
+
         font-size: 0.7rem;
+
+
+
         font-weight: 600;
+
+
+
         text-transform: uppercase;
+
+
+
         margin-bottom: 8px;
+
+
+
     }
+
+
 
     .badge-camera {
+
+
+
         background: #1a237e;
+
+
+
         color: white;
+
+
+
     }
+
+
 
     .badge-upload {
+
+
+
         background: #0d47a1;
+
+
+
         color: white;
+
+
+
     }
 
+
+
     /* ============================================
+
+
+
        COLOR IMBALANCE ANALYSIS STYLES
+
+
+
        ============================================ */
+
+
+
     .analysis-section {
+
+
+
         background: white;
+
+
+
         border-radius: 12px;
+
+
+
         padding: 16px;
+
+
+
         border: 1px solid #f0f2f5;
+
+
+
         margin-top: 14px;
+
+
+
     }
+
+
 
     .analysis-section-title {
+
+
+
         font-size: 0.9rem;
+
+
+
         font-weight: 700;
+
+
+
         color: #1a237e;
+
+
+
         margin-bottom: 12px;
+
+
+
         padding-bottom: 8px;
+
+
+
         border-bottom: 2px solid #f0f2f5;
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 8px;
+
+
+
     }
+
+
 
     .analysis-section-title i {
+
+
+
         font-size: 1rem;
+
+
+
     }
+
+
 
     .analysis-section.color-section .analysis-section-title {
+
+
+
         color: #6a1b9a;
+
+
+
     }
+
+
 
     .analysis-section.color-section {
+
+
+
         border-color: #f3e5f5;
+
+
+
         background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+
+
+
     }
+
+
 
     .probability-bars {
+
+
+
         display: flex;
+
+
+
         flex-direction: column;
+
+
+
         gap: 10px;
+
+
+
         margin-top: 12px;
+
+
+
     }
+
+
 
     .prob-row {
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 10px;
+
+
+
         font-size: 0.85rem;
+
+
+
     }
+
+
 
     .prob-label {
+
+
+
         width: 90px;
+
+
+
         font-weight: 600;
+
+
+
         color: #4a5568;
+
+
+
         flex-shrink: 0;
+
+
+
     }
+
+
 
     .prob-bar {
+
+
+
         flex: 1;
+
+
+
         height: 10px;
+
+
+
         background: #f0f2f5;
+
+
+
         border-radius: 5px;
+
+
+
         overflow: hidden;
+
+
+
     }
+
+
 
     .prob-fill {
+
+
+
         height: 100%;
+
+
+
         border-radius: 5px;
+
+
+
         transition: width 0.6s ease;
+
+
+
     }
+
+
 
     .prob-fill.balanced {
+
+
+
         background: linear-gradient(90deg, #2e7d32, #66bb6a);
+
+
+
     }
+
+
 
     .prob-fill.imbalanced {
+
+
+
         background: linear-gradient(90deg, #c62828, #ef5350);
+
+
+
     }
+
+
 
     .prob-value {
+
+
+
         width: 55px;
+
+
+
         text-align: right;
+
+
+
         font-weight: 700;
+
+
+
         color: #1a237e;
+
+
+
         flex-shrink: 0;
+
+
+
     }
+
+
 
     .verdict-pill {
+
+
+
         display: inline-flex;
+
+
+
         align-items: center;
+
+
+
         gap: 6px;
+
+
+
         padding: 4px 12px;
+
+
+
         border-radius: 20px;
+
+
+
         font-size: 0.75rem;
+
+
+
         font-weight: 700;
+
+
+
         text-transform: uppercase;
+
+
+
         letter-spacing: 0.3px;
+
+
+
     }
+
+
 
     .verdict-pill.pass {
+
+
+
         background: #e8f5e9;
+
+
+
         color: #2e7d32;
+
+
+
     }
+
+
 
     .verdict-pill.fail {
+
+
+
         background: #ffebee;
+
+
+
         color: #c62828;
+
+
+
     }
+
+
 
     /* ============================================
+
+
+
        ⭐ 4-MODEL CHECKLIST STYLES
+
+
+
        ============================================ */
+
+
+
     .checklist-section {
+
+
+
         background: white;
+
+
+
         border-radius: 12px;
+
+
+
         padding: 16px;
+
+
+
         border: 1px solid #f0f2f5;
+
+
+
         margin-top: 14px;
+
+
+
     }
+
+
 
     .checklist-section-title {
+
+
+
         font-size: 0.9rem;
+
+
+
         font-weight: 700;
+
+
+
         color: #1a237e;
+
+
+
         margin-bottom: 12px;
+
+
+
         padding-bottom: 8px;
+
+
+
         border-bottom: 2px solid #f0f2f5;
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 8px;
+
+
+
     }
+
+
 
     .checklist-row {
+
+
+
         display: flex;
+
+
+
         justify-content: space-between;
+
+
+
         align-items: center;
+
+
+
         padding: 10px 12px;
+
+
+
         border-radius: 8px;
+
+
+
         background: #fafbff;
+
+
+
         margin-bottom: 6px;
+
+
+
         font-size: 0.88rem;
+
+
+
         border: 1px solid #f0f2f5;
+
+
+
     }
+
+
 
     .checklist-row:last-child {
+
+
+
         margin-bottom: 0;
+
+
+
     }
+
+
 
     .checklist-row .check-label {
+
+
+
         display: flex;
+
+
+
         align-items: center;
+
+
+
         gap: 10px;
+
+
+
         font-weight: 600;
+
+
+
         color: #4a5568;
+
+
+
     }
+
+
 
     .checklist-row .check-label i {
+
+
+
         width: 18px;
+
+
+
         text-align: center;
+
+
+
         color: #1a237e;
+
+
+
     }
+
+
 
     .checklist-badge {
+
+
+
         display: inline-flex;
+
+
+
         align-items: center;
+
+
+
         gap: 5px;
+
+
+
         padding: 4px 12px;
+
+
+
         border-radius: 20px;
+
+
+
         font-size: 0.72rem;
+
+
+
         font-weight: 700;
+
+
+
         text-transform: uppercase;
+
+
+
         letter-spacing: 0.3px;
+
+
+
     }
+
+
 
     .checklist-badge.pass {
+
+
+
         background: #e8f5e9;
+
+
+
         color: #2e7d32;
+
+
+
     }
+
+
 
     .checklist-badge.fail {
+
+
+
         background: #ffebee;
+
+
+
         color: #c62828;
+
+
+
     }
+
+
 
     .checklist-badge.unknown {
+
+
+
         background: #f0f2f5;
+
+
+
         color: #6c757d;
+
+
+
     }
+
+
 
     @media (max-width: 992px) {
+
+
+
         .camera-card {
+
+
+
             margin-bottom: 20px;
+
+
+
         }
+
+
+
     }
+
+
 
     @media (max-width: 768px) {
+
+
+
         .page-title {
+
+
+
             font-size: 1.4rem;
+
+
+
         }
 
+
+
         .video-wrapper {
+
+
+
             min-height: 250px;
+
+
+
         }
+
+
 
         .video-overlay {
+
+
+
             position: relative;
+
+
+
             bottom: auto;
+
+
+
             left: auto;
+
+
+
             transform: none;
+
+
+
             margin-top: 16px;
+
+
+
             gap: 8px;
+
+
+
         }
+
+
 
         .video-overlay .btn {
+
+
+
             padding: 8px 14px;
+
+
+
             font-size: 0.8rem;
+
+
+
         }
 
+
+
         .result-detail-grid {
+
+
+
             grid-template-columns: 1fr 1fr;
+
+
+
             gap: 8px;
+
+
+
         }
+
+
 
         .result-status {
+
+
+
             font-size: 1.5rem;
+
+
+
         }
 
+
+
         .result-detail-item .value {
+
+
+
             font-size: 1.1rem;
+
+
+
         }
+
+
+
     }
+
+
 
     @media (max-width: 576px) {
+
+
+
         .inspection-container {
+
+
+
             padding: 10px 0;
+
+
+
         }
+
+
 
         .camera-card .card-body,
+
+
+
         .upload-card .card-body,
+
+
+
         .results-card .card-body {
+
+
+
             padding: 16px;
+
+
+
         }
+
+
 
         .video-wrapper {
+
+
+
             min-height: 200px;
+
+
+
         }
+
+
 
         .result-detail-grid {
+
+
+
             grid-template-columns: 1fr 1fr;
+
+
+
             gap: 6px;
+
+
+
         }
+
+
 
         .result-detail-item {
+
+
+
             padding: 8px 10px;
+
+
+
         }
+
+
 
         .result-detail-item .value {
+
+
+
             font-size: 1rem;
+
+
+
         }
+
+
 
         .upload-area {
+
+
+
             padding: 20px 16px;
+
+
+
         }
+
+
 
         .upload-area i {
+
+
+
             font-size: 30px;
+
+
+
         }
+
+
 
         .preview-container img {
+
+
+
             max-height: 100px;
+
+
+
         }
+
+
 
         .prob-label {
+
+
+
             width: 70px;
+
+
+
             font-size: 0.75rem;
+
+
+
         }
+
+
 
         .prob-value {
+
+
+
             width: 45px;
+
+
+
             font-size: 0.75rem;
+
+
+
         }
+
+
+
     }
+
+
 
     @keyframes slideUp {
+
+
+
         from {
+
+
+
             opacity: 0;
+
+
+
             transform: translateY(20px);
+
+
+
         }
+
+
+
         to {
+
+
+
             opacity: 1;
+
+
+
             transform: translateY(0);
+
+
+
         }
+
+
+
     }
+
+
 
     @keyframes fadeIn {
+
+
+
         from { opacity: 0; }
+
+
+
         to { opacity: 1; }
+
+
+
     }
+
+
 
     @keyframes slideDown {
+
+
+
         from { opacity: 0; transform: translateY(-10px); }
+
+
+
         to { opacity: 1; transform: translateY(0); }
+
+
+
     }
+
+
 
     @keyframes alarmPulse {
+
+
+
         from { transform: translate(-50%, -50%) scale(1); }
+
+
+
         to { transform: translate(-50%, -50%) scale(1.1); }
+
+
+
     }
+
+
 
     .camera-card {
+
+
+
         animation: fadeIn 0.5s ease-out;
+
+
+
     }
+
+
 
     .upload-card {
+
+
+
         animation: fadeIn 0.5s ease-out 0.1s both;
+
+
+
     }
+
+
 
     .results-card {
+
+
+
         animation: slideUp 0.4s ease-out;
+
+
+
     }
+
+
 
     .spinner-custom {
+
+
+
         width: 3rem;
+
+
+
         height: 3rem;
+
+
+
         border: 4px solid #e8ecf1;
+
+
+
         border-top-color: #1a237e;
+
+
+
         border-radius: 50%;
+
+
+
         animation: spin 0.8s linear infinite;
+
+
+
         display: inline-block;
+
+
+
     }
+
+
 
     @keyframes spin {
+
+
+
         to { transform: rotate(360deg); }
+
+
+
     }
+
+
 
     .analyzing-text {
+
+
+
         color: #6c757d;
+
+
+
         font-weight: 500;
+
+
+
         margin-top: 12px;
+
+
+
     }
+
+
 
     .permission-overlay {
+
+
+
         position: absolute;
+
+
+
         top: 0;
+
+
+
         left: 0;
+
+
+
         right: 0;
+
+
+
         bottom: 0;
+
+
+
         display: flex;
+
+
+
         flex-direction: column;
+
+
+
         align-items: center;
+
+
+
         justify-content: center;
+
+
+
         background: rgba(0, 0, 0, 0.85);
+
+
+
         color: white;
+
+
+
         padding: 30px;
+
+
+
         text-align: center;
+
+
+
         z-index: 5;
+
+
+
         border-radius: 12px;
+
+
+
     }
+
+
 
     .permission-overlay i {
+
+
+
         font-size: 48px;
+
+
+
         color: #f57c00;
+
+
+
         margin-bottom: 16px;
+
+
+
     }
+
+
 
     .permission-overlay h4 {
+
+
+
         color: white;
+
+
+
         margin-bottom: 12px;
+
+
+
     }
+
+
 
     .permission-overlay p {
+
+
+
         color: #ccc;
+
+
+
         max-width: 400px;
+
+
+
         line-height: 1.6;
+
+
+
         font-size: 14px;
+
+
+
     }
+
+
 
     .permission-overlay .btn-refresh {
+
+
+
         background: #1a237e;
+
+
+
         border: none;
+
+
+
         padding: 10px 30px;
+
+
+
         border-radius: 8px;
+
+
+
         color: white;
+
+
+
         font-weight: 600;
+
+
+
         margin-top: 16px;
+
+
+
         transition: all 0.3s ease;
+
+
+
         cursor: pointer;
+
+
+
     }
+
+
 
     .permission-overlay .btn-refresh:hover {
+
+
+
         background: #0d1445;
+
+
+
         transform: translateY(-2px);
+
+
+
     }
+
+
+
 </style>
+
+
+
 {% endblock %}
 
+
+
 {% block content %}
+
+
+
 <div class="inspection-container">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="page-title">
-                <i class="fas fa-camera"></i> New Inspection
-            </h1>
-        </div>
-    </div>
+
+
 
     <div class="row">
+
+
+
+        <div class="col-12">
+
+
+
+            <h1 class="page-title">
+
+
+
+                <i class="fas fa-camera"></i> New Inspection
+
+
+
+            </h1>
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <div class="row">
+
+
+
         <!-- Camera Section -->
+
+
+
         <div class="col-lg-8">
+
+
+
             <div class="card camera-card">
+
+
+
                 <div class="card-header">
+
+
+
                     <h5><i class="fas fa-video"></i> Camera Feed</h5>
+
+
+
                 </div>
+
+
+
                 <div class="card-body">
+
+
+
                     <div class="video-wrapper" id="videoWrapper">
+
+
+
                         <video id="videoFeed" autoplay playsinline style="display:none; width:100%; max-height:450px; background:#0a0a0a; border-radius:12px;"></video>
+
+
+
                         <canvas id="canvas" style="display:none;"></canvas>
+
+
+
                         <img id="capturedImage" style="display:none; width:100%; max-height:450px; border-radius:12px;">
 
+
+
                         <div id="cameraPlaceholder" class="placeholder-text">
+
+
+
                             <i class="fas fa-camera"></i>
+
+
+
                             <p>Click "Start Camera" to begin</p>
+
+
+
                             <small style="color: #666;">Make sure to allow camera permissions</small>
+
+
+
                         </div>
+
+
 
                         <div id="permissionOverlay" class="permission-overlay" style="display:none;">
+
+
+
                             <i class="fas fa-exclamation-triangle"></i>
+
+
+
                             <h4>Camera Access Required</h4>
+
+
+
                             <p>
+
+
+
                                 1. Click the <strong>🔒 lock icon</strong> in the address bar<br>
+
+
+
                                 2. Click <strong>"Site settings"</strong><br>
+
+
+
                                 3. Find <strong>"Camera"</strong> and change to <strong>"Allow"</strong><br>
+
+
+
                                 4. <strong>Refresh</strong> the page
+
+
+
                             </p>
+
+
+
                             <button onclick="location.reload()" class="btn-refresh">
+
+
+
                                 <i class="fas fa-sync"></i> Refresh Page
+
+
+
                             </button>
+
+
+
                         </div>
+
+
 
                         <div class="video-overlay">
+
+
+
                             <button class="btn btn-camera-start" onclick="startCamera()" id="startBtn">
+
+
+
                                 <i class="fas fa-play"></i> Start
+
+
+
                             </button>
+
+
+
                             <button class="btn btn-camera-stop" onclick="stopCamera()" id="stopBtn">
+
+
+
                                 <i class="fas fa-stop"></i> Stop
+
+
+
                             </button>
+
+
+
                             <button class="btn btn-camera-capture" onclick="captureImage()" id="captureBtn" disabled>
+
+
+
                                 <i class="fas fa-camera"></i> Capture
+
+
+
                             </button>
+
+
+
                             <button class="btn btn-camera-reset" onclick="resetInspection()">
+
+
+
                                 <i class="fas fa-redo"></i> Reset
+
+
+
                             </button>
+
+
+
                         </div>
+
+
+
                     </div>
+
+
+
                 </div>
+
+
+
             </div>
+
+
+
         </div>
+
+
 
         <!-- Upload & Results Section -->
+
+
+
         <div class="col-lg-4">
+
+
+
             <!-- Upload Card -->
+
+
+
             <div class="card upload-card">
+
+
+
                 <div class="card-header">
+
+
+
                     <h5><i class="fas fa-upload"></i> Upload Image</h5>
+
+
+
                 </div>
+
+
+
                 <div class="card-body">
+
+
+
                     <form id="uploadForm" enctype="multipart/form-data">
+
+
+
                         <div class="upload-area" id="uploadArea">
+
+
+
                             <i class="fas fa-cloud-upload-alt"></i>
+
+
+
                             <p>Click or drag to upload</p>
+
+
+
                             <small>Supports JPG, PNG, JPEG</small>
+
+
+
                             <input type="file" id="imageFile" accept="image/*">
+
+
+
                         </div>
+
+
 
                         <div class="preview-container" id="previewContainer">
+
+
+
                             <div id="imageSourceBadge" class="image-source-badge"></div>
+
+
+
                             <img id="previewImage" src="#" alt="Preview">
+
+
+
                             <div class="file-name" id="fileName">No file selected</div>
+
+
+
                             <div class="preview-actions">
+
+
+
                                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearPreview()">
+
+
+
                                     <i class="fas fa-times"></i> Remove
+
+
+
                                 </button>
+
+
+
                             </div>
+
+
+
                         </div>
 
+
+
                         <button type="button" class="btn-upload" id="uploadBtn" disabled onclick="handleUpload()">
-                            <i class="fas fa-upload"></i> Upload & Detect
+
+
+
+                            <i class="fas fa-upload"></i> Upload ***&*** Detect
+
+
+
                         </button>
+
+
+
                     </form>
+
+
+
                 </div>
+
+
+
             </div>
+
+
 
             <!-- Results Card -->
+
+
+
             <div class="card results-card mt-3" id="resultsCard" style="display:none;">
+
+
+
                 <div class="card-header" id="resultsHeader">
+
+
+
                     <i class="fas fa-chart-bar"></i> Detection Results
+
+
+
                 </div>
+
+
+
                 <div class="card-body" id="resultsBody">
+
+
+
                     <div class="text-center py-3">
+
+
+
                         <div class="spinner-custom"></div>
+
+
+
                         <p class="analyzing-text">Analyzing garment for defects...</p>
+
+
+
                     </div>
+
+
+
                 </div>
+
+
+
             </div>
+
+
+
         </div>
+
+
+
     </div>
+
+
+
 </div>
 
+
+
 <script>
+
+
+
     // ============================================
+
+
+
     // GLOBAL VARIABLES
+
+
+
     // ============================================
+
+
+
     let stream = null;
+
+
+
     let capturedImageBlob = null;
+
+
+
     let imageSource = null;
+
+
+
     let currentImageData = null;
+
+
+
     let isProcessing = false;
 
+
+
     const video = document.getElementById('videoFeed');
+
+
+
     const canvas = document.getElementById('canvas');
+
+
+
     const capturedImg = document.getElementById('capturedImage');
+
+
+
     const placeholder = document.getElementById('cameraPlaceholder');
+
+
+
     const permissionOverlay = document.getElementById('permissionOverlay');
+
+
+
     const captureBtn = document.getElementById('captureBtn');
+
+
+
     const startBtn = document.getElementById('startBtn');
+
+
+
     const stopBtn = document.getElementById('stopBtn');
+
+
+
     const uploadBtn = document.getElementById('uploadBtn');
+
+
+
     const fileInput = document.getElementById('imageFile');
 
+
+
     // ============================================
+
+
+
     // CAMERA FUNCTIONS
+
+
+
     // ============================================
+
+
+
     function checkCameraSupport() {
+
+
+
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+
+
+
             showToast('Your browser does not support camera access.', 'danger');
+
+
+
             return false;
+
+
+
         }
+
+
+
         return true;
+
+
+
     }
 
+
+
     function startCamera() {
+
+
+
         if (!checkCameraSupport()) return;
+
+
+
         if (placeholder) placeholder.style.display = 'none';
+
+
+
         if (permissionOverlay) permissionOverlay.style.display = 'none';
+
+
 
         showToast('Requesting camera access...', 'info');
 
+
+
         navigator.mediaDevices.getUserMedia({
+
+
+
             video: {
+
+
+
                 facingMode: 'environment',
+
+
+
                 width: { ideal: 1280 },
+
+
+
                 height: { ideal: 720 }
+
+
+
             },
+
+
+
             audio: false
+
+
+
         })
+
+
+
         .then(s => {
+
+
+
             stream = s;
+
+
+
             video.srcObject = stream;
+
+
+
             video.style.display = 'block';
+
+
+
             capturedImg.style.display = 'none';
+
+
+
             if (captureBtn) captureBtn.disabled = false;
+
+
+
             if (startBtn) startBtn.disabled = true;
+
+
+
             if (stopBtn) stopBtn.disabled = false;
+
+
+
             if (placeholder) placeholder.style.display = 'none';
+
+
+
             if (permissionOverlay) permissionOverlay.style.display = 'none';
+
+
+
             showToast('✅ Camera started successfully!', 'success');
+
+
+
         })
+
+
+
         .catch(err => {
+
+
+
             let errorMessage = '';
 
+
+
             if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+
+
+
                 errorMessage = 'Camera permission denied!';
+
+
+
                 showToast('❌ Camera permission denied! Click the lock icon to allow.', 'danger');
+
+
+
                 if (permissionOverlay) permissionOverlay.style.display = 'flex';
+
+
+
                 if (placeholder) placeholder.style.display = 'none';
+
+
+
                 console.error('Camera permission denied.');
+
+
+
             } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+
+
+
                 errorMessage = 'No camera found. Please connect a camera.';
+
+
+
                 showToast('❌ No camera found!', 'danger');
+
+
+
             } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+
+
+
                 errorMessage = 'Camera is in use by another application.';
+
+
+
                 showToast('❌ Camera is busy! Close other apps.', 'danger');
+
+
+
             } else {
+
+
+
                 errorMessage = err.message;
+
+
+
                 showToast('Camera error: ' + err.message, 'danger');
+
+
+
             }
+
+
 
             console.error('Camera error:', err);
 
+
+
             if (placeholder) {
+
+
+
                 placeholder.style.display = 'flex';
+
+
+
                 placeholder.innerHTML = `
+
+
+
                     <i class="fas fa-exclamation-triangle" style="color: #f57c00;"></i>
+
+
+
                     <p style="color: #ccc;">${errorMessage}</p>
+
+
+
                     <small style="color: #666; margin-top: 8px;">Click "Start Camera" to try again</small>
+
+
+
                 `;
+
+
+
             }
+
+
 
             if (captureBtn) captureBtn.disabled = true;
+
+
+
             if (startBtn) startBtn.disabled = false;
+
+
+
             if (stopBtn) stopBtn.disabled = true;
+
+
+
         });
+
+
+
     }
+
+
 
     function stopCamera() {
+
+
+
         if (stream) {
+
+
+
             stream.getTracks().forEach(t => t.stop());
+
+
+
             stream = null;
+
+
+
             video.srcObject = null;
+
+
+
         }
+
+
+
         video.style.display = 'none';
+
+
+
         capturedImg.style.display = 'none';
+
+
+
         if (captureBtn) captureBtn.disabled = true;
+
+
+
         if (startBtn) startBtn.disabled = false;
+
+
+
         if (stopBtn) stopBtn.disabled = true;
 
+
+
         if (placeholder) {
+
+
+
             placeholder.style.display = 'flex';
+
+
+
             placeholder.innerHTML = `
+
+
+
                 <i class="fas fa-camera"></i>
+
+
+
                 <p>Click "Start Camera" to begin</p>
+
+
+
                 <small style="color: #666;">Make sure to allow camera permissions</small>
+
+
+
             `;
+
+
+
         }
+
+
+
         if (permissionOverlay) permissionOverlay.style.display = 'none';
+
+
 
         showToast('Camera stopped.', 'info');
+
+
+
     }
+
+
 
     function captureImage() {
+
+
+
         if (!stream) {
+
+
+
             showToast('Please start the camera first.', 'warning');
+
+
+
             return;
+
+
+
         }
+
+
 
         if (!video.videoWidth || !video.videoHeight) {
+
+
+
             showToast('Camera not ready. Please wait.', 'warning');
+
+
+
             return;
+
+
+
         }
+
+
 
         canvas.width = video.videoWidth;
+
+
+
         canvas.height = video.videoHeight;
+
+
+
         const ctx = canvas.getContext('2d');
+
+
+
         ctx.drawImage(video, 0, 0);
 
+
+
         canvas.toBlob(function(blob) {
+
+
+
             if (blob) {
+
+
+
                 capturedImageBlob = blob;
+
+
+
                 imageSource = 'camera';
 
+
+
                 const imageUrl = URL.createObjectURL(blob);
+
+
+
                 capturedImg.src = imageUrl;
+
+
+
                 capturedImg.style.display = 'block';
+
+
+
                 video.style.display = 'none';
+
+
+
                 if (placeholder) placeholder.style.display = 'none';
+
+
+
                 if (permissionOverlay) permissionOverlay.style.display = 'none';
 
+
+
                 showPreviewFromDataUrl(imageUrl, 'Camera Capture', 'camera');
+
+
+
                 uploadBtn.disabled = false;
+
+
+
                 showToast('✅ Image captured! Click "Upload & Detect" to analyze.', 'success');
+
+
+
             } else {
+
+
+
                 showToast('❌ Failed to capture image.', 'danger');
+
+
+
             }
+
+
+
         }, 'image/jpeg', 0.95);
+
+
+
     }
+
+
 
     function resetInspection() {
+
+
+
         capturedImg.style.display = 'none';
+
+
+
         video.style.display = 'none';
+
+
+
         document.getElementById('resultsCard').style.display = 'none';
+
+
+
         fileInput.value = '';
+
+
+
         capturedImageBlob = null;
+
+
+
         imageSource = null;
+
+
+
         currentImageData = null;
+
+
+
         isProcessing = false;
+
+
+
         clearPreview();
 
+
+
         if (placeholder) {
+
+
+
             placeholder.style.display = 'flex';
+
+
+
             placeholder.innerHTML = `
+
+
+
                 <i class="fas fa-camera"></i>
+
+
+
                 <p>Click "Start Camera" to begin</p>
+
+
+
                 <small style="color: #666;">Make sure to allow camera permissions</small>
+
+
+
             `;
+
+
+
         }
+
+
+
         if (permissionOverlay) permissionOverlay.style.display = 'none';
+
+
+
         if (captureBtn) captureBtn.disabled = true;
+
+
+
         if (startBtn) startBtn.disabled = false;
+
+
+
         if (stopBtn) stopBtn.disabled = true;
+
+
+
         uploadBtn.disabled = true;
+
+
 
         showToast('Reset successful.', 'info');
+
+
+
     }
 
+
+
     // ============================================
+
+
+
     // PREVIEW FUNCTIONS
+
+
+
     // ============================================
+
+
+
     function showPreview(file) {
+
+
+
         const previewContainer = document.getElementById('previewContainer');
+
+
+
         const previewImage = document.getElementById('previewImage');
+
+
+
         const fileName = document.getElementById('fileName');
+
+
+
         const badge = document.getElementById('imageSourceBadge');
+
+
 
         if (file) {
+
+
+
             const reader = new FileReader();
+
+
+
             reader.onload = function(e) {
+
+
+
                 previewImage.src = e.target.result;
+
+
+
                 previewContainer.style.display = 'block';
+
+
+
                 fileName.textContent = file.name;
+
+
+
                 uploadBtn.disabled = false;
+
+
+
                 imageSource = 'upload';
+
+
+
                 currentImageData = file;
+
+
+
                 badge.textContent = '📁 Uploaded Image';
+
+
+
                 badge.className = 'image-source-badge badge-upload';
+
+
+
             };
+
+
+
             reader.readAsDataURL(file);
+
+
+
         }
+
+
+
     }
+
+
 
     function showPreviewFromDataUrl(imageUrl, name = 'Captured Image', source = 'camera') {
+
+
+
         const previewContainer = document.getElementById('previewContainer');
+
+
+
         const previewImage = document.getElementById('previewImage');
+
+
+
         const fileName = document.getElementById('fileName');
+
+
+
         const badge = document.getElementById('imageSourceBadge');
+
+
 
         previewImage.src = imageUrl;
+
+
+
         previewContainer.style.display = 'block';
+
+
+
         fileName.textContent = name;
+
+
+
         uploadBtn.disabled = false;
+
+
+
         imageSource = source;
 
+
+
         if (source === 'camera') {
+
+
+
             badge.textContent = '📷 Camera Capture';
+
+
+
             badge.className = 'image-source-badge badge-camera';
+
+
+
         } else {
+
+
+
             badge.textContent = '📁 Uploaded Image';
+
+
+
             badge.className = 'image-source-badge badge-upload';
+
+
+
         }
+
+
+
     }
+
+
 
     function clearPreview() {
+
+
+
         const previewContainer = document.getElementById('previewContainer');
+
+
+
         const previewImage = document.getElementById('previewImage');
+
+
+
         const fileName = document.getElementById('fileName');
+
+
+
         const badge = document.getElementById('imageSourceBadge');
 
+
+
         previewContainer.style.display = 'none';
+
+
+
         previewImage.src = '#';
+
+
+
         fileName.textContent = 'No file selected';
+
+
+
         uploadBtn.disabled = true;
+
+
+
         badge.textContent = '';
+
+
+
         badge.className = 'image-source-badge';
+
+
+
         fileInput.value = '';
+
+
+
         capturedImageBlob = null;
+
+
+
         imageSource = null;
+
+
+
         currentImageData = null;
+
+
+
     }
 
+
+
     // ============================================
+
+
+
     // ALARM SYSTEM
+
+
+
     // ============================================
+
+
+
     function playAlarm(defects) {
+
+
+
         console.log('🔊 ALARM TRIGGERED!');
+
+
+
         console.log('📋 Defects:', defects);
 
+
+
         let overlay = document.getElementById('alarmOverlay');
+
+
+
         if (!overlay) {
+
+
+
             overlay = document.createElement('div');
+
+
+
             overlay.id = 'alarmOverlay';
+
+
+
             overlay.style.cssText = `
+
+
+
                 display: none;
+
+
+
                 position: fixed;
+
+
+
                 top: 50%;
+
+
+
                 left: 50%;
+
+
+
                 transform: translate(-50%, -50%);
+
+
+
                 background: rgba(198, 40, 40, 0.95);
+
+
+
                 color: white;
+
+
+
                 padding: 40px 60px;
+
+
+
                 border-radius: 20px;
+
+
+
                 z-index: 9999;
+
+
+
                 text-align: center;
+
+
+
                 font-size: 24px;
+
+
+
                 box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+
+
+
                 animation: alarmPulse 0.5s infinite alternate;
+
+
+
             `;
+
+
+
             overlay.innerHTML = `
+
+
+
                 <i class="fas fa-exclamation-triangle" style="font-size:60px; display:block; margin-bottom:20px;"></i>
+
+
+
                 <div>⚠️ DEFECT DETECTED!</div>
+
+
+
                 <small style="font-size:16px; display:block; margin-top:10px;"></small>
+
+
+
             `;
+
+
+
             document.body.appendChild(overlay);
+
+
+
         }
 
+
+
         overlay.style.display = 'block';
+
+
+
         const small = overlay.querySelector('small');
+
+
+
         if (small && defects && defects.length > 0) {
+
+
+
             small.textContent = 'Defects: ' + defects.join(' • ');
+
+
+
         }
+
+
 
         let alarmPlayed = false;
 
+
+
         try {
+
+
+
             const audio = new Audio('/static/sounds/alarm.wav');
+
+
+
             audio.play().then(() => {
+
+
+
                 console.log('🔊 Alarm played via HTML5 Audio');
+
+
+
                 alarmPlayed = true;
+
+
+
             }).catch(() => {
+
+
+
                 console.log('⚠️ HTML5 Audio failed, trying fallback...');
+
+
+
             });
+
+
+
         } catch (e) {
+
+
+
             console.log('⚠️ HTML5 Audio error:', e);
+
+
+
         }
 
+
+
         setTimeout(() => {
+
+
+
             if (!alarmPlayed) {
+
+
+
                 try {
+
+
+
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+
+
                     const oscillator = audioCtx.createOscillator();
+
+
+
                     const gainNode = audioCtx.createGain();
+
+
+
                     oscillator.connect(gainNode);
+
+
+
                     gainNode.connect(audioCtx.destination);
+
+
+
                     oscillator.frequency.value = 880;
+
+
+
                     oscillator.type = 'square';
+
+
+
                     gainNode.gain.value = 0.3;
+
+
+
                     oscillator.start();
+
+
+
                     setTimeout(() => oscillator.stop(), 800);
+
+
+
                     console.log('🔊 Alarm played via Web Audio API');
+
+
+
                     alarmPlayed = true;
+
+
+
                 } catch (err) {
+
+
+
                     console.log('⚠️ Web Audio API error:', err);
+
+
+
                 }
+
+
+
             }
+
+
+
         }, 200);
 
+
+
         setTimeout(() => {
+
+
+
             if (!alarmPlayed) {
+
+
+
                 try {
+
+
+
                     if (navigator.vibrate) {
+
+
+
                         navigator.vibrate([200, 100, 200, 100, 200]);
+
+
+
                         console.log('🔊 Alarm played via vibration');
+
+
+
                         alarmPlayed = true;
+
+
+
                     }
+
+
+
                 } catch (e) {
+
+
+
                     console.log('⚠️ Vibration error:', e);
+
+
+
                 }
+
+
+
             }
+
+
+
         }, 400);
 
+
+
         setTimeout(() => {
+
+
+
             overlay.style.display = 'none';
+
+
+
             overlay.style.animation = '';
+
+
+
         }, 6000);
+
+
+
     }
 
+
+
     // ============================================
+
+
+
     // ⭐ DETECTION RESULTS DISPLAY (with 4-model checklist)
+
+
+
     // ============================================
+
+
+
     function displayResults(data) {
+
+
+
         console.log('📊 Displaying results:', data);
 
+
+
         const isPass = data.overall_status === 'PASS';
+
+
+
         const resultsHeader = document.getElementById('resultsHeader');
+
+
+
         const resultsBody = document.getElementById('resultsBody');
 
+
+
         resultsHeader.className = `card-header text-white ${isPass ? 'bg-success' : 'bg-danger'}`;
+
+
+
         resultsHeader.innerHTML = `<i class="fas fa-${isPass ? 'check-circle' : 'times-circle'}"></i> ${data.overall_status}`;
 
+
+
+        const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({
+
+
+
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+
+
+
+        }[c]));
+
+
+
         // -------- Defects list --------
+
+
+
         let defectsHtml = '';
+
+
+
         if (data.defects && data.defects.length > 0) {
+
+
+
             defectsHtml = data.defects.map(d =>
-                `<div class="alert alert-defect-list"><i class="fas fa-bug"></i> ${d}</div>`
+
+
+
+                `<div class="alert alert-defect-list"><i class="fas fa-bug"></i> ${escapeHtml(d)}</div>`
+
+
+
             ).join('');
+
+
+
+        }
+
+
+
+        if (data.color_imbalance?.status === 'FAIL') {
+
+
+
+            defectsHtml += '<div class="alert alert-defect-list"><i class="fas fa-palette"></i> Color Imbalance</div>';
+
+
+
+        }
+
+
+
+        if (data.label_detection?.status === 'FAIL') {
+            defectsHtml += '<div class="alert alert-defect-list"><i class="fas fa-tag"></i> Product label not confirmed (automated FAIL)</div>';
         }
 
         // -------- Button model data --------
+
+
+
         const buttonCount = data.button_count || data.count || 0;
+
+
+
         const expected = data.expected || 7;
+
+
+
         const alignmentScore = (data.alignment_score || 0).toFixed(1);
 
-        // -------- ⭐ 4-MODEL SUMMARY FLAGS --------
-        const hasBrokenStitch  = data.has_broken_stitch  === true;
-        const hasButtonDefect  = data.has_button_defect  === true;
-        const hasLabelDefect   = data.has_label_defect   === true;
-        const hasColorImbalance = data.has_color_imbalance === true;
 
-        // -------- Color model details (for the analysis card) --------
-        const colorHasError = (data.color_status === 'Error') || (data.color_status === 'Model not loaded');
-        const colorConfidence = (data.color_confidence || 0) * 100;
-        const balancedProb = data.color_balanced_probability || 0;
-        const imbalancedProb = data.color_imbalanced_probability || 0;
-        const colorPrediction = data.color_status || (hasColorImbalance ? 'Imbalanced' : 'Balanced');
 
-        // -------- Build the 4-model checklist HTML --------
-        function badge(hasDefect) {
+        // -------- Model status from Flask /api/detect --------
+
+
+
+        const buttonEvaluated = data.button_count !== undefined;
+
+
+
+        const hasButtonDefect = buttonEvaluated && (
+
+
+
+            data.button_status === 'FAIL' ||
+
+
+
+            (Array.isArray(data.defects) && data.defects.length > 0) ||
+
+
+
+            data.button_detection?.overall_status === 'FAIL'
+
+
+
+        );
+
+
+
+        const color = data.color_imbalance || {};
+
+
+
+        const colorAvailable = color.raw_score !== undefined &&
+
+
+
+            color.raw_score !== null &&
+
+
+
+            Number.isFinite(Number(color.raw_score)) &&
+
+
+
+            Number(color.raw_score) >= 0 && Number(color.raw_score) <= 1;
+
+
+
+        const rawScore = colorAvailable ? Number(color.raw_score) : 0;
+
+
+
+        const hasColorImbalance = colorAvailable &&
+
+
+
+            (color.status === 'FAIL' || (!color.status && rawScore > 0.5));
+
+
+
+        const colorHasError = !colorAvailable;
+
+
+
+        const colorPrediction = colorAvailable
+
+
+
+            ? (color.label || (hasColorImbalance ? 'Imbalanced' : 'Balanced'))
+
+
+
+            : 'Not Tested';
+
+
+
+        const colorConfidence = colorAvailable
+
+
+
+            ? (Number.isFinite(Number(color.confidence)) && color.confidence != null
+
+
+
+                ? Number(color.confidence) * 100
+
+
+
+                : Math.max(rawScore, 1 - rawScore) * 100)
+
+
+
+            : 0;
+
+
+
+        const balancedProb = colorAvailable ? (1 - rawScore) * 100 : 0;
+
+
+
+        const imbalancedProb = colorAvailable ? rawScore * 100 : 0;
+
+
+
+        // Product-label inspection uses PASS/FAIL from the Flask detector.
+        // The size-label class is intentionally not displayed or evaluated.
+        const label = data.label_detection || {};
+        const labelEvaluated = label.evaluated === true;
+        const labelProduct = label.product_label || {};
+        const noLabelDetected = label.no_label_detected === true;
+        const reportedLabelStatus = String(label.status || '').toUpperCase();
+        const labelStatus = labelEvaluated
+            ? (reportedLabelStatus === 'PASS' ? 'PASS' : 'FAIL')
+            : 'NOT TESTED';
+        const labelStatusClass = labelStatus === 'PASS' ? 'pass' : labelStatus === 'FAIL' ? 'fail' : 'unknown';
+        const labelBadge = `<span class="checklist-badge ${labelStatusClass}">${labelStatus}</span>`;
+        const labelStatusText = item => item.status === 'DETECTED' ? 'Detected' : 'Not Confirmed';
+        const labelConfidenceText = item => item.status === 'DETECTED' &&
+            item.confidence !== null && item.confidence !== undefined &&
+            Number.isFinite(Number(item.confidence))
+                ? ` (${(Number(item.confidence) * 100).toFixed(1)}% confidence)` : '';
+        const noLabelConfidence = Array.isArray(label.detections)
+            ? label.detections
+                .filter(d => String(d.class || '').trim().toLowerCase() === 'nolabel')
+                .map(d => Number(d.confidence))
+                .filter(Number.isFinite)
+                .reduce((max, value) => Math.max(max, value), 0)
+            : 0;
+        const noLabelText = noLabelDetected
+            ? `Detected${noLabelConfidence > 0 ? ` (${(noLabelConfidence * 100).toFixed(1)}% confidence)` : ''}`
+            : 'Not Detected';
+
+        const labelSectionHtml = `
+            <div class="analysis-section" style="border-color:#e0e5f3;background:#fafbff;">
+                <div class="analysis-section-title"><i class="fas fa-tag"></i> Label Detection Details
+                    <span class="verdict-pill ${labelStatusClass}" style="margin-left:auto;">${labelStatus}</span>
+                </div>
+                ${labelEvaluated ? `
+                    <div class="checklist-row"><span>Product Label</span><strong>${labelStatusText(labelProduct)}${labelConfidenceText(labelProduct)}</strong></div>
+                    <div class="checklist-row"><span>No Label</span><strong>${noLabelText}</strong></div>
+                    ${labelStatus === 'FAIL' ? '<small style="display:block;color:#856404;margin-top:10px;">Automated FAIL: the model did not confidently confirm a product label. Verify the garment before rejecting it.</small>' : ''}
+                ` : '<small>Label model result was not returned by the server. Check the Flask API response.</small>'}
+            </div>`;
+
+        const stitch = data.stitch_detection || {};
+        const stitchEvaluated = stitch.evaluated === true;
+        const stitchFailed = stitchEvaluated && stitch.status === 'FAIL';
+        const stitchRows = Array.isArray(stitch.rois) ? stitch.rois : [];
+        const escapeStitchText = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        const stitchSectionHtml = `
+            <div class="analysis-section">
+                <div class="analysis-section-title"><i class="fas fa-cut"></i> Broken Stitch Detection
+                    <span class="checklist-badge ${!stitchEvaluated ? 'unknown' : stitchFailed ? 'fail' : 'pass'}" style="margin-left:auto;">
+                        ${!stitchEvaluated ? 'Not Tested' : stitch.status}
+                    </span>
+                </div>
+                ${stitchEvaluated ? stitchRows.map(roi => `
+                    <div class="checklist-row">
+                        <span>${escapeStitchText(roi.roi_name)}</span>
+                        <strong>${escapeStitchText(roi.status)} (${(Number(roi.ensemble_prob) * 100).toFixed(1)}% broken probability)</strong>
+                    </div>`).join('') : '<small>No valid stitch regions detected.</small>'}
+                <small>AI predictions require verification; duplicate region detections may overlap.</small>
+            </div>`;
+
+
+        function badge(hasDefect, evaluated = true) {
+
+
+
+            if (!evaluated) return `<span class="checklist-badge unknown">Not Tested</span>`;
+
+
+
             if (hasDefect) return `<span class="checklist-badge fail"><i class="fas fa-times-circle"></i> Defect</span>`;
+
+
+
             return `<span class="checklist-badge pass"><i class="fas fa-check-circle"></i> No Defect</span>`;
+
+
+
         }
+
+
 
         const checklistHtml = `
+
+
+
             <div class="checklist-section">
+
+
+
                 <div class="checklist-section-title">
+
+
+
                     <i class="fas fa-clipboard-check"></i> Detection Checklist
+
+
+
                 </div>
 
+
+
                 <div class="checklist-row">
+
+
+
                     <span class="check-label"><i class="fas fa-cut"></i> Broken Stitch</span>
-                    ${badge(hasBrokenStitch)}
+
+
+
+                    ${badge(stitchFailed, stitchEvaluated)}
+
+
+
                 </div>
 
+
+
                 <div class="checklist-row">
+
+
+
                     <span class="check-label"><i class="fas fa-circle"></i> Button Defect</span>
-                    ${badge(hasButtonDefect)}
+
+
+
+                    ${badge(hasButtonDefect, buttonEvaluated)}
+
+
+
                 </div>
 
+
+
                 <div class="checklist-row">
+
+
+
                     <span class="check-label"><i class="fas fa-tag"></i> Label Defect</span>
-                    ${badge(hasLabelDefect)}
+
+
+
+                    ${labelBadge}
+
+
+
                 </div>
 
+
+
                 <div class="checklist-row">
+
+
+
                     <span class="check-label"><i class="fas fa-palette"></i> Color Imbalance</span>
-                    ${badge(hasColorImbalance)}
+
+
+
+                    ${badge(hasColorImbalance, colorAvailable)}
+
+
+
                 </div>
+
+
+
             </div>
+
+
+
         `;
+
+
 
         // -------- Build color analysis section (existing) --------
+
+
+
         let colorSectionHtml = '';
+
+
+
         if (colorHasError) {
+
+
+
             colorSectionHtml = `
+
+
+
                 <div class="analysis-section color-section">
+
+
+
                     <div class="analysis-section-title">
+
+
+
                         <i class="fas fa-palette"></i> Color Balance Analysis
+
+
+
                     </div>
+
+
+
                     <div style="color:#a0a8b5; font-size:0.85rem; text-align:center; padding:8px;">
+
+
+
                         <i class="fas fa-info-circle"></i> Color model not available
+
+
+
                     </div>
+
+
+
                 </div>
+
+
+
             `;
+
+
+
         } else {
+
+
+
             const verdictClass = hasColorImbalance ? 'fail' : 'pass';
+
+
+
             const verdictText  = hasColorImbalance ? 'IMBALANCED' : 'BALANCED';
+
+
+
             const verdictIcon  = hasColorImbalance ? 'fa-exclamation-triangle' : 'fa-check';
 
+
+
             colorSectionHtml = `
+
+
+
                 <div class="analysis-section color-section">
+
+
+
                     <div class="analysis-section-title">
+
+
+
                         <i class="fas fa-palette"></i> Color Balance Analysis
+
+
+
                         <span class="verdict-pill ${verdictClass}" style="margin-left:auto;">
+
+
+
                             <i class="fas ${verdictIcon}"></i> ${verdictText}
+
+
+
                         </span>
+
+
+
                     </div>
+
+
 
                     <div class="result-detail-grid" style="margin:0 0 12px 0;">
+
+
+
                         <div class="result-detail-item">
+
+
+
                             <div class="label">Prediction</div>
+
+
+
                             <div class="value" style="font-size:1rem;">${colorPrediction}</div>
+
+
+
                         </div>
+
+
+
                         <div class="result-detail-item">
+
+
+
                             <div class="label">Confidence</div>
+
+
+
                             <div class="value" style="font-size:1rem;">${colorConfidence.toFixed(1)}%</div>
+
+
+
                         </div>
+
+
+
                     </div>
+
+
 
                     <div class="probability-bars">
+
+
+
                         <div class="prob-row">
+
+
+
                             <span class="prob-label">Balanced</span>
+
+
+
                             <div class="prob-bar">
+
+
+
                                 <div class="prob-fill balanced" style="width:${balancedProb}%"></div>
+
+
+
                             </div>
+
+
+
                             <span class="prob-value">${balancedProb.toFixed(1)}%</span>
+
+
+
                         </div>
+
+
+
                         <div class="prob-row">
+
+
+
                             <span class="prob-label">Imbalanced</span>
+
+
+
                             <div class="prob-bar">
+
+
+
                                 <div class="prob-fill imbalanced" style="width:${imbalancedProb}%"></div>
+
+
+
                             </div>
+
+
+
                             <span class="prob-value">${imbalancedProb.toFixed(1)}%</span>
+
+
+
                         </div>
+
+
+
                     </div>
+
+
+
                 </div>
+
+
+
             `;
+
+
+
         }
 
+
+
         // -------- Final render --------
+
+
+
         resultsBody.innerHTML = `
+
+
+
             <div class="result-status ${isPass ? 'pass' : 'fail'}">
+
+
+
                 ${isPass ? '✅ PASS' : '❌ FAIL'}
+
+
+
             </div>
+
+
 
             <!-- ⭐ 4-Model Checklist -->
+
+
+
             ${checklistHtml}
 
+
+
             <!-- Button Detection Details -->
+
+
+
             <div class="analysis-section">
+
+
+
                 <div class="analysis-section-title">
+
+
+
                     <i class="fas fa-circle"></i> Button Detection Details
+
+
+
                 </div>
+
+
+
                 <div class="result-detail-grid" style="margin:0;">
+
+
+
                     <div class="result-detail-item">
+
+
+
                         <div class="label">Buttons Found</div>
+
+
+
                         <div class="value">${buttonCount} <span class="expected">/ ${expected}</span></div>
+
+
+
                     </div>
+
+
+
                     <div class="result-detail-item">
+
+
+
                         <div class="label">Alignment Score</div>
+
+
+
                         <div class="value">${alignmentScore}%</div>
+
+
+
                     </div>
+
+
+
                 </div>
+
+
+
             </div>
+
+
 
             <!-- Color Analysis -->
+
+
+
             ${colorSectionHtml}
 
+
+
+            <!-- Label detection -->
+
+            ${labelSectionHtml}
+
+            ${stitchSectionHtml}
+
+
+
             ${data.has_defect ?
+
+
+
                 `<div class="alert alert-defect alert-custom"><i class="fas fa-exclamation-triangle"></i> Defect Detected!</div>` :
-                `<div class="alert alert-success-custom alert-custom"><i class="fas fa-check-circle"></i> No defects detected</div>`
+
+
+
+                `<div class="alert alert-success-custom alert-custom"><i class="fas fa-check-circle"></i> No defects detected in the evaluated checks</div>`
+
+
+
             }
+
+
+
             ${defectsHtml}
 
+
+
             <div class="d-grid gap-2 mt-3">
+
+
+
                 <button class="btn btn-primary" onclick="window.location.href='/history'">
+
+
+
                     <i class="fas fa-history"></i> View History
+
+
+
                 </button>
+
+
+
                 <button class="btn btn-outline-secondary" onclick="resetInspection()">
+
+
+
                     <i class="fas fa-redo"></i> New Inspection
+
+
+
                 </button>
+
+
+
             </div>
+
+
+
         `;
+
+
+
     }
 
+
+
     function sendDetectionRequest(formData) {
+
+
+
         console.log('📤 Sending detection request...');
 
+
+
         const resultsCard = document.getElementById('resultsCard');
+
+
+
         const resultsHeader = document.getElementById('resultsHeader');
+
+
+
         const resultsBody = document.getElementById('resultsBody');
 
+
+
         resultsCard.style.display = 'block';
+
+
+
         resultsHeader.className = 'card-header bg-warning text-white';
+
+
+
         resultsHeader.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+
+
         resultsBody.innerHTML = `
+
+
+
             <div class="text-center py-3">
+
+
+
                 <div class="spinner-custom"></div>
+
+
+
                 <p class="analyzing-text">Analyzing garment for defects...</p>
+
+
+
             </div>
+
+
+
         `;
 
+
+
         uploadBtn.disabled = true;
+
+
+
         uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
+
+
         fetch('/api/detect', {
+
+
+
             method: 'POST',
+
+
+
             body: formData
+
+
+
         })
+
+
+
         .then(response => {
+
+
+
             console.log('📥 Response received:', response.status);
+
+
+
             if (!response.ok) {
+
+
+
                 throw new Error(`HTTP error! status: ${response.status}`);
+
+
+
             }
+
+
+
             return response.json();
+
+
+
         })
+
+
+
         .then(data => {
+
+
+
             console.log('📊 Detection data:', data);
 
+
+
             if (data.error) {
+
+
+
                 throw new Error(data.error);
+
+
+
             }
+
+
 
             displayResults(data);
 
+
+
             if (data.has_defect) {
+
+
+
                 console.log('🔊 Defect detected! Playing alarm...');
+
+
+
                 showToast('⚠️ Defect detected!', 'danger');
-                playAlarm(data.defects);
+
+
+
+                const detectedDefects = [...(data.defects || [])];
+
+
+
+                if (data.color_imbalance?.status === 'FAIL') {
+
+
+
+                    detectedDefects.push('Color Imbalance');
+
+
+
+                }
+
+
+
+                playAlarm(detectedDefects);
+
+
+
             } else {
+
+
+
                 console.log('✅ No defects detected.');
-                showToast('✅ No defects detected!', 'success');
+
+
+
+                showToast('✅ No defects detected in evaluated checks!', 'success');
+
+
+
             }
+
+
+
         })
+
+
+
         .catch(error => {
+
+
+
             console.error('❌ Detection error:', error);
+
+
+
             resultsHeader.className = 'card-header bg-danger text-white';
+
+
+
             resultsHeader.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+
+
+
             resultsBody.innerHTML = `
-                <div class="alert alert-danger">${error.message || 'An error occurred during detection'}</div>
+
+
+
+                <div class="alert alert-danger">${String(error.message || 'An error occurred during detection').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}</div>
+
+
+
                 <button class="btn btn-outline-secondary mt-2" onclick="resetInspection()">
+
+
+
                     <i class="fas fa-redo"></i> Try Again
+
+
+
                 </button>
+
+
+
             `;
+
+
+
             showToast('❌ Error: ' + (error.message || 'Detection failed'), 'danger');
+
+
+
         })
+
+
+
         .finally(() => {
+
+
+
             uploadBtn.disabled = false;
+
+
+
             uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload & Detect';
+
+
+
             isProcessing = false;
+
+
+
         });
+
+
+
     }
 
+
+
     // ============================================
+
+
+
     // HANDLE UPLOAD
+
+
+
     // ============================================
+
+
+
     function handleUpload() {
+
+
+
         if (isProcessing) {
+
+
+
             showToast('Please wait, processing in progress...', 'warning');
+
+
+
             return;
+
+
+
         }
 
+
+
         console.log('📤 Upload button clicked');
+
+
+
         console.log('Image source:', imageSource);
+
+
+
         console.log('Has captured blob:', !!capturedImageBlob);
+
+
+
         console.log('File input has file:', !!fileInput.files[0]);
+
+
 
         const formData = new FormData();
 
+
+
         if (imageSource === 'camera' && capturedImageBlob) {
+
+
+
             console.log('📷 Using captured image from camera');
+
+
+
             formData.append('image', capturedImageBlob, 'captured_image.jpg');
+
+
+
             isProcessing = true;
+
+
+
             sendDetectionRequest(formData);
+
+
+
             return;
+
+
+
         }
+
+
 
         if (fileInput.files && fileInput.files[0]) {
+
+
+
             console.log('📁 Uploading file:', fileInput.files[0].name);
+
+
+
             formData.append('image', fileInput.files[0]);
+
+
+
             isProcessing = true;
+
+
+
             sendDetectionRequest(formData);
+
+
+
             return;
+
+
+
         }
+
+
 
         showToast('Please select or capture an image first.', 'warning');
+
+
+
     }
 
-    // ============================================
-    // FILE INPUT HANDLER
-    // ============================================
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            capturedImageBlob = null;
-            imageSource = 'upload';
-            showPreview(this.files[0]);
-            isProcessing = false;
-        } else {
-            clearPreview();
-        }
-    });
+
 
     // ============================================
-    // TOAST NOTIFICATIONS
+
+
+
+    // FILE INPUT HANDLER
+
+
+
     // ============================================
+
+
+
+    fileInput.addEventListener('change', function() {
+
+
+
+        if (this.files && this.files[0]) {
+
+
+
+            capturedImageBlob = null;
+
+
+
+            imageSource = 'upload';
+
+
+
+            showPreview(this.files[0]);
+
+
+
+            isProcessing = false;
+
+
+
+        } else {
+
+
+
+            clearPreview();
+
+
+
+        }
+
+
+
+    });
+
+
+
+    // ============================================
+
+
+
+    // TOAST NOTIFICATIONS
+
+
+
+    // ============================================
+
+
+
     function showToast(message, type = 'info') {
+
+
+
         const colors = {
+
+
+
             success: '#2e7d32',
+
+
+
             danger: '#c62828',
+
+
+
             warning: '#f57c00',
+
+
+
             info: '#0d47a1'
+
+
+
         };
 
+
+
         let container = document.getElementById('toastContainer');
+
+
+
         if (!container) {
+
+
+
             container = document.createElement('div');
+
+
+
             container.id = 'toastContainer';
+
+
+
             container.style.cssText = 'position:fixed; top:80px; right:20px; z-index:9999; max-width:400px;';
+
+
+
             document.body.appendChild(container);
+
+
+
         }
+
+
 
         const toast = document.createElement('div');
+
+
+
         toast.style.cssText = `
+
+
+
             background: ${colors[type] || colors.info};
+
+
+
             color: white;
+
+
+
             padding: 14px 20px;
+
+
+
             border-radius: 12px;
+
+
+
             margin-bottom: 10px;
+
+
+
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+
+
+
             animation: slideDown 0.4s ease-out;
+
+
+
             display: flex;
+
+
+
             align-items: center;
+
+
+
             gap: 12px;
+
+
+
             font-weight: 500;
+
+
+
             font-size: 0.95rem;
+
+
+
             border: none;
+
+
+
         `;
+
+
+
         toast.innerHTML = `
+
+
+
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'times-circle' : 'info-circle'}"></i>
+
+
+
             ${message}
+
+
+
         `;
+
+
+
         container.appendChild(toast);
 
+
+
         setTimeout(() => {
+
+
+
             toast.style.transition = 'opacity 0.5s';
+
+
+
             toast.style.opacity = '0';
+
+
+
             setTimeout(() => toast.remove(), 500);
+
+
+
         }, 6000);
+
+
+
     }
 
+
+
     // ============================================
+
+
+
     // DRAG AND DROP
+
+
+
     // ============================================
+
+
+
     document.addEventListener('DOMContentLoaded', function() {
+
+
+
         const uploadArea = document.getElementById('uploadArea');
 
+
+
         if (uploadArea) {
+
+
+
             uploadArea.addEventListener('click', function() {
+
+
+
                 fileInput.click();
+
+
+
             });
+
+
 
             uploadArea.addEventListener('dragover', function(e) {
+
+
+
                 e.preventDefault();
+
+
+
                 this.classList.add('dragover');
+
+
+
             });
+
+
 
             uploadArea.addEventListener('dragleave', function(e) {
+
+
+
                 e.preventDefault();
+
+
+
                 this.classList.remove('dragover');
+
+
+
             });
+
+
 
             uploadArea.addEventListener('drop', function(e) {
+
+
+
                 e.preventDefault();
+
+
+
                 this.classList.remove('dragover');
+
+
+
                 if (e.dataTransfer.files.length) {
+
+
+
                     capturedImageBlob = null;
+
+
+
                     imageSource = 'upload';
+
+
+
                     fileInput.files = e.dataTransfer.files;
+
+
+
                     showPreview(e.dataTransfer.files[0]);
+
+
+
                     isProcessing = false;
+
+
+
                 }
+
+
+
             });
+
+
+
         }
 
+
+
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+
+
             setTimeout(startCamera, 1000);
+
+
+
         } else {
+
+
+
             if (placeholder) {
+
+
+
                 placeholder.innerHTML = `
+
+
+
                     <i class="fas fa-exclamation-triangle" style="color: #c62828;"></i>
+
+
+
                     <p style="color: #ccc;">Camera not supported in this browser</p>
+
+
+
                     <small style="color: #666;">Please use Chrome, Edge, or Firefox</small>
+
+
+
                 `;
+
+
+
             }
+
+
+
             showToast('Camera not supported in this browser.', 'danger');
+
+
+
         }
+
+
+
     });
+
+
+
 </script>
+
+
+
 {% endblock %}

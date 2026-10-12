@@ -16,7 +16,7 @@ from PIL import Image
 DEFAULT_MODEL_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     'models',
-    'button_model.pt'
+    'best.pt'
 )
 
 _yolo_model = None
@@ -71,11 +71,11 @@ class ButtonDetector:
             camera_index: Index of the camera device (0=default, 1=iPhone via Camo)
             phone_url: URL for IP Webcam app (if using URL method)
         """
-        self.expected_buttons = 7
+        self.expected_buttons = None  # No universal count; garments can have different button counts
 
         # Inference settings (match the Colab notebook's deployment config)
         self.model_img_size = 640
-        self.model_conf_threshold = 0.50
+        self.model_conf_threshold = 0.25  # Matches the successful standalone test; tune on validation images
 
         # Camera settings - iPhone is index 1
         self.camera_type = camera_type
@@ -341,8 +341,7 @@ class ButtonDetector:
                 if img is not None:
                     img = self.resize_image(img)
             else:
-                print(f"❌ Invalid image source: {image_source}")
-                return []
+                raise ValueError(f"Invalid image source: {image_source}")
         elif hasattr(image_source, 'read'):
             # File object (from Flask upload)
             img = self.process_uploaded_image(image_source)
@@ -353,12 +352,10 @@ class ButtonDetector:
             # OpenCV image
             img = self.resize_image(image_source)
         else:
-            print(f"❌ Unknown image source type: {type(image_source)}")
-            return []
+            raise TypeError(f"Unknown image source type: {type(image_source)}")
 
         if img is None:
-            print("❌ No image available for detection")
-            return []
+            raise ValueError("No readable image available for button detection")
 
         try:
             model = _get_model()
@@ -390,7 +387,7 @@ class ButtonDetector:
             print(f"❌ Detection error: {e}")
             import traceback
             traceback.print_exc()
-            return []
+            raise
         finally:
             # Clean up memory
             if img is not None:
@@ -398,77 +395,61 @@ class ButtonDetector:
             self._cleanup_memory()
 
     def analyze_buttons(self, detections):
+        """Combine trained YOLO classes with a cautious geometric gap check.
+
+        A fixed count of seven is NOT assumed. Missing buttons outside the
+        observed row cannot be inferred from spacing alone.
         """
-        Analyze YOLOv11 detections and decide the inspection result.
+        if not detections:
+            raise ValueError("No button detections: inspection is inconclusive; retake image")
 
-        Args:
-            detections: list of {'class': str, 'confidence': float, 'box': [...]}
-                        as returned by detect_buttons()
-
-        Returns:
-            dict with analysis results
-        """
-        if len(detections) == 0:
-            return {
-                'count': 0,
-                'expected': self.expected_buttons,
-                'button_count': 0,
-                'count_ok': False,
-                'alignment_ok': False,
-                'spacing_ok': False,
-                'has_defect': True,
-                'defects': ['No buttons detected'],
-                'alignment_score': 0,
-                'spacing_score': 0,
-                'overall_status': 'FAIL'
-            }
-
-        normal_count = sum(1 for d in detections if d['class'] == self.CLASS_BUTTON)
-        misaligned_count = sum(1 for d in detections if d['class'] == self.CLASS_MISALIGNED)
-        missing_gap_count = sum(1 for d in detections if d['class'] == self.CLASS_MISSING_GAP)
-
-        total_button_count = normal_count + misaligned_count
-
-        count_ok = total_button_count == self.expected_buttons
-        alignment_ok = misaligned_count == 0
-        spacing_ok = missing_gap_count == 0
+        normal = [d for d in detections if d['class'] == self.CLASS_BUTTON]
+        misaligned = [d for d in detections if d['class'] == self.CLASS_MISALIGNED]
+        missing = [d for d in detections if d['class'] == self.CLASS_MISSING_GAP]
+        button_detections = normal + misaligned
+        count = len(button_detections)
+        if count < 3 and not (missing or misaligned):
+            raise ValueError("Fewer than three buttons detected; cannot verify button spacing")
 
         defects = []
-        if not count_ok:
-            defects.append(f"Expected {self.expected_buttons} buttons, found {total_button_count}")
-        if not alignment_ok:
-            defects.append(f"{misaligned_count} misaligned button(s) detected")
-        if not spacing_ok:
-            defects.append(f"{missing_gap_count} missing button gap(s) detected")
+        if misaligned:
+            defects.append(f"{len(misaligned)} misaligned button(s) detected by YOLO")
+        if missing:
+            defects.append(f"{len(missing)} missing button gap(s) detected by YOLO")
 
-        has_defect = not (count_ok and alignment_ok and spacing_ok)
+        # Geometric reasoning on vertically ordered detected button centres.
+        # Use the median spacing as the reference, as in the hybrid notebook.
+        centers = sorted((d['box'][1] + d['box'][3]) / 2.0 for d in button_detections)
+        distances = [centers[i + 1] - centers[i] for i in range(len(centers) - 1)]
+        typical_spacing = float(np.median(distances)) if distances else None
+        large_gaps = []
+        if typical_spacing is not None and typical_spacing > 0:
+            large_gaps = [round(distance, 2) for distance in distances
+                          if distance > 1.5 * typical_spacing]
+        if large_gaps:
+            defects.append(f"{len(large_gaps)} unusually large button spacing gap(s) detected")
 
-        alignment_score = 100.0 if alignment_ok else max(
-            0.0, 100.0 - (misaligned_count / max(total_button_count, 1)) * 100
-        )
-        spacing_score = 100.0 if spacing_ok else max(
-            0.0, 100.0 - (missing_gap_count / max(self.expected_buttons, 1)) * 100
-        )
-
-        result = {
-            'count': total_button_count,
-            'expected': self.expected_buttons,
-            'button_count': total_button_count,
-            'count_ok': count_ok,
+        has_defect = bool(defects)
+        alignment_ok = not misaligned
+        spacing_ok = not (missing or large_gaps)
+        return {
+            'count': count,
+            'expected': None,
+            'button_count': count,
+            'count_ok': None,
             'alignment_ok': alignment_ok,
             'spacing_ok': spacing_ok,
             'has_defect': has_defect,
             'defects': defects,
-            'alignment_score': round(alignment_score, 2),
-            'spacing_score': round(spacing_score, 2),
+            'alignment_score': 100.0 if alignment_ok else round(100 * len(normal) / max(count, 1), 2),
+            'spacing_score': 100.0 if spacing_ok else 0.0,
             'overall_status': 'FAIL' if has_defect else 'PASS',
-            'misaligned_count': misaligned_count,
-            'missing_gap_count': missing_gap_count,
+            'misaligned_count': len(misaligned),
+            'missing_gap_count': len(missing),
+            'geometric_gap_count': len(large_gaps),
+            'median_spacing': round(typical_spacing, 2) if typical_spacing is not None else None,
+            'model': 'YOLO11 garment button detector',
         }
-
-        self._cleanup_memory()
-
-        return result
 
     # ============================================
     # COMPLETE PROCESSING PIPELINE
