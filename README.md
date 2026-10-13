@@ -4,162 +4,279 @@
 
 ### A Deep Learning-Based Computer Vision System for Garment Quality Inspection
 
-*Detecting broken stitches, missing/misaligned buttons, missing or defective labels, and color imbalance — with a live dashboard for results and reporting.*
+**Automated inspection of broken stitches, button defects, garment labels, and color imbalance through a Flask web application.**
 
-![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?logo=tensorflow&logoColor=white)
-![YOLO11](https://img.shields.io/badge/YOLO11-Ultralytics-111F68?logo=ultralytics&logoColor=00FFF0)
-![ResNet](https://img.shields.io/badge/ResNet-50-EE4C2C?logo=pytorch&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow%2FKeras-FF6F00?logo=tensorflow&logoColor=white)
+![YOLO](https://img.shields.io/badge/YOLO-Ultralytics-111F68)
 ![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?logo=opencv&logoColor=white)
-![Tesseract OCR](https://img.shields.io/badge/OCR-Tesseract-4285F4?logo=google&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
-![XAMPP](https://img.shields.io/badge/XAMPP-FB7A24?logo=xampp&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Status](https://img.shields.io/badge/status-in%20development-orange)
+![MariaDB](https://img.shields.io/badge/MariaDB-003545?logo=mariadb&logoColor=white)
+![XAMPP](https://img.shields.io/badge/XAMPP-FB7A24?logo=xampp&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Implemented%20%26%20Under%20Evaluation-blue)
 
-**🎓 Team Aurors** — Faculty of Applied Sciences, Rajarata University of Sri Lanka (2021/2022 Batch)  
-Supervised by **Mr. E.A.C.I. Senaratne**
+**Team Aurors** · Faculty of Applied Sciences · Rajarata University of Sri Lanka  
+**2021/2022 Batch** · Supervisor: **Mr. E.A.C.I. Senaratne**
 
 </div>
 
-<br>
+---
 
-| 👤 Name | 🆔 Registration No. | 🔢 Index No. |
-|---|:---:|:---:|
+## 📑 Contents
+
+- [Overview](#-overview)
+- [Objectives](#-objectives)
+- [Features](#-features)
+- [Detection Modules](#-detection-modules)
+- [System Workflow](#-system-workflow)
+- [Technology Stack](#-technology-stack)
+- [Getting Started](#-getting-started)
+- [Database Setup](#-database-setup)
+- [Model Files](#-model-files)
+- [Evaluation Results](#-evaluation-results)
+- [Data Privacy](#-data-privacy)
+- [Team](#-team)
+- [Project Status and Limitations](#-project-status-and-limitations)
+
+## 🎯 Overview
+
+Manual garment quality inspection is labor-intensive and can be inconsistent, particularly when several types of defects must be checked. This project integrates computer vision and deep learning models into a single inspection interface to assist operators with consistent defect screening and reporting.
+
+The application supports four inspection categories: **broken stitches**, **missing or misaligned buttons**, **missing garment labels**, and **color imbalance**. It combines model predictions with rule-based checks and presents an inspection-level **PASS / FAIL** decision. The system is intended as a decision-support tool; its results should be validated before use in production quality control.
+
+## 🚀 Objectives
+
+1. Identify broken stitches in garment images.
+2. Detect buttons and evaluate missing-button gaps and alignment.
+3. Detect garment label presence.
+4. Classify color imbalance.
+5. Provide an operator-friendly dashboard, inspection history, and reports.
+
+## ✨ Features
+
+- Operator registration, PIN-based login, and account recovery.
+- Image-based garment inspection through a Flask web interface.
+- Four integrated defect-detection modules.
+- Per-module outcomes and an overall inspection verdict.
+- Dashboard statistics, inspection history, and report generation.
+- MariaDB-backed storage of inspection and defect metadata.
+- Temporary image processing rather than permanent inspection-image storage.
+
+## 🔍 Detection Modules
+
+| Module | Implemented approach | Key components |
+|---|---|---|
+| 🧵 Broken stitches | Stitch-region localization followed by ensemble classification | YOLO ROI detector; MobileNetV2, EfficientNetB0, Vision Transformer |
+| 🔘 Button defects | Button object detection and geometric spacing/alignment rules | YOLO and spatial analysis |
+| 🏷️ Garment labels | Detection of the label region/presence | YOLO label detector |
+| 🎨 Color imbalance | Deep-learning image classification | ResNet50 and model-specific preprocessing |
+
+### Broken-stitch ensemble
+
+The stitch inspection pipeline first identifies a stitch region of interest (ROI), then combines predictions from three classifiers:
+
+| Classifier | Ensemble weight |
+|---|---:|
+| MobileNetV2 | 40% |
+| EfficientNetB0 | 25% |
+| Vision Transformer (ViT) | 35% |
+
+The configured ensemble decision threshold is **0.50**. The ensemble weights and threshold are implementation settings, not independently measured performance values.
+
+### Button inspection
+
+Detected button positions are checked for irregular gaps and misalignment. Where too few buttons are detected for reliable geometric evaluation, the button check may be reported as **NOT_TESTED**, rather than presenting an unsupported PASS or FAIL.
+
+### Label inspection
+
+The integrated label module uses YOLO object detection. **OCR-based label text verification should not be assumed to be part of the current end-to-end workflow** unless separately enabled and tested.
+
+## 🏗️ System Workflow
+
+```mermaid
+flowchart TD
+    A[Operator login] --> B[Capture or upload garment image]
+    B --> C[Run detection modules]
+    C --> D[Stitch ROI and ensemble]
+    C --> E[Button detection and geometry]
+    C --> F[Label detection]
+    C --> G[Color classification]
+    D --> H[Combine available module results]
+    E --> H
+    F --> H
+    G --> H
+    H --> I[Inspection verdict and dashboard]
+    I --> J[Store inspection metadata]
+    J --> K[History and reports]
+```
+
+The system uses a Flask backend, Jinja2 web templates, detection utilities, and a relational database. Each model handles its required image preprocessing within its own pipeline.
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Language | Python |
+| Deep learning | TensorFlow / Keras, Ultralytics YOLO, MobileNetV2, EfficientNetB0, ViT, ResNet50 |
+| Image processing | OpenCV, NumPy |
+| Web application | Flask, Jinja2, Flask-Login, Flask-WTF |
+| Database | MariaDB via XAMPP, SQLAlchemy, PyMySQL |
+| Reporting | Python-based report generation |
+| Development and training | VS Code, Google Colab, Git, GitHub |
+
+## ⚡ Getting Started
+
+### Prerequisites
+
+- Windows with Python and pip installed.
+- Git (to clone the repository).
+- XAMPP with its **MySQL** service running (the supplied development environment uses MariaDB).
+- The required trained model files, which may be distributed separately from the Git repository.
+
+### 1. Clone the repository
+
+```powershell
+git clone https://github.com/Ishini01/garment_defect_system.git
+cd garment_defect_system
+```
+
+### 2. Create and activate a virtual environment
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation, use Command Prompt and run `venv\Scripts\activate.bat` instead.
+
+### 3. Install dependencies
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+> **Note:** Model compatibility can depend on the TensorFlow/Keras, Ultralytics, and Python versions used during training. Use the project's tested environment where possible.
+
+### 4. Configure the database
+
+Follow [Database Setup](#-database-setup) below and ensure the connection in `backend/app.py` matches your local MariaDB credentials.
+
+### 5. Place the trained model files
+
+See [Model Files](#-model-files). The Flask application must be able to load the configured weights before all inspection modules can run.
+
+### 6. Start the application
+
+From the project root:
+
+```powershell
+python backend/app.py
+```
+
+Open the address printed by Flask, typically **http://127.0.0.1:5000/**, then register or log in as an operator.
+
+## 🗄️ Database Setup
+
+1. Open **XAMPP Control Panel** and start **MySQL**. Start **Apache** as well if using phpMyAdmin.
+2. Open **http://localhost/phpmyadmin/**.
+3. Create a database named `garment_defect_db`.
+4. Confirm that the SQLAlchemy connection configuration in `backend/app.py` matches the database server, username, and password.
+5. Start Flask and check the terminal for database connection errors.
+
+The local development configuration previously used:
+
+```python
+mysql+pymysql://root:@localhost/garment_defect_db
+```
+
+This example assumes a local `root` account with an empty password. **Do not use these credentials for a public or production deployment.** Store production credentials securely and use a dedicated database account.
+
+The application records operator, inspection-session, and defect information. Database schema details are maintained in the project implementation and design documentation.
+
+## 🧠 Model Files
+
+Trained weights may be too large for ordinary Git commits and are **not guaranteed to be included in a fresh clone**. The application expects model paths configured in its backend detection utilities.
+
+Known model artifacts include:
+
+| Module | Model artifact / role |
+|---|---|
+| Buttons | `models/best.pt` |
+| Labels | `models/label_best.pt` |
+| Stitch ROI | `models/stitch_roi_best.pt` |
+| Stitch classification | MobileNetV2, EfficientNetB0, ViT trained `.keras` models |
+| Color imbalance | `models/color_imbalance_model.h5` |
+
+Check the model-loading paths in `backend/utils/` before running the system on a new machine. Do not commit trained weights, inspection images, credentials, or private datasets without confirming their size, ownership, and sharing permissions.
+
+## 📈 Evaluation Results
+
+The following are **previously reported module-level evaluation results**. They should **not** be interpreted as end-to-end accuracy for the complete system.
+
+| Component | Reported metric | Result |
+|---|---|---:|
+| Broken-stitch ensemble | Classification accuracy on stitch-focused test images | **98.08%** |
+| Button hybrid detector | Decision accuracy on 209 evaluation images | **90.43%** |
+| Label detector | YOLO mAP@0.50 | **88.05%** |
+| Color imbalance classifier | Classification accuracy | **91.67%** |
+
+### Overall System Accuracy
+
+**Overall integrated system accuracy: Not yet measured (N/A).** An end-to-end evaluation requires a labeled set of complete garment inspections, comparing the system’s final **PASS / FAIL** decision against the known ground truth for each garment.
+
+For reference, the **unweighted arithmetic mean of the four reported module scores is 92.06%**:
+
+```text
+(98.08 + 90.43 + 88.05 + 91.67) / 4 = 92.06%
+```
+
+> **Important:** 92.06% is a descriptive average of *different evaluation metrics*, **not validated overall system accuracy**. In particular, the label score is mAP@0.50, not classification accuracy. These component results were obtained from different evaluation sets and cannot establish the accuracy of the combined decision.
+
+To report verified overall accuracy, evaluate the complete pipeline on an independent, labeled garment test set:
+
+```text
+Overall system accuracy (%) =
+  (Number of correct final PASS/FAIL decisions / Total labeled inspections) × 100
+```
+
+End-to-end evaluation should additionally examine mixed-defect images, module failures, false positives/negatives, inspection latency, and real production conditions.
+
+## 🔒 Data Privacy
+
+The intended application workflow processes garment images temporarily and stores inspection **metadata** rather than permanently saving uploaded inspection images. Inspection history and reporting use stored session/defect records. Deployments should separately verify temporary-file cleanup, access controls, database backups, and report retention before handling sensitive factory data.
+
+## 👥 Team
+
+**Team Aurors — Rajarata University of Sri Lanka**
+
+| Team member | Registration number | Index number |
+|---|---|---|
 | M.A.I.A. Ranathunga | ICT/2022/082 | 5686 |
 | C. Ashini Kumarawadu | ICT/2022/033 | 5639 |
 | M.F.F. Fazeena | ICT/2022/024 | 5631 |
 | G.C.P.A. Hemasiri | ICT/2022/067 | 5671 |
 | I.O. Subasinghe | ICT/2022/002 | 5610 |
 
----
+**Supervisor:** Mr. E.A.C.I. Senaratne  
+**Faculty:** Faculty of Applied Sciences, Rajarata University of Sri Lanka
 
-## 📑 Table of Contents
+## 📌 Project Status and Limitations
 
-- [🎯 Problem Statement](#-problem-statement)
-- [🚀 Objectives](#-objectives)
-- [✨ Key Features](#-key-features)
-- [🏗️ System Architecture](#️-system-architecture)
-- [🔍 Detection Modules](#-detection-modules)
-- [🛠️ Technology Stack](#️-technology-stack)
-- [📁 Repository Structure](#-repository-structure)
-- [⚡ Getting Started](#-getting-started)
-- [🗄️ Database Setup](#️-database-setup)
-- [📊 Dataset](#-dataset)
-- [🧠 Model Training](#-model-training)
-- [📚 Documentation](#-documentation)
-- [📈 Non-Functional Targets](#-non-functional-targets)
-- [📄 License](#-license)
+The Flask application and four detection modules have been integrated and tested by the project team. Further independent acceptance testing and validation under production-like conditions remain important.
+
+- Performance depends on garment type, image quality, lighting, camera positioning, and dataset coverage.
+- Button geometry may be inconclusive when insufficient buttons are visible.
+- Label presence detection does not, by itself, verify printed label text or correctness.
+- Module-level metrics do not establish the accuracy of the combined PASS/FAIL decision.
+- Model weights and local database configuration are required for a complete installation.
 
 ---
-
-## 🎯 Problem Statement
-
-> 🧑‍🏭 Manual visual inspection accuracy in garment factories typically ranges between **60–75%**, leaving a large share of defects undetected.
-
-Critical defects — broken or skipped stitches, missing/misaligned buttons, absent or incorrect labels, and color imbalance — often escape detection until later production stages, increasing rework costs and damaging brand reputation. Most existing computer-vision inspection tools address only a **single** defect type and are too costly for small/medium-scale factories.
-
-This project delivers a **low-cost, integrated inspection platform** that detects all four defect categories in one system and generates structured inspection reports for operational decision-making.
-
-## 🚀 Objectives
-
-**🎯 Main Objective**
-> Develop a low-cost garment defect detection system using image processing techniques, capable of detecting broken stitches, missing buttons and button alignment defects, missing garment labels and label defects, and color imbalances — with a dashboard for result visualization and report generation.
-
-**✅ Sub-Objectives**
-
-| # | Objective |
-|:---:|---|
-| 1 | 🧵 Detect broken stitches using image processing techniques |
-| 2 | 🔘 Detect missing buttons and button alignment defects via presence, shape, and spatial-arrangement analysis |
-| 3 | 🎨 Identify color imbalance using color space analysis |
-| 4 | 🏷️ Detect missing garment labels and label defects (fading, misprinting) using region-based, texture, and color feature analysis |
-| 5 | 📊 Design and develop a dashboard for visualizing results and generating inspection reports |
-
-## ✨ Key Features
-
-- 📷 Real-time image capture (USB/industrial camera) or batch image upload
-- 🤖 Four independent AI defect-detection modules running per inspection
-- ⚖️ Rule-based decision engine aggregating module outputs into a **PASS / FAIL** result
-- 🔐 Operator authentication with PIN-based login and email-based recovery
-- 🕒 Inspection history tracking and PDF/CSV report generation
-- 🖥️ Web dashboard for operators with minimal technical background
-
-## 🏗️ System Architecture
-
-The system follows a layered, modular architecture (see SDS §2.1) built on **Scrum** (process model) and **MVC** (architectural pattern):
-
-Each detection module handles its own preprocessing (resizing, normalization, ROI extraction), so no separate shared preprocessing layer is required.
-
-## 🔍 Detection Modules
-
-| Module | Approach | Primary Technologies | Status |
-|---|---|---|---|
-| 🧵 **Broken Stitches Detection** | CNN texture analysis + Canny edge detection | ![TensorFlow](https://img.shields.io/badge/-TensorFlow-FF6F00?logo=tensorflow&logoColor=white) ![OpenCV](https://img.shields.io/badge/-OpenCV-5C3EE8?logo=opencv&logoColor=white) | 🟡 In Progress |
-| 🔘 **Missing Buttons & Alignment** | Object detection + template comparison | ![TensorFlow](https://img.shields.io/badge/-YOLO%2FSSD-FF6F00?logo=tensorflow&logoColor=white) | 🟡 In Progress |
-| 🏷️ **Missing Labels Detection** | Object detection (label presence) + OCR verification | ![YOLO11](https://img.shields.io/badge/-YOLO11-111F68?logo=ultralytics&logoColor=00FFF0) ![Tesseract](https://img.shields.io/badge/-Tesseract%20OCR-4285F4?logo=google&logoColor=white) | 🟡 In Progress |
-| 🎨 **Color Imbalance Detection** | **ResNet-based** deep classifier on LAB/HSV color space features | ![ResNet](https://img.shields.io/badge/-ResNet-EE4C2C?logo=pytorch&logoColor=white) ![OpenCV](https://img.shields.io/badge/-OpenCV-5C3EE8?logo=opencv&logoColor=white) ![NumPy](https://img.shields.io/badge/-NumPy-013243?logo=numpy&logoColor=white) | ✅ **Integrated** |
-
-> 💡 **Note on Label Detection:** The SDS specifies a CNN classifier + OCR for label detection. The implemented version uses **YOLO11** as an object detector instead of a plain classifier — this additionally localizes the label region, which makes the OCR verification step (Tesseract, run on the cropped region) significantly more accurate than running OCR on the full image.
-
-> 💡 **Note on Color Imbalance Detection:** The SDS specified a statistical LAB/HSV analysis approach. The implemented version uses a **ResNet-based deep classifier** trained on color distribution features — this achieves higher accuracy and robustness to lighting variation than pure statistical methods, while still leveraging LAB/HSV preprocessing for input normalization. The module is **fully integrated** into the Flask web dashboard and its verdict (Balanced / Imbalanced) is displayed live on the inspection result screen and stored in every inspection record.
-
-## 🛠️ Technology Stack
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
-![Keras](https://img.shields.io/badge/Keras-D00000?style=for-the-badge&logo=keras&logoColor=white)
-![ResNet](https://img.shields.io/badge/ResNet-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
-![Ultralytics](https://img.shields.io/badge/YOLO11-111F68?style=for-the-badge&logo=ultralytics&logoColor=00FFF0)
-![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
-![Tesseract](https://img.shields.io/badge/Tesseract_OCR-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-![XAMPP](https://img.shields.io/badge/XAMPP-FB7A24?style=for-the-badge&logo=xampp&logoColor=white)
-![Pandas](https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
-![GoogleColab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+**Developed by Team Aurors · Rajarata University of Sri Lanka**
+
+*Academic research and software development project for garment quality inspection.*
 
 </div>
-
-| Category | Technologies |
-|---|---|
-| 🐍 Language | Python |
-| 🧠 Deep Learning | TensorFlow / Keras, Ultralytics YOLO11, **ResNet** |
-| 👁️ Computer Vision | OpenCV, NumPy |
-| 🔤 OCR | Tesseract OCR (pytesseract) |
-| 🔄 Data Augmentation | Albumentations, TensorFlow `ImageDataGenerator` |
-| 📈 Supplementary ML | scikit-learn |
-| 🖥️ Web Framework | Flask (Jinja2 templates, Flask-Login, Flask-WTF, Flask-Mail) |
-| 🗄️ Database | **MySQL via XAMPP** (Apache + MySQL + phpMyAdmin stack) |
-| 🔗 ORM | Flask-SQLAlchemy + PyMySQL driver |
-| 📄 Reporting | pandas, ReportLab / fpdf |
-| 📧 Email | Flask-Mail (Gmail SMTP for PIN recovery) |
-| ☁️ Model Training | Google Colab (free GPU access) |
-| 🔀 Version Control | Git / GitHub |
-| 📐 Diagramming | Draw.io / Lucidchart |
-| 🎨 UI Mockups | Canva |
-
-## 📁 Repository Structure
-
-## ⚡ Getting Started
-
-### ✅ Prerequisites
-
-- 🐍 Python 3.9+
-- 📦 pip
-- 🗄️ **XAMPP** (for MySQL — see [Database Setup](#️-database-setup))
-- 🎮 (Optional) NVIDIA GPU + CUDA for local training; otherwise use Google Colab
-- 🔤 Tesseract OCR engine installed on the host system (for the label-defect module)
-
-### 📥 Installation
-
-```bash
-git clone https://github.com/<your-org>/<your-repo>.git
-cd garment_defect_system
-python -m pip install -r requirements.txt
