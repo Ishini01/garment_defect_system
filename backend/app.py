@@ -131,7 +131,7 @@ with app.app_context():
 
     db.create_all()
 
-    print("Γ£à MySQL Database tables created successfully!")
+    print("MySQL Database tables created successfully!")
 
 # ============================================
 
@@ -451,7 +451,7 @@ def register():
 
         db.session.commit()
 
-        flash('Γ£à Registration successful! Please login.', 'success')
+        flash('Registration successful! Please login.', 'success')
 
         return redirect(url_for('login'))
 
@@ -475,13 +475,13 @@ def login():
 
             login_user(user, remember=form.remember.data)
 
-            flash(f'≡ƒæï Welcome back, {user.operator_name}!', 'success')
+            flash(f'Welcome back, {user.operator_name}!', 'success')
 
             next_page = request.args.get('next')
 
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
 
-        flash('Γ¥î Invalid Operator ID or PIN.', 'danger')
+        flash('Invalid Operator ID or PIN.', 'danger')
 
     return render_template('login.html', form=form)
 
@@ -493,7 +493,7 @@ def logout():
 
     logout_user()
 
-    flash('≡ƒæï You have been logged out.', 'info')
+    flash('You have been logged out.', 'info')
 
     return redirect(url_for('login'))
 
@@ -569,7 +569,7 @@ def reset_password(token):
 
     if not operator_id:
 
-        flash('Γ¥î Invalid or expired reset link.', 'danger')
+        flash('Invalid or expired reset link.', 'danger')
 
         return redirect(url_for('forgot_password'))
 
@@ -577,7 +577,7 @@ def reset_password(token):
 
     if not user:
 
-        flash('Γ¥î User not found.', 'danger')
+        flash('User not found.', 'danger')
 
         return redirect(url_for('forgot_password'))
 
@@ -589,7 +589,7 @@ def reset_password(token):
 
         db.session.commit()
 
-        flash('Γ£à PIN reset successful! Please login.', 'success')
+        flash('PIN reset successful! Please login.', 'success')
 
         return redirect(url_for('login'))
 
@@ -1078,7 +1078,7 @@ def detect_defects():
 
         print("=" * 50)
 
-        print("≡ƒô╖ DETECTION REQUEST")
+        print("DETECTION REQUEST")
 
         print("=" * 50)
 
@@ -1319,7 +1319,7 @@ def detect_defects():
 
         db.session.commit()
 
-        print(f"≡ƒÆ╛ Inspection saved: {session_id}")
+        print(f"Inspection saved: {session_id}")
 
         # Persist defect records for both integrated detectors.
 
@@ -1394,7 +1394,7 @@ def detect_defects():
 
             # ============================================
 
-            print("≡ƒöè ALARM TRIGGERED!")
+            print("ALARM TRIGGERED!")
 
             try:
 
@@ -1402,11 +1402,11 @@ def detect_defects():
 
                 alarm.play_alarm()
 
-                print("Γ£à Server alarm played successfully")
+                print("Server alarm played successfully")
 
             except Exception as e:
 
-                print(f"Γ¥î Alarm error: {e}")
+                print(f"Alarm error: {e}")
 
                 # Try simple beep as fallback
 
@@ -1416,7 +1416,7 @@ def detect_defects():
 
                     sys.stdout.flush()
 
-                    print("≡ƒöö Terminal bell played")
+                    print("Terminal bell played")
 
                 except:
 
@@ -1438,7 +1438,7 @@ def detect_defects():
 
                     winsound.Beep(880, 400)
 
-                    print("≡ƒöö Windows beep played")
+                    print("Windows beep played")
 
             except:
 
@@ -1481,7 +1481,7 @@ def detect_defects():
 
     except Exception as e:
 
-        print(f"Γ¥î Detection error: {e}")
+        print(f"Detection error: {e}")
 
         import traceback
 
